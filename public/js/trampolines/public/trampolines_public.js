@@ -2,7 +2,8 @@ let Actions = {
     InitActions: function () {
         Carousels.trampolinesCarousel.init();
         Trampolines.init();
-        Trampolines.Events.init();
+        Trampolines.SendOrder.Events.init();
+        Trampolines.Modals.showTrampoline.Events.init();
     }
 }
 
@@ -29,11 +30,28 @@ let Trampolines = {
         /*Global init*/
     },
     chosen: [],
-    Events: {
-        init: function () {
-            $('#sendToOrder').on('click', (event) => {
-                window.location.href = '/trampolines/order/';
-            });
+    Modals: {
+        showTrampoline: {
+            element: new bootstrap.Modal('#showTrampolineModal'),
+            Events: {
+                init: function () {
+                    $('#showTrampolineModal .chooseTrampoline').on('click', (event) => {
+                        event.stopPropagation()
+                        console.log("batuto id po paspaudimo: ", Carousels.trampolinesCarousel.ChosenTrampoline)
+                        Trampolines.addToSelected(Carousels.trampolinesCarousel.ChosenTrampoline)
+                        Trampolines.Modals.showTrampoline.element.hide()
+                    })
+                }
+            }
+        }
+    },
+    SendOrder: {
+        Events:{
+            init: function () {
+                $('#sendToOrder').on('click', (event) => {
+                    window.location.href = '/trampolines/order/';
+                });
+            }
         }
     },
     addToSelected: function (TrampolineID) {
@@ -54,7 +72,7 @@ let Trampolines = {
             this.removeFromSelected($(event.currentTarget).data('trampolineid'))
         })
     },
-    getTrampolinesView : function () {
+    getTrampolinesView: function () {
         $.ajax({
             headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
@@ -73,7 +91,6 @@ let Trampolines = {
         });
     }
 }
-
 
 
 $(document).ready(function () {
