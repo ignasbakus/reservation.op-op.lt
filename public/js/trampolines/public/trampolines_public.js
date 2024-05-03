@@ -2,6 +2,7 @@ let Actions = {
     InitActions: function () {
         Carousels.trampolinesCarousel.init();
         Trampolines.init();
+        Trampolines.Events.init();
     }
 }
 
@@ -28,6 +29,13 @@ let Trampolines = {
         /*Global init*/
     },
     chosen: [],
+    Events: {
+        init: function () {
+            $('#sendToOrder').on('click', (event) => {
+                window.location.href = '/trampolines/order/';
+            });
+        }
+    },
     addToSelected: function (TrampolineID) {
         if (this.chosen.find((element) => element === TrampolineID) !== TrampolineID) {
             this.chosen.push(TrampolineID)
@@ -65,6 +73,8 @@ let Trampolines = {
         });
     }
 }
+
+
 
 $(document).ready(function () {
     console.log("/js/trampolines/public/trampolines_public.js -> ready!");

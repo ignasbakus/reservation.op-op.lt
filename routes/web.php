@@ -4,6 +4,7 @@ use App\Http\Controllers\ClientsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
 
+
 Route::controller(ClientsController::class)->group(function () {
     Route::get('/clients', 'index')->name('clients');
 });
@@ -11,6 +12,9 @@ Route::controller(ClientsController::class)->group(function () {
 Route::controller(TrampolinesController::class)->group(function () {
     Route::get('/', 'publicIndex')->name('trampolinesPublic');
     Route::prefix('trampolines')->group(function () {
+        Route::prefix('order')->group(function () {
+            Route::get('/', 'createOrderForm')->name('order');
+        });
         Route::post('public/render_selected_view', 'publicRenderSelectedTrampolines')->name('trampolinesPublicSectionA');
         //http://locahost:8000/trampolines/admin/
         Route::prefix('admin')->group(function () {

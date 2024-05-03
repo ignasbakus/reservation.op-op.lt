@@ -41,7 +41,13 @@
         <div class="col-1"></div>
         <div class="col-7">
             Jusu pasirinkti batutai
-            <ol id="SelectedTrampolines" class="list-group"></ol>
+            <ul id="SelectedTrampolines" class="list-group"></ul>
+            <div class="row mt-3 ">
+                <div class="col-8"></div>
+                <div class="col-4 text-end">
+                    <button name="sendToOrder" id="sendToOrder" type="button" class="btn btn-primary w-75">Užsakyti</button>
+                </div>
+            </div>
         </div>
     </div>
 

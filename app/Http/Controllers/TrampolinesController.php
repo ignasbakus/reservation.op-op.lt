@@ -179,4 +179,10 @@ class TrampolinesController extends Controller
     {
         return view('trampolines.private.calendar_index', []);
     }
+
+    public function createOrderForm (): \Illuminate\Contracts\View\Factory|\Illuminate\Foundation\Application|\Illuminate\Contracts\View\View|\Illuminate\Contracts\Foundation\Application
+    {
+        return view ('orders.public.order');
+    }
+
 }
