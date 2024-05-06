@@ -14,7 +14,7 @@ function initCalendar() {
         headerToolbar: {
             left: 'promptTrampoline promptNewOrder today prev,next',
             center: 'title',
-            right: 'resourceTimelineDay,resourceTimelineThreeDays,timeGridWeek,dayGridMonth,listWeek'
+            right: 'resourceTimelineDay,resourceTimelineThreeDays,resourceTimelineSevenDays,timeGridWeek,dayGridMonth,listWeek'
         },
         initialView: 'resourceTimelineDay',
         views: {
@@ -22,28 +22,15 @@ function initCalendar() {
                 type: 'resourceTimeline',
                 duration: { days: 3 },
                 buttonText: '3 days'
+            },
+            resourceTimelineSevenDays: {
+                type: 'resourceTimeline',
+                duration: { days: 7 },
+                buttonText: '7 days'
             }
         },
         resourceAreaHeaderContent: 'Batutai',
         resources: [
-            {
-                id: 'a',
-                title: 'Šiaulių padalinys',
-                children: [
-                    { id: 'a1', title: 'Tomas Tomauskas / Šaltkalvis',eventColor: 'blue' },
-                    { id: 'a2', title: 'Jonas Jonauskas / Garantinis',eventColor: 'black' },
-                    { id: 'a3', title: 'Tomas Kitas / Smulkūs darbai',eventColor: 'grey' }
-                ]
-            },
-            {
-                id: 'b',
-                title: 'Tauragės padalinys',
-                children: [
-                    { id: 'b1', title: 'Airidas Airidauskas / Šaltkalvis',eventColor: 'blue' },
-                    { id: 'b2', title: 'Gedvydas Gedvydauskas / Garantinis',eventColor: 'black' },
-                    { id: 'b3', title: 'Arvydas Arvydauskas / Smulkūs darbai',eventColor: 'grey' }
-                ]
-            },
             { id: 'c', title: 'Battuas A',eventColor: 'blue' },
             { id: 'd', title: 'Battuas B', eventColor: 'red'},
             { id: 'e', title: 'Battuas C', eventColor: 'green' },
@@ -58,7 +45,6 @@ function initCalendar() {
             { id: '6', resourceId: 'd', start: '2023-01-07T06:00:00', end: '2023-01-07T11:30:00', title: 'JJK222 | MAN LARGE | UAB Ratukas' },
             { id: '7', resourceId: 'e', start: '2023-01-07T06:30:00', end: '2023-01-07T10:30:00', title: 'JJK222 | MAN LARGE | UAB Ratukas' },
             { id: '8', resourceId: 'f', start: '2023-01-07T10:30:00', end: '2023-01-07T14:30:00', title: 'JJK222 | MAN LARGE | UAB Ratukas' }
-
         ],
         select: function(arg) {
             console.log(

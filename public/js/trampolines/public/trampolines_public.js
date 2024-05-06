@@ -27,7 +27,6 @@ let Carousels = {
 
 let Trampolines = {
     init: function () {
-        /*Global init*/
     },
     chosen: [],
     Modals: {
@@ -49,7 +48,15 @@ let Trampolines = {
         Events:{
             init: function () {
                 $('#sendToOrder').on('click', (event) => {
-                    window.location.href = '/trampolines/order/';
+                    let dynamicURL = '/trampolines/order/?';
+                    Trampolines.chosen.forEach((trampolineID, index) => {
+                        dynamicURL += 'trampolineid[' + index + ']=' + trampolineID;
+
+                        if (index !== Trampolines.chosen.length - 1) {
+                            dynamicURL += '&';
+                        }
+                    })
+                    window.location.href = dynamicURL;
                 });
             }
         }

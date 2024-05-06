@@ -80,9 +80,9 @@
     </div>
 </nav-->
 
-<div class="container" style="border: 1px solid grey">
+{{--<div class="container" style="border: 1px solid grey">--}}
     @yield('content')
-</div>
+{{--</div>--}}
 
 <nav class="navbar fixed-bottom bg-body-tertiary">
     <div class="container-fluid">

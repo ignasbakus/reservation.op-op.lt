@@ -243,7 +243,10 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Batuto nuotraukos</p>
+                    <div class="mb-3">
+                        <label for="formFileMultiple" class="form-label">Įkelkite nuotraukas</label>
+                        <input class="form-control" type="file" id="formFileMultiple" multiple>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Uždaryti</button>

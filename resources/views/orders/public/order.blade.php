@@ -2,9 +2,9 @@
 
 @section('content')
     <div class="row">
-        <div class="col-5">
+        <div class="col-4 ms-5">
             <h2>Užsakymo Forma</h2>
-            <form>
+            <form id="orderForm">
                 <div class="row">
                     <div class="form-group col-6">
                         <label for="firstName">Vardas:</label>
@@ -38,61 +38,42 @@
                 </div>
                 <div class="form-group mt-3">
                     <label for="deliveryAddress">Pristatymo Adresas:</label>
-                    <input class="form-control" id="deliveryAddress" rows="3"
-                           placeholder="Įveskite pristatymo adresą" required></input>
+                    <input class="form-control" id="deliveryAddress" placeholder="Įveskite pristatymo adresą" required></input>
                 </div>
-                <button type="submit" class="btn btn-primary mt-3">Siųsti</button>
+                <div class="row">
+                    <div class="col-2">
+                        <button type="submit" class="btn btn-primary mt-3">Siųsti</button>
+                    </div>
+                    <div class="col-6"></div>
+                    <div class="col-4">
+                        <div class="form-check mt-3">
+                            <input class="form-check-input orderSameDay" type="checkbox" value="" id="flexCheckChecked" checked>
+                            <label class="form-check-label" for="flexCheckChecked">
+                                Batutus uzsakyti ta pacia diena
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </form>
         </div>
-        <div class="col-1"></div>
-{{--        <div class="col-4">--}}
-{{--            <div id="myCarousel" class="carousel slide" data-ride="carousel">--}}
-{{--                <div class="carousel-inner">--}}
-{{--                    <div class="carousel-item active">--}}
-{{--                        <div class="card">--}}
-{{--                            <img class="card-img-top" src="https://5.imimg.com/data5/SELLER/Default/2023/6/316404293/SS/QV/DR/144487269/inflatable-bouncy-castle.jpg" alt="Card image cap">--}}
-{{--                            <div class="card-body">--}}
-{{--                                <h5 class="card-title">First Card Title</h5>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="carousel-item">--}}
-{{--                        <div class="card">--}}
-{{--                            <img class="card-img-top" src="https://m.media-amazon.com/images/I/711Hnk9Va5L.jpg" alt="Card image cap">--}}
-{{--                            <div class="card-body">--}}
-{{--                                <h5 class="card-title">Second Card Title</h5>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                    <div class="carousel-item">--}}
-{{--                        <div class="card">--}}
-{{--                            <img class="card-img-top" src="https://backyardbounce.ca/cdn/shop/products/image000004.jpg?v=1678810396" alt="Card image cap">--}}
-{{--                            <div class="card-body">--}}
-{{--                                <h5 class="card-title">Third Card Title</h5>--}}
-{{--                            </div>--}}
-{{--                        </div>--}}
-{{--                    </div>--}}
-{{--                </div>--}}
-{{--                <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">--}}
-{{--                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>--}}
-{{--                    <span class="visually-hidden">Previous</span>--}}
-{{--                </button>--}}
-{{--                <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">--}}
-{{--                    <span class="carousel-control-next-icon" aria-hidden="true"></span>--}}
-{{--                    <span class="visually-hidden">Next</span>--}}
-{{--                </button>--}}
-{{--            </div>--}}
-{{--        </div>--}}
+        <div class="col-2"></div>
+        <div class="col-5">
+            <select class="form-select showTrampolineSelect" aria-label="Default select example" style="display: none">
+                <option selected>Open this select menu</option>
+                <option value="1">Batutas drambliukas</option>
+                <option value="2">Batutas kiskutis</option>
+                <option value="3">Batutas peliukas</option>
+            </select>
+            <div id="calendar"></div>
+        </div>
+    </div>
+    <div class="row">
         <div class="col-6">
-            <div id="calendar" class="container">
-                <h2>Kalendorius</h2>
-                <!-- Placeholder for Calendar -->
-                <!-- You can integrate your calendar here -->
-            </div>
         </div>
     </div>
 @endsection
 
 @section('custom_js')
+    <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
     <script src="/js/trampolines/public/order_public.js"></script>
 @endsection
