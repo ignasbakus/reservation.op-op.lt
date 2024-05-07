@@ -10,20 +10,28 @@ Route::controller(ClientsController::class)->group(function () {
     Route::get('/clients', 'index')->name('clients');
 });
 
-//Route::controller(OrderController::class)->group(function () {
-//    Route::get('/', 'createOrderForm')->name('orderPublic');
-//    Route::prefix('public-order')->group(function () {
-//        Route::prefix('send-order')->group(function () {
-//            Route::post('/', 'orderSend');
-//        });
-//    });
-//});
-
-Route::controller(OrderController::class)->group(function () {
-    Route::get('/', 'createOrderForm')->name('orderPublic');
-    Route::prefix('public-order')->group(function () {
-        Route::get('/', 'createOrderForm'); // Route for the createOrderForm action
-        Route::post('orderSend', 'orderSend')->name('sendOrder'); // Route for the orderSend action
+Route::controller(OrderController::class)->prefix('orders')->group(function () {
+    /*For admin usage (authenticated user)*/
+    Route::prefix('admin')->group(function () {
+        Route::get('/', 'adminGetIndex'); //http://locahost:8000/orders/admin
+        Route::prefix('order')->group(function () {
+            //http://locahost:8000/orders/admin/order [CRUD]
+            Route::get('/', 'orderGet');
+            Route::post('/', 'orderInsert');
+            Route::put('/', 'orderUpdate');
+            Route::delete('/', 'orderDelete');
+        });
+    });
+    /*For customer usage (no authentication)*/
+    Route::prefix('public')->group(function () {
+        Route::get('/', 'publicGetIndex'); //http://locahost:8000/orders/public
+        Route::prefix('order')->group(function () {
+            //http://locahost:8000/orders/public/order [CRUD]
+            Route::get('/', 'orderGet');
+            Route::post('/', 'orderInsert');
+            Route::put('/', 'orderUpdate');
+            Route::delete('/', 'orderDelete');
+        });
     });
 });
 

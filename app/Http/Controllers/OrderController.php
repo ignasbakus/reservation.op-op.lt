@@ -11,13 +11,23 @@ use Illuminate\Support\Facades\Log;
 
 class OrderController extends Controller
 {
-    public function createOrderForm(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    public function adminGetIndex()
+    {
+
+    }
+
+    public function publicGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
         Log::info(json_encode(\request()->all()));
         return view ('orders.public.order');
     }
 
-    public function orderSend(Request $request): JsonResponse
+    public function orderGet()
+    {
+
+    }
+
+    public function orderInsert(Request $request): JsonResponse
     {
         $formData = $request->only([
             'customerName',

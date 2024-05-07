@@ -46,29 +46,21 @@
             events: [
             ],
             eventAllow: function(dropInfo, draggedEvent) {
-                console.log('dropInfo => ',dropInfo);
-                console.log('draggedEvent => ',draggedEvent);
-                console.log('draggedEvent dropInfo.start => ',dropInfo.start)
-                console.log('draggedEvent dropInfo.end => ',dropInfo.end)
                 let CouldBeDropped = true;
-                Occupied.forEach(function (Occupation){
-                    let OccupationStart = new Date(Occupation.start)
-                    let OccupationEnd = new Date(Occupation.end)
-                    let dropStart = new Date(dropInfo.start)
-                    let dropEnd = new Date(dropInfo.end)
-                    if (dropStart >= OccupationStart && dropEnd <= OccupationEnd) {
-                        console.log('Occupied !');
-                        CouldBeDropped = false
-                    } else {
-                        console.log('Available !');
+                let dropStart = new Date(dropInfo.start);
+                let dropEnd = new Date(dropInfo.end);
+
+                Occupied.forEach(function (Occupation) {
+                    let OccupationStart = new Date(Occupation.start);
+                    let OccupationEnd = new Date(Occupation.end);
+
+                    if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
+                        console.log('Occupied!');
+                        CouldBeDropped = false;
+                        return false;
                     }
-                    /*if (dropStart >= OccupationStart || OccupationStart <= OccupationEnd) {
-                        console.log('Occupied !');
-                        CouldBeDropped = false
-                    } else {
-                        console.log('Available !');
-                    }*/
-                })
+                });
+
                 return CouldBeDropped;
             }
         });
@@ -126,25 +118,11 @@
                     $.ajax({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         method: "POST",
-                        url: "/public-order/orderSend",
+                        url: "/orders/public/order",
                         data: Variables.getOrderFormInputs()
                     }).done((response) => {
                         console.log("response : ", response);
                         console.log(Variables.getOrderFormInputs())
-                        // if (response.status === false) {
-                        //
-                        //     $('#createTrampolineModal form input').removeClass('is-invalid');
-                        //
-                        //     Object.keys(response.failed_input).forEach(function (FailedInput) {
-                        //         $('#createTrampolineModal form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
-                        //         $('#createTrampolineModal form input[name=' + FailedInput + ']').addClass('is-invalid');
-                        //     })
-                        // }
-                        // if (response.status) {
-                        //     $('#createTrampolineModal form input[type=text], #createTrampolineModal form input[type=number], #createTrampolineModal form textarea').val('');
-                        //     $('#createTrampolineModal form input').removeClass('is-invalid');
-                        //     Trampolines.Modals.addTrampoline.element.hide();
-                        // }
                     })
                 }
             }
