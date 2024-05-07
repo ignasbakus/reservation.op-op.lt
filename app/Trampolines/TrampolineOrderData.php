@@ -31,7 +31,13 @@ class TrampolineOrderData
         $this->Address = request()->get('customerDeliveryAddress','');
 
         //Trampolines -> [{id:xxx,rent_start:YYYY-MM-DD,rent_end:YYYY-MM-DD}]
-        $this->Trampolines = [(object)['id' => 1]];
+        $this->Trampolines = [
+            (object)[
+                'id' => 1,
+                'rental_start' => '2024-05-02 00:00:00',
+                'rental_end' => '2024-05-09 00:00:00'
+            ]
+        ];
     }
 
 

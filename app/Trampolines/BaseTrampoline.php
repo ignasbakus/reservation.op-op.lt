@@ -111,13 +111,16 @@ class BaseTrampoline implements Trampoline
         ]);
 
         foreach ($trampolineOrderData->Trampolines as $trampoline) {
+            $RentalStart = Carbon::parse($trampoline->rental_start);
+            $RentalDuration = $RentalStart->diffInDays(Carbon::parse($trampoline->rental_end));
+            $Trampoline = \App\Models\Trampoline::find($trampoline->id);
             OrdersTrampoline::create([
                 'orders_id' => $NewOrder->id,
                 'trampolines_id' => $trampoline->id,
                 'rental_start' => Carbon::now()->format('Y-m-d H:i:s'),
                 'rental_end' => Carbon::now()->format('Y-m-d H:i:s'),
-                'rental_duration' => 5,
-                'total_sum' => 0,
+                'rental_duration' => $RentalDuration,
+                'total_sum' => $RentalDuration * $Trampoline->price,
             ]);
         }
 
