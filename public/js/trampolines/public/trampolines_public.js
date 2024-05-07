@@ -48,15 +48,7 @@ let Trampolines = {
         Events:{
             init: function () {
                 $('#sendToOrder').on('click', (event) => {
-                    let dynamicURL = '/trampolines/order/?';
-                    Trampolines.chosen.forEach((trampolineID, index) => {
-                        dynamicURL += 'trampolineid[' + index + ']=' + trampolineID;
-
-                        if (index !== Trampolines.chosen.length - 1) {
-                            dynamicURL += '&';
-                        }
-                    })
-                    window.location.href = dynamicURL;
+                    window.location.href = '/orders/public?'+$.param({trampoline_id:Trampolines.chosen});
                 });
             }
         }
