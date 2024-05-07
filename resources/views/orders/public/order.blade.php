@@ -2,47 +2,45 @@
 
 @section('content')
     <div class="row">
-        <div class="col-4 ms-5">
+        <div id="sendOrderColumn" class="col-4 ms-5">
             <h2>Užsakymo Forma</h2>
             <form id="orderForm">
                 <div class="row">
                     <div class="form-group col-6">
-                        <label for="firstName">Vardas:</label>
-                        <input type="text" class="form-control" id="firstName" placeholder="Įveskite vardą" required>
+                        <label for="customerName">Vardas:</label>
+                        <input name="customerName" type="text" class="form-control" id="customerName" placeholder="Įveskite vardą">
                     </div>
                     <div class="form-group col-6">
-                        <label for="lastName">Pavardė:</label>
-                        <input type="text" class="form-control" id="lastName" placeholder="Įveskite pavardę" required>
+                        <label for="customerSurname">Pavardė:</label>
+                        <input name="customerSurname" type="text" class="form-control" id="customerSurname" placeholder="Įveskite pavardę">
                     </div>
                 </div>
                 <div class="form-group mt-3">
-                    <label for="phoneNumber">Telefono Numeris:</label>
-                    <input type="tel" class="form-control" id="phoneNumber" placeholder="Įveskite telefono numerį"
-                           required>
+                    <label for="customerPhoneNumber">Telefono Numeris:</label>
+                    <input name="customerPhoneNumber" type="tel" class="form-control" id="customerPhoneNumber" placeholder="Įveskite telefono numerį">
                 </div>
                 <div class="form-group mt-3">
-                    <label for="email">El. Paštas:</label>
-                    <input type="email" class="form-control" id="email" placeholder="Įveskite el. paštą" required>
+                    <label for="customerEmail">El. Paštas:</label>
+                    <input name="customerEmail" type="email" class="form-control" id="customerEmail" placeholder="Įveskite el. paštą">
                 </div>
                 <div class="row mt-3">
                     <div class="form-group col-6">
-                        <label for="deliveryCity">Pristatymo Miestas:</label>
-                        <input type="text" class="form-control" id="deliveryCity"
-                               placeholder="Įveskite pristatymo miestą" required>
+                        <label for="customerDeliveryCity">Pristatymo Miestas:</label>
+                        <input name="customerDeliveryCity" type="text" class="form-control" id="customerDeliveryCity"
+                               placeholder="Įveskite pristatymo miestą">
                     </div>
                     <div class="form-group col-6">
-                        <label for="postCode">Pašto Kodas:</label>
-                        <input type="text" class="form-control" id="postCode" placeholder="Įveskite pašto kodą"
-                               required>
+                        <label for="customerDeliveryPostCode">Pašto Kodas:</label>
+                        <input name="customerDeliveryPostCode" type="text" class="form-control" id="customerDeliveryPostCode" placeholder="Įveskite pašto kodą">
                     </div>
                 </div>
                 <div class="form-group mt-3">
-                    <label for="deliveryAddress">Pristatymo Adresas:</label>
-                    <input class="form-control" id="deliveryAddress" placeholder="Įveskite pristatymo adresą" required></input>
+                    <label for="customerDeliveryAddress">Pristatymo Adresas:</label>
+                    <input name="customerDeliveryAddress" class="form-control" id="customerDeliveryAddress" placeholder="Įveskite pristatymo adresą"></input>
                 </div>
                 <div class="row">
                     <div class="col-2">
-                        <button type="submit" class="btn btn-primary mt-3">Siųsti</button>
+                        <button class="btn btn-primary mt-3 createOrder">Siųsti</button>
                     </div>
                     <div class="col-6"></div>
                     <div class="col-4">
@@ -75,5 +73,5 @@
 
 @section('custom_js')
     <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
-    <script src="/js/trampolines/public/order_public.js"></script>
+    <script src="/js/orders/public/order_public.js"></script>
 @endsection
