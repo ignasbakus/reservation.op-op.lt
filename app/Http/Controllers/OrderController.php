@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Trampoline;
 use App\Trampolines\BaseTrampoline;
+use App\Trampolines\OccupationTimeFrames;
 use App\Trampolines\TrampolineOrderData;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -20,8 +23,34 @@ class OrderController extends Controller
 
     public function publicGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-        Log::info(json_encode(\request()->all()));
-        return view ('orders.public.order');
+        $Trampolines = (new Trampoline())->newQuery()->whereIn('id',\request()->get('trampoline_id',[]))->get();
+        if (count($Trampolines) > 1) {
+            $OrderEventName = 'Batutai ';
+        } else {
+            $OrderEventName = 'Batutas ';
+        }
+        foreach ($Trampolines as $trampoline) {
+            $OrderEventName .= $trampoline->title.'/';
+        }
+        return view ('orders.public.order',[
+            'Events' => [
+                (object)[
+                    'id' => 123,
+                    'title' => $OrderEventName,
+                    'start' => '2024-05-26', //@todo FIND THE FREE START DAY THROUGH OCCUPATION
+                    'end' => '2024-05-29', //@todo FIND THE FREE END DAY THROUGH OCCUPATION
+                ]
+            ],
+            'Occupied' => (new BaseTrampoline())->getOccupation(
+                $Trampolines,
+                OccupationTimeFrames::MONTH,
+                true
+            ),
+            'Trampolines' => $Trampolines,
+            'Dates' => (object)[
+                'CalendarInitial'=>Carbon::now()->format('Y-m-d')
+            ]
+        ]);
     }
 
     public function orderGet()

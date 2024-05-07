@@ -7,60 +7,32 @@
             this.orderFormInput.forEach(function (inputName) {
                 values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
             });
+            values.trampolines = Trampolines
             return values;
         }
     }
-
     let Calendar = null;
-    let Occupied = [
-        {
-            id : 1,
-            title: "Uzimta",
-            start: '2024-05-01 00:00:00',
-            end: '2024-05-11 00:00:00',
-            type_custom: 'occ'
-        },
-        {
-            id : 2,
-            title: 'Uzimta',
-            start: '2024-05-14 00:00:00',
-            end: '2024-05-17 00:00:00',
-            type_custom: 'occ'
-        },
-        {
-            id : 3,
-            title: 'Uzimta',
-            start: '2024-05-26 00:00:00',
-            end: '2024-05-31 00:00:00',
-            type_custom: 'occ'
-        },
-    ];
-
     document.addEventListener('DOMContentLoaded', function() {
         Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-            initialDate: '2024-05-06',
+            initialDate: Dates.CalendarInitial,
             editable: true,
             selectable: true,
             // businessHours: true,
             dayMaxEvents: true,
-            events: [
-            ],
+            events: [],
             eventAllow: function(dropInfo, draggedEvent) {
                 let CouldBeDropped = true;
                 let dropStart = new Date(dropInfo.start);
                 let dropEnd = new Date(dropInfo.end);
-
                 Occupied.forEach(function (Occupation) {
                     let OccupationStart = new Date(Occupation.start);
                     let OccupationEnd = new Date(Occupation.end);
-
                     if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
                         console.log('Occupied!');
                         CouldBeDropped = false;
                         return false;
                     }
                 });
-
                 return CouldBeDropped;
             }
         });
@@ -68,29 +40,19 @@
         addOccupied()
         addEvent()
     })
-
     function addOccupied () {
         Occupied.forEach(function (Occupation){
-            Occupation.title = 'Užimta'
-            Occupation.backgroundColor = 'red'
             if (Occupation.type_custom === 'occ') {
                 Occupation.editable = false
             }
             Calendar.addEvent(Occupation)
         })
     }
-
     function addEvent () {
-        Calendar.addEvent(
-            {
-                id: 123,
-                title: 'Batutas kiskutis',
-                start: '2024-05-19',
-                end: '2024-05-19',
-            }
-        )
+        Events.forEach(function (Event){
+            Calendar.addEvent(Event)
+        });
     }
-
     let TrampolineOrder = {
         init: function () {
             this.FormSendOrder.Event.init()
@@ -128,7 +90,6 @@
             }
         }
     }
-
     $(document).ready(function () {
         console.log("/js/trampolines/public/order_public.js -> ready!");
         TrampolineOrder.init()

@@ -3,7 +3,9 @@
 namespace App\Interfaces;
 
 use App\Trampolines\BaseTrampolineData;
+use App\Trampolines\OccupationTimeFrames;
 use App\Trampolines\TrampolineOrderData;
+use Illuminate\Database\Eloquent\Collection;
 
 interface Trampoline
 {
@@ -22,4 +24,6 @@ interface Trampoline
     public function makeRentable();
 
     public function onHold();
+
+    public function getOccupation(Collection $Trampolines,OccupationTimeFrames $TimeFrame, $FullCalendarFormat = false);
 }

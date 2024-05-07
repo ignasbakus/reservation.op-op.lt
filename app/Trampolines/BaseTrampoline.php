@@ -16,7 +16,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class BaseTrampoline implements Trampoline
 {
-
     public function register(BaseTrampolineData $TrampolineData): void
     {
         $Trampoline = \App\Models\Trampoline::create([
@@ -140,5 +139,49 @@ class BaseTrampoline implements Trampoline
     public function onHold()
     {
         // TODO: Implement onHold() method.
+    }
+
+    public function getOccupation(Collection $Trampolines,OccupationTimeFrames $TimeFrame, $FullCalendarFormat = false): array
+    {
+        switch ($TimeFrame) {
+            case OccupationTimeFrames::WEEK :
+                $GetOccupationFrom = Carbon::now()->startOfWeek()->format('Y-m-d');
+                $GetOccupationTill = Carbon::now()->endOfWeek()->format('Y-m-d');
+                break;
+            case OccupationTimeFrames::MONTH :
+                $GetOccupationFrom = Carbon::now()->startOfMonth()->format('Y-m-d');
+                $GetOccupationTill = Carbon::now()->endOfMonth()->format('Y-m-d');
+                break;
+        }
+        /*Make occupation object for $trampoline for current : week, month [$GetOccupationFrom <> $GetOccupationTill] */
+        /*foreach ($Trampolines as $trampoline) {
+        }*/
+        /*Occupation array for $Trampolines in $FullCalendarFormat format*/
+        return [
+            (object)[
+                'id' => 1,
+                'title' => "Užimta",
+                'start' => '2024-05-01 00:00:00',
+                'end' => '2024-05-11 00:00:00',
+                'backgroundColor' => 'red',
+                'type_custom' => 'occ'
+            ],
+            (object)[
+                'id' => 2,
+                'title' => "Užimta",
+                'start' => '2024-05-14 00:00:00',
+                'end' => '2024-05-16 00:00:00',
+                'backgroundColor' => 'red',
+                'type_custom' => 'occ'
+            ],
+            (object)[
+                'id' => 3,
+                'title' => "Užimta",
+                'start' => '2024-05-21 00:00:00',
+                'end' => '2024-05-25 00:00:00',
+                'backgroundColor' => 'red',
+                'type_custom' => 'occ'
+            ],
+        ];
     }
 }

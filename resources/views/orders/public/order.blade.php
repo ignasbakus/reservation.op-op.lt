@@ -57,21 +57,26 @@
         <div class="col-2"></div>
         <div class="col-5">
             <select class="form-select showTrampolineSelect" aria-label="Default select example" style="display: none">
-                <option selected>Open this select menu</option>
-                <option value="1">Batutas drambliukas</option>
-                <option value="2">Batutas kiskutis</option>
-                <option value="3">Batutas peliukas</option>
+                <option selected>Pasirinkite batutą ...</option>
+                @foreach($Trampolines as $Trampoline)
+                    <option value="{{$Trampoline->id}}">{{$Trampoline->title}} / {{$Trampoline->description}}</option>
+                @endforeach
             </select>
             <div id="calendar"></div>
         </div>
     </div>
     <div class="row">
-        <div class="col-6">
-        </div>
+        <div class="col-6"></div>
     </div>
 @endsection
 
 @section('custom_js')
+    <script>
+        let Trampolines = {{ Illuminate\Support\Js::from($Trampolines) }};
+        let Occupied = {{ Illuminate\Support\Js::from($Occupied) }};
+        let Dates = {{ Illuminate\Support\Js::from($Dates) }};
+        let Events = {{ Illuminate\Support\Js::from($Events) }};
+    </script>
     <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
     <script src="/js/orders/public/order_public.js"></script>
 @endsection
