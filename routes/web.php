@@ -5,7 +5,6 @@ use App\Http\Controllers\OrderController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
 
-
 Route::controller(ClientsController::class)->group(function () {
     Route::get('/clients', 'index')->name('clients');
 });
@@ -39,7 +38,7 @@ Route::controller(TrampolinesController::class)->group(function () {
     Route::get('/', 'publicIndex')->name('trampolinesPublic');
     Route::prefix('trampolines')->group(function () {
         Route::post('public/render_selected_view', 'publicRenderSelectedTrampolines')->name('trampolinesPublicSectionA');
-        //http://locahost:8000/trampolines/admin/
+        //http://localhost:8000/trampolines/admin/
         Route::prefix('admin')->group(function () {
             Route::get('/', 'privateIndex')->name('adminIndex');
             /*http://locahost:8000/trampolines/admin/trampoline [GET/POST/PUT/DELETE]*/

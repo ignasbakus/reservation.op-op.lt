@@ -7,6 +7,12 @@
             this.orderFormInput.forEach(function (inputName) {
                 values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
             });
+            /*Get params from Calendar about event start<>end date*/
+            /*For now added in static way*/
+            Trampolines.forEach(function (Trampoline){
+                Trampoline.rental_start = Events[0].start;
+                Trampoline.rental_end = Events[0].end;
+            })
             values.trampolines = Trampolines
             return values;
         }

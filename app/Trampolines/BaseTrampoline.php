@@ -13,6 +13,7 @@ use Faker\Provider\Base;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class BaseTrampoline implements Trampoline
 {
@@ -91,16 +92,25 @@ class BaseTrampoline implements Trampoline
             ]
         );
 
-        $ClientAddress = ClientAddress::create([
-            'clients_id' => $Client->id,
-            'address_street' => $trampolineOrderData->Address,
-            'address_town'  => $trampolineOrderData->City,
-            'address_postcode'  => $trampolineOrderData->PostCode,
-            'address_country'  => ''
-        ]);
+        $ClientAddress = ClientAddress::updateOrCreate(
+            [
+                'clients_id' => $Client->id,
+                'address_street' => $trampolineOrderData->Address,
+                'address_town'  => $trampolineOrderData->City,
+                'address_postcode'  => $trampolineOrderData->PostCode,
+                'address_country'  => ''
+            ],
+            [
+                'clients_id' => $Client->id,
+                'address_street' => $trampolineOrderData->Address,
+                'address_town'  => $trampolineOrderData->City,
+                'address_postcode'  => $trampolineOrderData->PostCode,
+                'address_country'  => ''
+            ]
+        );
 
         $NewOrder = Order::create([
-            'order_number'  => '',
+            'order_number'  => Str::uuid(),
             'order_date' => Carbon::now()->format('Y-m-d H:i:s'),
             'rental_duration'  => 5,
             'delivery_address_id' => $ClientAddress->id,
@@ -109,19 +119,27 @@ class BaseTrampoline implements Trampoline
             'client_id' => $Client->id
         ]);
 
+        $OrderTotalSum = 0;
+        $OrderRentalDuration = 0;
         foreach ($trampolineOrderData->Trampolines as $trampoline) {
-            $RentalStart = Carbon::parse($trampoline->rental_start);
-            $RentalDuration = $RentalStart->diffInDays(Carbon::parse($trampoline->rental_end));
-            $Trampoline = \App\Models\Trampoline::find($trampoline->id);
+            $RentalStart = Carbon::parse($trampoline['rental_start']);
+            $RentalDuration = $RentalStart->diffInDays(Carbon::parse($trampoline['rental_end']));
+            $Trampoline = \App\Models\Trampoline::with('Parameter')->find($trampoline['id']);
             OrdersTrampoline::create([
                 'orders_id' => $NewOrder->id,
-                'trampolines_id' => $trampoline->id,
-                'rental_start' => Carbon::now()->format('Y-m-d H:i:s'),
-                'rental_end' => Carbon::now()->format('Y-m-d H:i:s'),
+                'trampolines_id' => $Trampoline->id,
+                'rental_start' => Carbon::parse($trampoline['rental_start'])->format('Y-m-d H:i:s'),
+                'rental_end' => Carbon::parse($trampoline['rental_end'])->format('Y-m-d H:i:s'),
                 'rental_duration' => $RentalDuration,
-                'total_sum' => $RentalDuration * $Trampoline->price,
+                'total_sum' => $RentalDuration * $Trampoline->Parameter->price,
             ]);
+            $OrderTotalSum += $RentalDuration * $Trampoline->Parameter->price;
+            $OrderRentalDuration = $RentalDuration;
         }
+        $NewOrder->update([
+            'total_sum' => $OrderTotalSum,
+            'rental_duration' => $OrderRentalDuration /*Not in every case would be true - needs develop*/
+        ]);
 
         return $this;
     }
