@@ -9,9 +9,10 @@
             });
             /*Get params from Calendar about event start<>end date*/
             /*For now added in static way*/
+            // @todo Ideti drop starta ir drop enda. Kolkas neveikia
             Trampolines.forEach(function (Trampoline){
-                Trampoline.rental_start = Events[0].start;
-                Trampoline.rental_end = Events[0].end;
+                Trampoline.rental_start = Calendar.dropStart;
+                Trampoline.rental_end = Calendar.dropEnd;
             })
             values.trampolines = Trampolines
             return values;
@@ -39,6 +40,8 @@
                         return false;
                     }
                 });
+                Calendar.dropStart = dropStart;
+                Calendar.dropEnd = dropEnd;
                 return CouldBeDropped;
             }
         });

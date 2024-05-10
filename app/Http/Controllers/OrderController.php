@@ -32,22 +32,49 @@ class OrderController extends Controller
         foreach ($Trampolines as $trampoline) {
             $OrderEventName .= $trampoline->title.'/';
         }
+
+
+        //@todo Paziureti ar sitas yra logiskas (iki $endDate)
+        $availability = (new BaseTrampoline())->getOccupation(
+            $Trampolines,
+            OccupationTimeFrames::MONTH,
+            true
+        );
+
+        Log::info('Availability: ' . json_encode($availability));
+
+        $startDate = null;
+        foreach ($availability as $occupiedSlot) {
+            if ($occupiedSlot->start > Carbon::now()) {
+                $startDate = $occupiedSlot->start;
+                break;
+            }
+        }
+
+        $endDate = $startDate ? Carbon::parse($startDate)->addDays(1)->format('Y-m-d') : null;
+
+        if ($startDate && $endDate) {
+            Log::info('Start Date: ' . $startDate->toDateString());
+            Log::info('End Date: ' . $endDate->toDateString());
+        } else {
+            Log::info('Start Date or End Date is null.');
+        }
+
+
         return view ('orders.public.order',[
             'Events' => [
                 (object)[
                     'id' => 123,
                     'title' => $OrderEventName,
                     'start' => '2024-05-26', //@todo FIND THE FREE START DAY THROUGH OCCUPATION
-                    'end' => '2024-05-29', //@todo FIND THE FREE END DAY THROUGH OCCUPATION
+                    'end' => '2024-05-27', //@todo FIND THE FREE END DAY THROUGH OCCUPATION
                 ]
             ],
-            'Occupied' => (new BaseTrampoline())->getOccupation(
-                $Trampolines,
-                OccupationTimeFrames::MONTH,
-                true
-            ),
+            'Occupied' => $availability,
             'Trampolines' => $Trampolines,
             'Dates' => (object)[
+                'start' => $startDate,
+                'end' => $endDate,
                 'CalendarInitial'=>Carbon::now()->format('Y-m-d')
             ]
         ]);

@@ -161,6 +161,8 @@ class BaseTrampoline implements Trampoline
 
     public function getOccupation(Collection $Trampolines,OccupationTimeFrames $TimeFrame, $FullCalendarFormat = false): array
     {
+        $occupiedDates = [];
+
         switch ($TimeFrame) {
             case OccupationTimeFrames::WEEK :
                 $GetOccupationFrom = Carbon::now()->startOfWeek()->format('Y-m-d');
@@ -174,32 +176,53 @@ class BaseTrampoline implements Trampoline
         /*Make occupation object for $trampoline for current : week, month [$GetOccupationFrom <> $GetOccupationTill] */
         /*foreach ($Trampolines as $trampoline) {
         }*/
+
+        foreach ($Trampolines as $trampoline){
+            $occupiedDatesForTrampoline = OrdersTrampoline::where('trampolines_id', $trampoline->id)
+                ->whereBetween('rental_start', [$GetOccupationFrom, $GetOccupationTill])
+                ->get();
+
+            foreach ($occupiedDatesForTrampoline as $orderTrampoline){
+                $occupiedDates[] = (object)[
+                    'id' => $orderTrampoline->id,
+                    'title' => "Užimta",
+                    'start' => $orderTrampoline->rental_start,
+                    'end' => $orderTrampoline->rental_end,
+                    'backgroundColor' => 'red',
+                    'type_custom' => 'occ'
+                ];
+            }
+        }
+
         /*Occupation array for $Trampolines in $FullCalendarFormat format*/
-        return [
-            (object)[
-                'id' => 1,
-                'title' => "Užimta",
-                'start' => '2024-05-01 00:00:00',
-                'end' => '2024-05-11 00:00:00',
-                'backgroundColor' => 'red',
-                'type_custom' => 'occ'
-            ],
-            (object)[
-                'id' => 2,
-                'title' => "Užimta",
-                'start' => '2024-05-14 00:00:00',
-                'end' => '2024-05-16 00:00:00',
-                'backgroundColor' => 'red',
-                'type_custom' => 'occ'
-            ],
-            (object)[
-                'id' => 3,
-                'title' => "Užimta",
-                'start' => '2024-05-21 00:00:00',
-                'end' => '2024-05-25 00:00:00',
-                'backgroundColor' => 'red',
-                'type_custom' => 'occ'
-            ],
-        ];
+//        return [
+//            (object)[
+//                'id' => 1,
+//                'title' => "Užimta",
+//                'start' => '2024-05-01 00:00:00',
+//                'end' => '2024-05-11 00:00:00',
+//                'backgroundColor' => 'red',
+//                'type_custom' => 'occ'
+//            ],
+//            (object)[
+//                'id' => 2,
+//                'title' => "Užimta",
+//                'start' => '2024-05-14 00:00:00',
+//                'end' => '2024-05-16 00:00:00',
+//                'backgroundColor' => 'red',
+//                'type_custom' => 'occ'
+//            ],
+//            (object)[
+//                'id' => 3,
+//                'title' => "Užimta",
+//                'start' => '2024-05-21 00:00:00',
+//                'end' => '2024-05-25 00:00:00',
+//                'backgroundColor' => 'red',
+//                'type_custom' => 'occ'
+//            ],
+//        ];
+        return $occupiedDates;
     }
+
+
 }
