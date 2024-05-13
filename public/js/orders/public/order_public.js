@@ -7,13 +7,6 @@
             this.orderFormInput.forEach(function (inputName) {
                 values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
             });
-            /*Get params from Calendar about event start<>end date*/
-            /*For now added in static way*/
-            // @todo Ideti drop starta ir drop enda. Kolkas neveikia
-            Trampolines.forEach(function (Trampoline){
-                Trampoline.rental_start = Calendar.dropStart;
-                Trampoline.rental_end = Calendar.dropEnd;
-            })
             values.trampolines = Trampolines
             return values;
         }
@@ -22,6 +15,8 @@
     document.addEventListener('DOMContentLoaded', function() {
         Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             initialDate: Dates.CalendarInitial,
+            locale: 'lt',
+            //timeZone: 'local',
             editable: true,
             selectable: true,
             // businessHours: true,
@@ -29,8 +24,8 @@
             events: [],
             eventAllow: function(dropInfo, draggedEvent) {
                 let CouldBeDropped = true;
-                let dropStart = new Date(dropInfo.start);
-                let dropEnd = new Date(dropInfo.end);
+                let dropStart = new Date(dropInfo.startStr);
+                let dropEnd = new Date(dropInfo.endStr);
                 Occupied.forEach(function (Occupation) {
                     let OccupationStart = new Date(Occupation.start);
                     let OccupationEnd = new Date(Occupation.end);
@@ -40,25 +35,30 @@
                         return false;
                     }
                 });
-                Calendar.dropStart = dropStart;
-                Calendar.dropEnd = dropEnd;
+                Trampolines.forEach(function (Trampoline){
+                    draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline){
+                        if (Trampoline.id === AffectedTrampoline.id) {
+                            Trampoline.rental_start = dropInfo.startStr
+                            Trampoline.rental_end = dropInfo.endStr
+                        }
+                    })
+                })
+                console.log('Rental range => ',dropInfo.startStr,'<>',dropInfo.endStr)
                 return CouldBeDropped;
+            },
+            eventTimeFormat: { /*like 14:30:00*/
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
             }
         });
         Calendar.render();
-        addOccupied()
-        addEvent()
+        addEvent(Occupied)
+        addEvent(Availability)
     })
-    function addOccupied () {
-        Occupied.forEach(function (Occupation){
-            if (Occupation.type_custom === 'occ') {
-                Occupation.editable = false
-            }
-            Calendar.addEvent(Occupation)
-        })
-    }
-    function addEvent () {
-        Events.forEach(function (Event){
+    function addEvent (EventsToAdd) {
+        EventsToAdd.forEach(function (Event){
             Calendar.addEvent(Event)
         });
     }
@@ -94,6 +94,23 @@
                     }).done((response) => {
                         console.log("response : ", response);
                         console.log(Variables.getOrderFormInputs())
+                        if(response.status === false) {
+                            $('form input').removeClass('is-invalid');
+                            Object.keys(response.failed_input).forEach(function (FailedInput) {
+                                $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
+                                $('form input[name=' + FailedInput + ']').addClass('is-invalid');
+                            })
+                        }
+                        if (response.status) {
+                            $('form input[type=text], form input[type=number], #createTrampolineModal form textarea').val('');
+                            $('form input').removeClass('is-invalid');
+                        }
+                        /*Renew fullcalendar occupation*/
+                        Occupied = response.Occupied
+                        Calendar.removeAllEvents();
+                        addEvent(Occupied)
+                        Availability = response.Events
+                        addEvent(Availability)
                     })
                 }
             }
@@ -102,4 +119,5 @@
     $(document).ready(function () {
         console.log("/js/trampolines/public/order_public.js -> ready!");
         TrampolineOrder.init()
+        console.log('Trampolines at init stage => ',Trampolines);
     });

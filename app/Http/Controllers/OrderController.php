@@ -7,12 +7,15 @@ use App\Trampolines\BaseTrampoline;
 use App\Trampolines\OccupationTimeFrames;
 use App\Trampolines\TrampolineOrderData;
 use Carbon\Carbon;
+use http\Env\Response;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
+
 
 class OrderController extends Controller
 {
@@ -24,57 +27,26 @@ class OrderController extends Controller
     public function publicGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
         $Trampolines = (new Trampoline())->newQuery()->whereIn('id',\request()->get('trampoline_id',[]))->get();
-        if (count($Trampolines) > 1) {
-            $OrderEventName = 'Batutai ';
-        } else {
-            $OrderEventName = 'Batutas ';
-        }
+        $Availability = (new BaseTrampoline())->getAvailability($Trampolines, Carbon::now(), true);
         foreach ($Trampolines as $trampoline) {
-            $OrderEventName .= $trampoline->title.'/';
+            $trampoline->rental_start = Carbon::parse($Availability[0]->start)->format('Y-m-d');
+            $trampoline->rental_end = Carbon::parse($Availability[0]->end)->format('Y-m-d');
         }
-
-
-        //@todo Paziureti ar sitas yra logiskas (iki $endDate)
-        $availability = (new BaseTrampoline())->getOccupation(
-            $Trampolines,
-            OccupationTimeFrames::MONTH,
-            true
-        );
-
-        Log::info('Availability: ' . json_encode($availability));
-
-        $startDate = null;
-        foreach ($availability as $occupiedSlot) {
-            if ($occupiedSlot->start > Carbon::now()) {
-                $startDate = $occupiedSlot->start;
-                break;
-            }
-        }
-
-        $endDate = $startDate ? Carbon::parse($startDate)->addDays(1)->format('Y-m-d') : null;
-
-        if ($startDate && $endDate) {
-            Log::info('Start Date: ' . $startDate->toDateString());
-            Log::info('End Date: ' . $endDate->toDateString());
-        } else {
-            Log::info('Start Date or End Date is null.');
-        }
-
-
         return view ('orders.public.order',[
-            'Events' => [
+            'Availability' => $Availability
+            /*[
                 (object)[
-                    'id' => 123,
+                    'extendedProps' => [
+                        'trampolines' => $Trampolines,
+                    ],
                     'title' => $OrderEventName,
-                    'start' => '2024-05-26', //@todo FIND THE FREE START DAY THROUGH OCCUPATION
-                    'end' => '2024-05-27', //@todo FIND THE FREE END DAY THROUGH OCCUPATION
+                    'start' => Carbon::parse($startDate)->format('Y-m-d'),
+                    'end' => Carbon::parse($endDate)->format('Y-m-d')
                 ]
-            ],
-            'Occupied' => $availability,
+            ]*/,
+            'Occupied' => (new BaseTrampoline())->getOccupation($Trampolines, OccupationTimeFrames::MONTH, true),
             'Trampolines' => $Trampolines,
             'Dates' => (object)[
-                'start' => $startDate,
-                'end' => $endDate,
                 'CalendarInitial'=>Carbon::now()->format('Y-m-d')
             ]
         ]);
@@ -87,23 +59,65 @@ class OrderController extends Controller
 
     public function orderInsert(Request $request): JsonResponse
     {
-        /*Validation*/
-        /*Phone required*/
-        $formData = $request->only([
-            'customerName',
-            'customerSurname',
-            'customerPhoneNumber',
-            'customerEmail',
-            'customerDeliveryCity',
-            'customerDeliveryPostCode',
-            'customerDeliveryAddress'
+        $validator = Validator::make($request->all(), [
+            'customerName' => 'required|max:50',
+            'customerSurname' => 'required|max:50',
+            'customerPhoneNumber' => 'required|max:50',
+            'customerEmail' => 'max:50',
+            'customerDeliveryCity' => 'required|max:50',
+            'customerDeliveryPostCode' => 'required|max:15',
+            'customerDeliveryAddress' => 'required|max:256',
+        ], [
+           'customerName.required' => 'Vardas privalomas',
+            'customerName.max' => 'Vardas per ilgas',
+            'customerSurname.required' => 'Pavardė privaloma',
+            'customerSurname.max' => 'Pavardė per ilga',
+            'customerPhoneNumber.required' => 'Telefono numeris privalomas',
+            'customerPhoneNumber.max' => 'Telefono numeris per ilgas',
+            'customerEmail.max' => 'Elektroninio pašto adresas per ilgas',
+            'customerDeliveryCity.required' => 'Miesto pavadinimas privalomas',
+            'customerDeliveryCity.max' => 'Miesto pavadinimas per ilgas',
+            'customerDeliveryPostCode.required' => 'Pašto kodas privalomas',
+            'customerDeliveryPostCode.max' => 'Pašto kodas per ilgas',
+            'customerDeliveryAddress.required' => 'Adresas privalomas',
+            'customerDeliveryAddress.max' => 'Adresas per ilgas'
         ]);
+        if($validator->fails()) {
+            return response()->json([
+                'status' => false,
+                'received_params' => request()->all(),
+                'failed_input' => $validator->errors()
+            ]);
+        }
+        $trampolines_id = [];
+        foreach (\request()->get('trampolines',[])  as $Trampoline) {
+            $trampolines_id[] = $Trampoline['id'];
+        }
+        $Trampolines = (new Trampoline())->newQuery()->whereIn('id',$trampolines_id)->get();
+        $availability = (new BaseTrampoline())->getOccupation(
+            $Trampolines,
+            OccupationTimeFrames::MONTH,
+            true
+        );
 
         $Order = (new BaseTrampoline())->rent((new TrampolineOrderData()));
-
         return response()->json([
             'status' => true,
-            'received_params' => $formData
+            'Occupied' => $availability,
+            'Events' => [
+                (object)[
+                    'id' => $Order->OrderData->Order->id,
+                    'extendedProps' => [
+                        'trampolines' => $Trampolines,
+                        'order' => $Order->OrderData,
+                        'order_id' => $Order->OrderData->Order->id
+                    ],
+                    'title' => 'Jūsų užsakymas',
+                    'start' => $Order->OrderData->OrderTrampolines[0]->rental_start, //@todo FIND THE FREE START DAY THROUGH OCCUPATION
+                    'end' => $Order->OrderData->OrderTrampolines[0]->rental_end, //@todo FIND THE FREE END DAY THROUGH OCCUPATION
+                    'backgroundColor' => 'green'
+                ]
+            ]
         ]);
     }
 

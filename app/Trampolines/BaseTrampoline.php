@@ -17,6 +17,9 @@ use Illuminate\Support\Str;
 
 class BaseTrampoline implements Trampoline
 {
+
+    public $OrderData;
+
     public function register(BaseTrampolineData $TrampolineData): void
     {
         $Trampoline = \App\Models\Trampoline::create([
@@ -80,6 +83,11 @@ class BaseTrampoline implements Trampoline
     public function rent(TrampolineOrderData $trampolineOrderData): static
     {
 
+        $this->OrderData = (object)[
+            'Order' => null,
+            'OrderTrampolines' => []
+        ];
+
         $Client = (new Client())->updateOrCreate(
             [
                 'phone' => $trampolineOrderData->CustomerPhone,
@@ -109,7 +117,7 @@ class BaseTrampoline implements Trampoline
             ]
         );
 
-        $NewOrder = Order::create([
+        $this->OrderData->Order = Order::create([
             'order_number'  => Str::uuid(),
             'order_date' => Carbon::now()->format('Y-m-d H:i:s'),
             'rental_duration'  => 5,
@@ -125,18 +133,18 @@ class BaseTrampoline implements Trampoline
             $RentalStart = Carbon::parse($trampoline['rental_start']);
             $RentalDuration = $RentalStart->diffInDays(Carbon::parse($trampoline['rental_end']));
             $Trampoline = \App\Models\Trampoline::with('Parameter')->find($trampoline['id']);
-            OrdersTrampoline::create([
-                'orders_id' => $NewOrder->id,
+            $this->OrderData->OrderTrampolines[] = OrdersTrampoline::create([
+                'orders_id' => $this->OrderData->Order->id,
                 'trampolines_id' => $Trampoline->id,
-                'rental_start' => Carbon::parse($trampoline['rental_start'])->format('Y-m-d H:i:s'),
-                'rental_end' => Carbon::parse($trampoline['rental_end'])->format('Y-m-d H:i:s'),
+                'rental_start' => Carbon::parse($trampoline['rental_start'])->format('Y-m-d'),
+                'rental_end' => Carbon::parse($trampoline['rental_end'])->format('Y-m-d'),
                 'rental_duration' => $RentalDuration,
                 'total_sum' => $RentalDuration * $Trampoline->Parameter->price,
             ]);
             $OrderTotalSum += $RentalDuration * $Trampoline->Parameter->price;
             $OrderRentalDuration = $RentalDuration;
         }
-        $NewOrder->update([
+        $this->OrderData->Order->update([
             'total_sum' => $OrderTotalSum,
             'rental_duration' => $OrderRentalDuration /*Not in every case would be true - needs develop*/
         ]);
@@ -159,70 +167,112 @@ class BaseTrampoline implements Trampoline
         // TODO: Implement onHold() method.
     }
 
-    public function getOccupation(Collection $Trampolines,OccupationTimeFrames $TimeFrame, $FullCalendarFormat = false): array
+    public function getOccupation(Collection $Trampolines, OccupationTimeFrames $TimeFrame, $FullCalendarFormat = false): array
     {
         $occupiedDates = [];
-
         switch ($TimeFrame) {
-            case OccupationTimeFrames::WEEK :
+            case OccupationTimeFrames::WEEK:
                 $GetOccupationFrom = Carbon::now()->startOfWeek()->format('Y-m-d');
                 $GetOccupationTill = Carbon::now()->endOfWeek()->format('Y-m-d');
                 break;
-            case OccupationTimeFrames::MONTH :
+            case OccupationTimeFrames::MONTH:
                 $GetOccupationFrom = Carbon::now()->startOfMonth()->format('Y-m-d');
                 $GetOccupationTill = Carbon::now()->endOfMonth()->format('Y-m-d');
                 break;
+            default:
+                return $occupiedDates;
+                break;
         }
-        /*Make occupation object for $trampoline for current : week, month [$GetOccupationFrom <> $GetOccupationTill] */
-        /*foreach ($Trampolines as $trampoline) {
-        }*/
-
-        foreach ($Trampolines as $trampoline){
+        foreach ($Trampolines as $trampoline) {
             $occupiedDatesForTrampoline = OrdersTrampoline::where('trampolines_id', $trampoline->id)
                 ->whereBetween('rental_start', [$GetOccupationFrom, $GetOccupationTill])
                 ->get();
-
-            foreach ($occupiedDatesForTrampoline as $orderTrampoline){
-                $occupiedDates[] = (object)[
-                    'id' => $orderTrampoline->id,
-                    'title' => "Užimta",
-                    'start' => $orderTrampoline->rental_start,
-                    'end' => $orderTrampoline->rental_end,
-                    'backgroundColor' => 'red',
-                    'type_custom' => 'occ'
-                ];
+            foreach ($occupiedDatesForTrampoline as $orderTrampoline) {
+                if ($FullCalendarFormat) {
+                    $DoWeHaveEventForSameDates = false;
+                    foreach ($occupiedDates as $occupiedDate) {
+                        if (
+                            $occupiedDate->start == $orderTrampoline->rental_start &&
+                            $occupiedDate->end == $orderTrampoline->rental_end
+                        ) {
+                            $DoWeHaveEventForSameDates = true;
+                        }
+                    }
+                    if (!$DoWeHaveEventForSameDates) {
+                        $merged = false;
+                        foreach ($occupiedDates as $occupiedDate) {
+                            if ($occupiedDate->end == $orderTrampoline->rental_start) {
+                                $occupiedDate->end = $orderTrampoline->rental_end;
+                                $merged = true;
+                                break;
+                            } elseif ($occupiedDate->start == $orderTrampoline->rental_end) {
+                                $occupiedDate->start = $orderTrampoline->rental_start;
+                                $merged = true;
+                                break;
+                            } elseif ($orderTrampoline->rental_end >= $occupiedDate->start && $orderTrampoline->rental_start <= $occupiedDate->end) {
+                                $occupiedDate->start = min($occupiedDate->start, $orderTrampoline->rental_start);
+                                $occupiedDate->end = max($occupiedDate->end, $orderTrampoline->rental_end);
+                                $merged = true;
+                            }
+                        }
+                        if (!$merged) {
+                            $occupiedDates[] = (object)[
+                                'id' => $orderTrampoline->id,
+                                'start' => $orderTrampoline->rental_start,
+                                'end' => $orderTrampoline->rental_end,
+                                'backgroundColor' => 'red',
+                                'editable' => false,
+                                'extendedProps' => [
+                                    'type_custom' => 'occ'
+                                ],
+                            ];
+                        }
+                    }
+                } else {
+                    $occupiedDates[] = $orderTrampoline;
+                }
             }
         }
-
-        /*Occupation array for $Trampolines in $FullCalendarFormat format*/
-//        return [
-//            (object)[
-//                'id' => 1,
-//                'title' => "Užimta",
-//                'start' => '2024-05-01 00:00:00',
-//                'end' => '2024-05-11 00:00:00',
-//                'backgroundColor' => 'red',
-//                'type_custom' => 'occ'
-//            ],
-//            (object)[
-//                'id' => 2,
-//                'title' => "Užimta",
-//                'start' => '2024-05-14 00:00:00',
-//                'end' => '2024-05-16 00:00:00',
-//                'backgroundColor' => 'red',
-//                'type_custom' => 'occ'
-//            ],
-//            (object)[
-//                'id' => 3,
-//                'title' => "Užimta",
-//                'start' => '2024-05-21 00:00:00',
-//                'end' => '2024-05-25 00:00:00',
-//                'backgroundColor' => 'red',
-//                'type_custom' => 'occ'
-//            ],
-//        ];
         return $occupiedDates;
     }
 
+    public function getAvailability(Collection $Trampolines, Carbon $fromDate,$FullCalendarFormat = false): array
+    {
+        /*Logic to find available day*/
+        $availableDates = [];
 
+        $occupiedDates = $this->getOccupation($Trampolines, OccupationTimeFrames::MONTH, true);
+
+        foreach ($occupiedDates as $occupiedDate){
+//            if($occupiedDate->start)
+        }
+        /*
+            Log::info('Availability: ' . json_encode($availability));
+            $startDate = null;
+            foreach ($availability as $occupiedSlot) {
+                if ($occupiedSlot->start > Carbon::now()) {
+                    $startDate = $occupiedSlot->start;
+                    break;
+                }
+            }
+
+            $endDate = $startDate ? Carbon::parse($startDate)->addDays(1)->format('Y-m-d') : null;
+        */
+
+        $startDate = '2024-05-30';
+        $endDate = '2024-05-31';
+
+        if ($FullCalendarFormat) {
+            $availableDates[] = (object)[
+                'extendedProps' => [
+                    'trampolines' => $Trampolines,
+                ],
+                'title' => 'Jūsų užsakymas',
+                'start' => Carbon::parse($startDate)->format('Y-m-d'),
+                'end' => Carbon::parse($endDate)->format('Y-m-d')
+            ];
+        }
+
+        return $availableDates;
+    }
 }
