@@ -75,14 +75,32 @@ class OrderController extends Controller
 
     public function publicUpdateCalendar(): JsonResponse
     {
-        $Trampolines = (new Trampoline())->newQuery()->whereIn('id', \request()->get('trampoline_id', []))->get();
-        $Availability = (new BaseTrampoline())->getAvailability($Trampolines, Carbon::now()->startOfDay()->addMonth()->startOfMonth(), true);
-//        dd($Availability);
-        $Occupied = (new BaseTrampoline())->getOccupation($Trampolines, OccupationTimeFrames::MONTH, new Order(), true, Carbon::now()->startOfDay()->addMonth());
+        $trampolineIds = \request()->get('trampoline_id', []);
+        $targetDate = Carbon::parse(\request()->get('target_date', null));
+//        dd($targetDate);
+//        $month = \request()->get('month', Carbon::now()->month); Default to current month if not provided
+//        $year = \request()->get('year', Carbon::now()->year); Default to current year if not provided
+
+//        dd($targetDate);
+
+        // Ensure valid month and year
+//        if ($month < 1 || $month > 12 || $year < 1900 || $year > 2100) {
+//            return response()->json([
+//                'status' => false,
+//                'message' => 'Invalid month or year provided.'
+//            ], 400);
+//        }
+
+        $Trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolineIds)->get();
+
+        $Availability = (new BaseTrampoline())->getAvailability($Trampolines, $targetDate, true);
+        $Occupied = (new BaseTrampoline())->getOccupation($Trampolines, OccupationTimeFrames::MONTH, new Order(), true, $targetDate);
+
         foreach ($Trampolines as $trampoline) {
             $trampoline->rental_start = Carbon::parse($Availability[0]->start)->format('Y-m-d');
             $trampoline->rental_end = Carbon::parse($Availability[0]->end)->format('Y-m-d');
         }
+
         return response()->json([
             'status' => true,
             'Availability' => $Availability,
@@ -90,6 +108,7 @@ class OrderController extends Controller
             'Trampolines' => $Trampolines
         ]);
     }
+
 
     public function orderGet(): JsonResponse
     {
@@ -104,14 +123,15 @@ class OrderController extends Controller
 
         /*Send notification on order create*/
 
-        $Order = Order::find(33);
-        $Result = Mail::to($Order->client->email)->send(new OrderPlaced($Order));
-        dd($Result);
-
+//        $Order = Order::find(33);
+//        $Result = Mail::to($Order->client->email)->send(new OrderPlaced($Order));
+//        dd($Result);
+        $targetDate = Carbon::parse(\request()->get('targetDate', null));
         $NewOrderEventBackgroundColor = 'green';
         $NewOrderEventTitle = 'Jūsų užsakymas pateiktas';
         $Order = (new TrampolineOrder())->create((new TrampolineOrderData($request)));
         $trampolines_id = [];
+
         foreach ($request->get('trampolines', []) as $Trampoline) {
             $trampolines_id[] = $Trampoline['id'];
         }
@@ -144,7 +164,8 @@ class OrderController extends Controller
                 $Trampolines,
                 OccupationTimeFrames::MONTH,
                 $Order->Order,
-                true
+                true,
+                $targetDate
             ),
             'Events' => $Events
         ]);

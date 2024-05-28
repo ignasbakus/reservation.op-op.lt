@@ -48,6 +48,9 @@ class TrampolineOrder implements Order
                 $Trampoline = (object)[
                     'rental_start' => Carbon::parse(request()->get('trampolines')[0]['rental_start']),
                     'rental_end' => Carbon::parse(request()->get('trampolines')[0]['rental_end'])
+
+//                    'rental_start' => Carbon::parse(request()->get('orderInputs')['trampolines'][0]['rental_start']),
+
                 ];
             }
 

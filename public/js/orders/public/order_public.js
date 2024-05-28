@@ -8,45 +8,53 @@ let Variables = {
             values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
         });
         values.trampolines = Trampolines
+        values.targetDate = TargetDate.getTargetDate(globalDropInfo)
         console.log('Trampolines orderPublic=>', Trampolines)
+        console.log(values)
         return values;
     },
     getTrampolines: function () {
         return Trampolines
     }
 }
+let TargetDate = {
+    getTargetDate: function (dropInfo) {
+        if (!dropInfo || !dropInfo.event) {
+            console.error('Invalid dropInfo:', dropInfo);
+            return null;
+        }
+        console.log(dropInfo.event.start.getFullYear());
+        let targetDate = new Date(dropInfo.event.start.getFullYear(), dropInfo.event.start.getMonth(), 1);
+        targetDate.setUTCHours(targetDate.getUTCHours() + 3);
+        return targetDate.toISOString().split('T')[0];
+    }
+};
+let globalDropInfo;
 let Calendar = null;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 today = today.toISOString().split('T')[0];
+let lastUpdatedMonth = new Date().getMonth(); // Track the last updated month
+
 document.addEventListener('DOMContentLoaded', function () {
     Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
         initialDate: Dates.CalendarInitial,
         locale: 'lt',
-        //timeZone: 'local',
         editable: true,
         selectable: true,
         eventDrop: function (dropInfo) {
+            globalDropInfo = dropInfo
+            let droppedDate = dropInfo.event.start;
             let currentMonth = Calendar.getDate().getMonth();
-            let droppedMonth = dropInfo.event.start.getMonth();
-
+            let droppedMonth = droppedDate.getMonth();
             if (droppedMonth < currentMonth) {
-                Calendar.getEvents().forEach(function (event) {
-                    if (event.extendedProps.type_custom === 'occ') {
-                        event.remove();
-                    }
-                })
-                Calendar.prev()
-
-                addEvent(Occupied)
-            } else if (droppedMonth > currentMonth) {
-                // Calendar.getEvents().forEach(function (event) {
-                //     if (event.extendedProps.type_custom === 'occ') {
-                //         event.remove();
-                //     }
-                // })
+                Calendar.prev();
+            } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
+                lastUpdatedMonth = droppedMonth;
                 Calendar.next();
-                updateEvents()
+                updateEvents(TargetDate.getTargetDate(dropInfo));
+            } else if (droppedMonth > currentMonth) {
+                Calendar.next();
             }
         },
         eventChange: function (changeInfo) {
@@ -99,25 +107,31 @@ function addEvent(EventsToAdd) {
     });
 }
 
-function updateEvents() {
+function updateEvents(targetDate) {
     $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
         url: '/orders/public/order/public_calendar/get',
         method: 'POST',
         data: {
-            trampoline_id: Variables.getTrampolines().map(t => t.id)
+            trampoline_id: Variables.getTrampolines().map(t => t.id),
+            target_date: targetDate
         },
     }).done((response) => {
         Occupied = response.Occupied
-        if (response.status){
-            Calendar.removeAllEvents();
+        if (response.status) {
+            console.log(targetDate)
+            Calendar.getEvents().forEach(function (event) {
+                if (event.extendedProps.type_custom === 'trampolineEvent') {
+                    event.remove();
+                }
+            });
             addEvent(Occupied)
             Availability = response.Availability
             addEvent(Availability)
         }
     }).always((instance) => {
         // console.log("always => response : ", instance);
-    })
+    });
 }
 
 let TrampolineOrder = {
@@ -147,7 +161,8 @@ let TrampolineOrder = {
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: "POST",
                     url: "/orders/public/order",
-                    data: Variables.getOrderFormInputs()
+                    data: Variables.getOrderFormInputs(),
+                    // targetDate: targetDate
                 }).done((response) => {
                     if (response.status === false) {
                         $('form input').removeClass('is-invalid');
@@ -164,7 +179,11 @@ let TrampolineOrder = {
                     Occupied = response.Occupied
                     console.log('Occupied create =>', Occupied)
                     if (response.status) {
-                        Calendar.removeAllEvents();
+                        Calendar.getEvents().forEach(function (event) {
+                            if (event.extendedProps.type_custom === 'trampolineEvent') {
+                                event.remove();
+                            }
+                        });
                         addEvent(Occupied)
                         Availability = response.Events
                         addEvent(Availability)
@@ -179,11 +198,12 @@ let TrampolineOrder = {
                         });
                         addEvent(Occupied)
                     }
-                })
+                });
             }
         }
     }
 }
+
 $(document).ready(function () {
     console.log("/js/trampolines/public/order_public.js -> ready!");
     TrampolineOrder.init()
