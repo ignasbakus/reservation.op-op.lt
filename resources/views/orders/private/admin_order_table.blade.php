@@ -113,8 +113,28 @@
                         <div class="col-2"></div>
                         <div class="col-4">
                             <div id="calendar"></div>
+                            <div class="mt-5">
+                                <div class="confirmation-container" style="display: none" >
+                                    <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>
+                                    <div class="dates-info">
+                                        <p class="date-label">Užsakymo datas bus pakeistos į:</p>
+                                        <p><strong>Pradžia:</strong> 2024-06-01</p>
+                                        <p><strong>Pabaiga:</strong> 2024-06-03</p>
+                                    </div>
+                                    <div class="button-container">
+                                        <button class="cancel-btn">Atšaukti</button>
+                                        <button class="confirm-btn">Patvirtinti</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+{{--                    <div class="row">--}}
+{{--                        <div class="col-8"></div>--}}
+{{--                        <div class="col-4">--}}
+{{--                            <h3>Ar tikrai norite pakeisti užsakymo datas?</h3>--}}
+{{--                        </div>--}}
+{{--                    </div>--}}
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Uždaryti</button>

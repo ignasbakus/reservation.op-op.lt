@@ -8,7 +8,10 @@ let Variables = {
             values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
         });
         values.trampolines = Trampolines
-        values.targetDate = TargetDate.getTargetDate(globalDropInfo)
+        values.firstVisibleDay = firstVisibleDayOnCalendar
+        values.lastVisibleDay = lastVisibleDayOnCalendar
+
+        // values.targetDateEnd = TargetDate.getTargetDate(globalDropInfo)
         console.log('Trampolines orderPublic=>', Trampolines)
         console.log(values)
         return values;
@@ -17,24 +20,27 @@ let Variables = {
         return Trampolines
     }
 }
-let TargetDate = {
-    getTargetDate: function (dropInfo) {
-        if (!dropInfo || !dropInfo.event) {
-            console.error('Invalid dropInfo:', dropInfo);
-            return null;
-        }
-        console.log(dropInfo.event.start.getFullYear());
-        let targetDate = new Date(dropInfo.event.start.getFullYear(), dropInfo.event.start.getMonth(), 1);
-        targetDate.setUTCHours(targetDate.getUTCHours() + 3);
-        return targetDate.toISOString().split('T')[0];
-    }
-};
-let globalDropInfo;
+// let TargetDate = {
+//     getTargetDate: function (dropInfo) {
+//         if (!dropInfo || !dropInfo.event) {
+//             console.error('Invalid dropInfo:', dropInfo);
+//             return null;
+//         }
+//         console.log(dropInfo.event.start.getFullYear());
+//         let targetDate = new Date(dropInfo.event.start.getFullYear(), dropInfo.event.start.getMonth() + 1, 0);
+//         targetDate.setUTCHours(targetDate.getUTCHours() + 3);
+//         console.log('target date =>', targetDate.toISOString().split('T')[0])
+//         return targetDate.toISOString().split('T')[0];
+//     },
+// };
+let firstVisibleDayOnCalendar;
+let lastVisibleDayOnCalendar;
 let Calendar = null;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 today = today.toISOString().split('T')[0];
-let lastUpdatedMonth = new Date().getMonth(); // Track the last updated month
+let lastUpdatedMonth = new Date().getMonth();
+let isEventDrop = false; // Flag to prevent double updates
 
 document.addEventListener('DOMContentLoaded', function () {
     Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -43,18 +49,17 @@ document.addEventListener('DOMContentLoaded', function () {
         editable: true,
         selectable: true,
         eventDrop: function (dropInfo) {
-            globalDropInfo = dropInfo
+            isEventDrop = true
             let droppedDate = dropInfo.event.start;
             let currentMonth = Calendar.getDate().getMonth();
             let droppedMonth = droppedDate.getMonth();
             if (droppedMonth < currentMonth) {
                 Calendar.prev();
+                updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
             } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
                 lastUpdatedMonth = droppedMonth;
                 Calendar.next();
-                updateEvents(TargetDate.getTargetDate(dropInfo));
-            } else if (droppedMonth > currentMonth) {
-                Calendar.next();
+                updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
             }
         },
         eventChange: function (changeInfo) {
@@ -63,9 +68,22 @@ document.addEventListener('DOMContentLoaded', function () {
                 changeInfo.revert();
             }
         },
-        // businessHours: true,
         dayMaxEvents: true,
         events: [],
+        datesSet: function (info) {
+            let firstCalendarVisibleDate = info.start;
+            let lastCalendarVisibleDate = info.end;
+            firstCalendarVisibleDate.setUTCHours(firstCalendarVisibleDate.getUTCHours() + 3);
+            lastCalendarVisibleDate.setUTCHours(lastCalendarVisibleDate.getUTCHours() + 3);
+            firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
+            lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
+            console.log('First calendar day => ', firstVisibleDayOnCalendar);
+            console.log('Last calendar day => ', lastVisibleDayOnCalendar);
+            if (!isEventDrop) {
+                updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+            }
+            isEventDrop = false;
+        },
         eventAllow: function (dropInfo, draggedEvent) {
             let CouldBeDropped = true;
             let dropStart = new Date(dropInfo.startStr);
@@ -97,6 +115,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     Calendar.render();
+    updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+
+
     addEvent(Occupied)
     addEvent(Availability)
 })
@@ -107,24 +128,20 @@ function addEvent(EventsToAdd) {
     });
 }
 
-function updateEvents(targetDate) {
+function updateEvents(targetStartDate, targetEndDate) {
     $.ajax({
         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
         url: '/orders/public/order/public_calendar/get',
         method: 'POST',
         data: {
             trampoline_id: Variables.getTrampolines().map(t => t.id),
-            target_date: targetDate
+            target_start_date: targetStartDate,
+            target_end_date: targetEndDate
         },
     }).done((response) => {
         Occupied = response.Occupied
         if (response.status) {
-            console.log(targetDate)
-            Calendar.getEvents().forEach(function (event) {
-                if (event.extendedProps.type_custom === 'trampolineEvent') {
-                    event.remove();
-                }
-            });
+            Calendar.removeAllEvents()
             addEvent(Occupied)
             Availability = response.Availability
             addEvent(Availability)
@@ -179,11 +196,7 @@ let TrampolineOrder = {
                     Occupied = response.Occupied
                     console.log('Occupied create =>', Occupied)
                     if (response.status) {
-                        Calendar.getEvents().forEach(function (event) {
-                            if (event.extendedProps.type_custom === 'trampolineEvent') {
-                                event.remove();
-                            }
-                        });
+                        Calendar.removeAllEvents()
                         addEvent(Occupied)
                         Availability = response.Events
                         addEvent(Availability)

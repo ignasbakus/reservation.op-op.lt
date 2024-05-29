@@ -11,85 +11,249 @@ let Variables = {
     }
 }
 
-let Calendar = null;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 today = today.toISOString().split('T')[0];
+let firstVisibleDayOnCalendar;
+let lastVisibleDayOnCalendar;
+let isEventDrop = false;
+let trampolineID;
 
-function populateFullCalendar(Dates, Occupied, Event, Trampolines) {
-    // Initialize the FullCalendar with specified options
-    Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-        initialDate: Dates.CalendarInitial,
-        locale: 'lt',
-        editable: true,
-        selectable: true,
-        // eventChange: function(changeInfo) {
-        // },
-        dayMaxEvents: true,
-        events: [],
-        eventAllow: function (dropInfo, draggedEvent) {
-            let CouldBeDropped = true;
-            let dropStart = new Date(dropInfo.startStr);
-            let dropEnd = new Date(dropInfo.endStr);
 
-            // Check for occupation overlap
-            Occupied.forEach(function (Occupation) {
-                let OccupationStart = new Date(Occupation.start);
-                let OccupationEnd = new Date(Occupation.end);
-                if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
-                    CouldBeDropped = false;
-                    return false;
+let CalendarFunctions = {
+    populateFullCalendar: function (Dates, Occupied, Event, Trampolines){
+        Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+            initialDate: Dates.CalendarInitial,
+            locale: 'lt',
+            editable: true,
+            selectable: true,
+            eventDrop: function (dropInfo) {
+                isEventDrop = true
+                // let droppedDate = dropInfo.event.start;
+                // let currentMonth = Calendar.getDate().getMonth();
+                // let droppedMonth = droppedDate.getMonth();
+                // if (droppedMonth < currentMonth) {
+                //     Calendar.prev();
+                //     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
+                // } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
+                //     lastUpdatedMonth = droppedMonth;
+                //     Calendar.next();
+                //     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+                // }
+                $('.confirmation-container').css('display', 'block');
+            },
+            eventChange: function (changeInfo) {
+                let newStartDate = new Date(changeInfo.event.start);
+                if (newStartDate < new Date(today)) {
+                    changeInfo.revert();
                 }
-            });
+            },
+            // datesSet: function (info) {
+            //     let firstCalendarVisibleDate = info.start;
+            //     let lastCalendarVisibleDate = info.end;
+            //     firstCalendarVisibleDate.setUTCHours(firstCalendarVisibleDate.getUTCHours() + 3);
+            //     lastCalendarVisibleDate.setUTCHours(lastCalendarVisibleDate.getUTCHours() + 3);
+            //     firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
+            //     lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
+            //     console.log('First calendar day => ', firstVisibleDayOnCalendar);
+            //     console.log('Last calendar day => ', lastVisibleDayOnCalendar);
+            //     if (!isEventDrop) {
+            //         CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+            //     }
+            //     isEventDrop = false;
+            // },
+            dayMaxEvents: true,
+            events: [],
+            eventAllow: function (dropInfo, draggedEvent) {
+                let CouldBeDropped = true;
+                let dropStart = new Date(dropInfo.startStr);
+                let dropEnd = new Date(dropInfo.endStr);
 
-            // Check trampolines in the dragged event
-
-            Trampolines.forEach(function (Trampoline) {
-                draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
-                    if (Trampoline.id === AffectedTrampoline.id) {
-                        Trampoline.rental_start = dropInfo.startStr
-                        Trampoline.rental_end = dropInfo.endStr
+                // Check for occupation overlap
+                Occupied.forEach(function (Occupation) {
+                    let OccupationStart = new Date(Occupation.start);
+                    let OccupationEnd = new Date(Occupation.end);
+                    if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
+                        CouldBeDropped = false;
+                        return false;
                     }
-                })
-            });
+                });
 
-            return CouldBeDropped;
-        },
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hour12: false
+                // Check trampolines in the dragged event
+
+                Trampolines.forEach(function (Trampoline) {
+                    draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
+                        if (Trampoline.id === AffectedTrampoline.id) {
+                            Trampoline.rental_start = dropInfo.startStr
+                            Trampoline.rental_end = dropInfo.endStr
+                        }
+                    })
+                });
+
+                return CouldBeDropped;
+            },
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false
+            }
+        });
+        Calendar.render();
+        // this.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+        if (Occupied && Array.isArray(Occupied)) {
+            this.addEvent(Occupied);
+        } else {
+            console.error('Occupied events data is invalid:', Occupied);
         }
-    });
-    Calendar.render();
 
-    console.log('Initial Date:', Dates.CalendarInitial);
-    console.log('Occupied:', Occupied);
-    console.log('Events:', Event);
-    // Validate and add events to the calendar
-    if (Occupied && Array.isArray(Occupied)) {
-        addEvent(Occupied);
-        // console.log('Occupied events: ', Occupied)
-    } else {
-        console.error('Occupied events data is invalid:', Occupied);
+        if (Event && Array.isArray(Event)) {
+            this.addEvent(Event);
+        } else if (Event && typeof Event === 'object') {
+            this.addEvent([Event]);
+        } else {
+            console.error('Event data is invalid:', Event);
+        }
+    },
+    updateEvents: function (targetStartDate, targetEndDate){
+        $.ajax({
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+            url: '/orders/public/order/public_calendar/get',
+            method: 'POST',
+            data: {
+                trampoline_id: trampolineID,
+                target_start_date: targetStartDate,
+                target_end_date: targetEndDate
+            },
+        }).done((response) => {
+            Occupied = response.Occupied
+            if (response.status) {
+                Calendar.removeAllEvents()
+                this.addEvent(Occupied)
+                Availability = response.Availability
+                this.addEvent(Availability)
+            }
+        }).always((instance) => {
+            // console.log("always => response : ", instance);
+        });
+    },
+    addEvent: function (EventsToAdd){
+        EventsToAdd.forEach(function (Event) {
+            console.log('Adding event:', Event);
+            Calendar.addEvent(Event);
+        });
     }
 
-    if (Event && Array.isArray(Event)) {
-        addEvent(Event);
-    } else if (Event && typeof Event === 'object') {
-        addEvent([Event]);
-    } else {
-        console.error('Event data is invalid:', Event);
-    }
 }
-
-function addEvent(EventsToAdd) {
-    EventsToAdd.forEach(function (Event) {
-        console.log('Adding event:', Event);
-        Calendar.addEvent(Event);
-    });
-}
+// function populateFullCalendar(Dates, Occupied, Event, Trampolines) {
+//     // Initialize the FullCalendar with specified options
+//     Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
+//         initialDate: Dates.CalendarInitial,
+//         locale: 'lt',
+//         editable: true,
+//         selectable: true,
+//         eventDrop: function (dropInfo) {
+//             isEventDrop = true
+//             let droppedDate = dropInfo.event.start;
+//             let currentMonth = Calendar.getDate().getMonth();
+//             let droppedMonth = droppedDate.getMonth();
+//             if (droppedMonth < currentMonth) {
+//                 Calendar.prev();
+//                 updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
+//             } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
+//                 lastUpdatedMonth = droppedMonth;
+//                 Calendar.next();
+//                 updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+//             }
+//         },
+//         // eventChange: function(changeInfo) {
+//         // },
+//         dayMaxEvents: true,
+//         events: [],
+//         eventAllow: function (dropInfo, draggedEvent) {
+//             let CouldBeDropped = true;
+//             let dropStart = new Date(dropInfo.startStr);
+//             let dropEnd = new Date(dropInfo.endStr);
+//
+//             // Check for occupation overlap
+//             Occupied.forEach(function (Occupation) {
+//                 let OccupationStart = new Date(Occupation.start);
+//                 let OccupationEnd = new Date(Occupation.end);
+//                 if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
+//                     CouldBeDropped = false;
+//                     return false;
+//                 }
+//             });
+//
+//             // Check trampolines in the dragged event
+//
+//             Trampolines.forEach(function (Trampoline) {
+//                 draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
+//                     if (Trampoline.id === AffectedTrampoline.id) {
+//                         Trampoline.rental_start = dropInfo.startStr
+//                         Trampoline.rental_end = dropInfo.endStr
+//                     }
+//                 })
+//             });
+//
+//             return CouldBeDropped;
+//         },
+//         eventTimeFormat: {
+//             hour: '2-digit',
+//             minute: '2-digit',
+//             second: '2-digit',
+//             hour12: false
+//         }
+//     });
+//     Calendar.render();
+//
+//     console.log('Initial Date:', Dates.CalendarInitial);
+//     console.log('Occupied:', Occupied);
+//     console.log('Events:', Event);
+//     // Validate and add events to the calendar
+//     if (Occupied && Array.isArray(Occupied)) {
+//         addEvent(Occupied);
+//         // console.log('Occupied events: ', Occupied)
+//     } else {
+//         console.error('Occupied events data is invalid:', Occupied);
+//     }
+//
+//     if (Event && Array.isArray(Event)) {
+//         addEvent(Event);
+//     } else if (Event && typeof Event === 'object') {
+//         addEvent([Event]);
+//     } else {
+//         console.error('Event data is invalid:', Event);
+//     }
+// }
+// function updateEvents(targetStartDate, targetEndDate) {
+//     $.ajax({
+//         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+//         url: '/orders/public/order/public_calendar/get',
+//         method: 'POST',
+//         data: {
+//             trampoline_id: Variables.getTrampolines().map(t => t.id),
+//             target_start_date: targetStartDate,
+//             target_end_date: targetEndDate
+//         },
+//     }).done((response) => {
+//         Occupied = response.Occupied
+//         if (response.status) {
+//             Calendar.removeAllEvents()
+//             addEvent(Occupied)
+//             Availability = response.Availability
+//             addEvent(Availability)
+//         }
+//     }).always((instance) => {
+//         // console.log("always => response : ", instance);
+//     });
+// }
+// function addEvent(EventsToAdd) {
+//     EventsToAdd.forEach(function (Event) {
+//         console.log('Adding event:', Event);
+//         Calendar.addEvent(Event);
+//     });
+// }
 
 let Orders = {
     init: function () {
@@ -317,7 +481,8 @@ let Orders = {
                     if (response.status) {
                         console.log('getOrderUpdateData response => ', response)
                         this.fillDataForm(response.order)
-                        populateFullCalendar(response.Dates, response.Occupied, response.Events, response.Trampolines)
+                        trampolineID = response.Trampolines
+                        CalendarFunctions.populateFullCalendar(response.Dates, response.Occupied, response.Events, response.Trampolines)
                     } else {
                         console.error("Failed to fetch data: ", response.message);
                     }

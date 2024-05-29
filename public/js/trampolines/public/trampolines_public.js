@@ -48,7 +48,9 @@ let Trampolines = {
         Events: {
             init: function () {
                 $('#sendToOrder').on('click', (event) => {
-                    window.location.href = '/orders/public?' + $.param({trampoline_id: Trampolines.chosen});
+                    window.location.href = '/orders/public?' + $.param({
+                        trampoline_id: Trampolines.chosen
+                    });
                 });
             }
         }
