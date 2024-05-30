@@ -135,6 +135,9 @@ class BaseTrampoline implements Trampoline
         $from = $getOccupationFrom->copy();
         $till = $getOccupationTill->copy();
 
+        Log::info('From in getOccupation: ', $from->toArray());
+        Log::info('Till in getOccupation: ', $till->toArray());
+
         foreach ($Trampolines as $trampoline) {
             $Query = (new OrdersTrampoline())->newQuery();
             $Query->where('trampolines_id', $trampoline->id);
@@ -143,6 +146,7 @@ class BaseTrampoline implements Trampoline
                 $builder->orWhereBetween('rental_end', [$getOccupationFrom->copy()->addDay()->format('Y-m-d'), $getOccupationTill->copy()->addDay()->format('Y-m-d')]);
             });
             $occupiedDatesForTrampoline = $Query->get();
+//            dd($occupiedDatesForTrampoline);
             if ($FullCalendarFormat) {
                 for ($currentDate = $from->copy(); $currentDate->lte($till); $currentDate->addDay()) {
                     foreach ($occupiedDatesForTrampoline as $reserved) {

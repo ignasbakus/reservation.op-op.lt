@@ -51,7 +51,11 @@ class OrderController extends Controller
 
     public function adminGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-        return view('orders.private.admin_order_table');
+        return view('orders.private.admin_order_table', [
+            'Dates' => (object)[
+                'CalendarInitial' => Carbon::now()->format('Y-m-d')
+            ]
+        ]);
     }
 
     public function publicGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
@@ -92,21 +96,36 @@ class OrderController extends Controller
 
         $Trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolineIds)->get();
 
-        $Occupied = (new BaseTrampoline())->getOccupation(
-            $Trampolines,
-            OccupationTimeFrames::MONTH,
-            new Order(),
-            true,
-            $targetFromDate,
-            $targetTillDate
-        );
+//        $Occupied = (new BaseTrampoline())->getOccupation(
+//            $Trampolines,
+//            OccupationTimeFrames::MONTH,
+//            new Order(),
+//            true,
+//            $targetFromDate,
+//            $targetTillDate
+//        );
 
-        Log::info('FromDate sent to getAvailability', $targetFromDate->toArray());
-
-        if ($targetFromDate < Carbon::now()){
+//        Log::info('FromDate sent to getAvailability', $targetFromDate->toArray());
+        if ($targetFromDate < Carbon::now()) {
             $Availability = (new BaseTrampoline())->getAvailability($Trampolines, Carbon::now()->startOfDay(), true);
+            $Occupied = (new BaseTrampoline())->getOccupation(
+                $Trampolines,
+                OccupationTimeFrames::MONTH,
+                new Order(),
+                true,
+                Carbon::now()->startOfDay(),
+                $targetTillDate
+            );
         } else {
             $Availability = (new BaseTrampoline())->getAvailability($Trampolines, $targetFromDate, true);
+            $Occupied = (new BaseTrampoline())->getOccupation(
+                $Trampolines,
+                OccupationTimeFrames::MONTH,
+                new Order(),
+                true,
+                $targetFromDate,
+                $targetTillDate
+            );
         }
 
         foreach ($Trampolines as $trampoline) {
@@ -201,31 +220,69 @@ class OrderController extends Controller
 
     public function prepareOrderUpdateModalInfo(): JsonResponse
     {
-        // Get the IDs of trampolines associated with the order
-        $trampolineIds = Order::findOrFail(request()->get('order_id'))->trampolines()->pluck('trampolines_id')->toArray();
-        $order = Order::findOrFail(Order::findOrFail(request()->get('order_id'))->id);
-//        dd($order);
-        $event = (object)[
-            'id' => Order::findOrFail(request()->get('order_id'))->id,
-            'extendedProps' => [
-                'trampolines' => Trampoline::whereIn('id', $trampolineIds)->get()->toArray(),
-                'order' => Order::findOrFail(request()->get('order_id')),
-                'order_id' => Order::findOrFail(request()->get('order_id'))->id
-            ],
-            'title' => 'Kliento užsakymas',
-            'start' => Carbon::parse(Order::findOrFail(request()->get('order_id'))->trampolines()->first()->rental_start)->format('Y-m-d'),
-            'end' => Carbon::parse(Order::findOrFail(request()->get('order_id'))->trampolines()->first()->rental_end)->format('Y-m-d'),
-            'backgroundColor' => 'green'
-        ];
-        return \response()->json([
-            'status' => true,
-            'Events' => [$event],
-            'Trampolines' => $trampolineIds,
-            'Occupied' => (new BaseTrampoline())->getOccupation(Trampoline::whereIn('id', $trampolineIds)->get(), OccupationTimeFrames::MONTH, $order, true),
-            'order' => (new TrampolineOrder())->read(request()->get('order_id')),
-            'Dates' => (object) [
-                'CalendarInitial' => Carbon::parse(Order::findOrFail(request()->get('order_id'))->trampolines()->first()->rental_start)->startOfMonth()->format('Y-m-d')
-            ]
-        ]);
+        try {
+            $orderId = request()->get('order_id');
+            $order = (new TrampolineOrder())->read($orderId);
+//
+            if (!$order instanceof \App\Models\Order) {
+                throw new \Exception('Order not found or invalid type');
+            }
+            $trampolineIds = $order->trampolines()->pluck('trampolines_id')->toArray();
+            $targetFromDate = Carbon::parse(request()->get('target_start_date', null));
+            $targetTillDate = Carbon::parse(request()->get('target_end_date', null));
+
+            Log::info('Target from date =>', $targetFromDate->toArray());
+            Log::info('Target till date =>', $targetTillDate->toArray());
+
+
+            $Trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolineIds)->get();
+//            dd((new Trampoline())->newQuery()->whereIn('id', $trampolineIds)->get());
+//            dd($Trampolines);
+            $event = (object)[
+                'id' => $order->id,
+                'extendedProps' => [
+                    'trampolines' => $order->trampolines->toArray(),
+                    'order' => $order,
+                    'order_id' => $order->id
+                ],
+                'title' => 'Kliento užsakymas',
+                'start' => Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d'),
+                'end' => Carbon::parse($order->trampolines->first()->rental_end)->format('Y-m-d'),
+                'backgroundColor' => 'green'
+            ];
+
+            if ($targetFromDate < Carbon::now()) {
+                $Occupied = (new BaseTrampoline())->getOccupation(
+                    $Trampolines,
+                    OccupationTimeFrames::MONTH,
+                    $order,
+                    true,
+                    Carbon::now()->startOfDay(),
+                    $targetTillDate
+                );
+            } else {
+                $Occupied = (new BaseTrampoline())->getOccupation(
+                    $Trampolines,
+                    OccupationTimeFrames::MONTH,
+                    $order,
+                    true,
+                    $targetFromDate,
+                    $targetTillDate
+                );
+            }
+
+            return response()->json([
+                'status' => true,
+                'Events' => [$event],
+                'Occupied' => $Occupied,
+                'Trampolines' => $trampolineIds,
+                'order' => $order,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => false,
+                'message' => $e->getMessage(),
+            ], 400);
+        }
     }
 }

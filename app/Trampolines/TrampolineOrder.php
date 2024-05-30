@@ -185,6 +185,6 @@ class TrampolineOrder implements Order
 
     public function read($orderID): Model|Collection|Builder|array|null
     {
-        return \App\Models\Order::with('client', 'address')->find($orderID);
+        return \App\Models\Order::with('trampolines','client', 'address')->find($orderID);
     }
 }

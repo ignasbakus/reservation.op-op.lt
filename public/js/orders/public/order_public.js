@@ -20,19 +20,6 @@ let Variables = {
         return Trampolines
     }
 }
-// let TargetDate = {
-//     getTargetDate: function (dropInfo) {
-//         if (!dropInfo || !dropInfo.event) {
-//             console.error('Invalid dropInfo:', dropInfo);
-//             return null;
-//         }
-//         console.log(dropInfo.event.start.getFullYear());
-//         let targetDate = new Date(dropInfo.event.start.getFullYear(), dropInfo.event.start.getMonth() + 1, 0);
-//         targetDate.setUTCHours(targetDate.getUTCHours() + 3);
-//         console.log('target date =>', targetDate.toISOString().split('T')[0])
-//         return targetDate.toISOString().split('T')[0];
-//     },
-// };
 let firstVisibleDayOnCalendar;
 let lastVisibleDayOnCalendar;
 let Calendar = null;
@@ -53,6 +40,11 @@ document.addEventListener('DOMContentLoaded', function () {
             let droppedDate = dropInfo.event.start;
             let currentMonth = Calendar.getDate().getMonth();
             let droppedMonth = droppedDate.getMonth();
+
+            console.log('Dropped date =>', droppedDate)
+            console.log('Dropped month =>', droppedMonth)
+            console.log('current month =>', currentMonth)
+
             if (droppedMonth < currentMonth) {
                 Calendar.prev();
                 updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
@@ -115,11 +107,11 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     Calendar.render();
-    updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
+    // updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
 
 
-    addEvent(Occupied)
-    addEvent(Availability)
+    // addEvent(Occupied)
+    // addEvent(Availability)
 })
 
 function addEvent(EventsToAdd) {
@@ -188,6 +180,7 @@ let TrampolineOrder = {
                             $('form input[name=' + FailedInput + ']').addClass('is-invalid');
                         })
                     }
+
                     if (response.status) {
                         $('form input[type=text], form input[type=number], #createTrampolineModal form textarea').val('');
                         $('form input').removeClass('is-invalid');

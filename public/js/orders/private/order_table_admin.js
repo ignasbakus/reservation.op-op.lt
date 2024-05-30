@@ -11,6 +11,17 @@ let Variables = {
     }
 }
 
+let FirstAndLastDays = {
+    formCorrectFirstDate: function (firstVisibleDay){
+        firstVisibleDay.setUTCHours(firstVisibleDay.getUTCHours() + 3)
+        firstVisibleDayOnCalendar = firstVisibleDay.toISOString().split('T')[0]
+    },
+    formCorrectLastDay: function (lastVisibleDay){
+        lastVisibleDay.setUTCHours(lastVisibleDay.getUTCHours() + 3)
+        lastVisibleDayOnCalendar = lastVisibleDay.toISOString().split('T')[0]
+    }
+}
+
 let today = new Date();
 today.setHours(0, 0, 0, 0);
 today = today.toISOString().split('T')[0];
@@ -18,10 +29,12 @@ let firstVisibleDayOnCalendar;
 let lastVisibleDayOnCalendar;
 let isEventDrop = false;
 let trampolineID;
+let lastStartDate, lastEndDate;
+let lastUpdatedMonth = new Date().getMonth();
 
 
 let CalendarFunctions = {
-    populateFullCalendar: function (Dates, Occupied, Event, Trampolines){
+    populateFullCalendar: function (){
         Calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
             initialDate: Dates.CalendarInitial,
             locale: 'lt',
@@ -29,17 +42,20 @@ let CalendarFunctions = {
             selectable: true,
             eventDrop: function (dropInfo) {
                 isEventDrop = true
-                // let droppedDate = dropInfo.event.start;
-                // let currentMonth = Calendar.getDate().getMonth();
-                // let droppedMonth = droppedDate.getMonth();
-                // if (droppedMonth < currentMonth) {
-                //     Calendar.prev();
-                //     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
-                // } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
-                //     lastUpdatedMonth = droppedMonth;
-                //     Calendar.next();
-                //     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
-                // }
+                let droppedDate = dropInfo.event.start;
+                let currentMonth = Calendar.getDate().getMonth();
+                let droppedMonth = droppedDate.getMonth();
+                console.log('Dropped date =>', droppedDate)
+                console.log('Dropped month =>', droppedMonth)
+                console.log('current month =>', currentMonth)
+                if (droppedMonth < currentMonth) {
+                    Calendar.prev();
+                    // Orders.Modals.updateOrder.getDataForModal(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
+                } else if (droppedMonth > currentMonth && droppedMonth > lastUpdatedMonth) {
+                    lastUpdatedMonth = droppedMonth;
+                    // Orders.Modals.updateOrder.getDataForModal(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar)
+                    Calendar.next();
+                }
                 $('.confirmation-container').css('display', 'block');
             },
             eventChange: function (changeInfo) {
@@ -48,21 +64,33 @@ let CalendarFunctions = {
                     changeInfo.revert();
                 }
             },
-            // datesSet: function (info) {
-            //     let firstCalendarVisibleDate = info.start;
-            //     let lastCalendarVisibleDate = info.end;
-            //     firstCalendarVisibleDate.setUTCHours(firstCalendarVisibleDate.getUTCHours() + 3);
-            //     lastCalendarVisibleDate.setUTCHours(lastCalendarVisibleDate.getUTCHours() + 3);
-            //     firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
-            //     lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
-            //     console.log('First calendar day => ', firstVisibleDayOnCalendar);
-            //     console.log('Last calendar day => ', lastVisibleDayOnCalendar);
-            //     if (!isEventDrop) {
-            //         CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
-            //     }
-            //     isEventDrop = false;
-            // },
+            datesSet: function (info) {
+                let firstCalendarVisibleDate = info.start;
+                let lastCalendarVisibleDate = info.end;
+                FirstAndLastDays.formCorrectFirstDate(firstCalendarVisibleDate)
+                FirstAndLastDays.formCorrectLastDay(lastCalendarVisibleDate)
+                console.log('First calendar day => ', firstVisibleDayOnCalendar);
+                console.log('Last calendar day => ', lastVisibleDayOnCalendar);
+
+                if (!isEventDrop) {
+                    // Check if the new date range is different from the last one to avoid redundant requests
+                    if (firstVisibleDayOnCalendar !== lastStartDate || lastVisibleDayOnCalendar !== lastEndDate) {
+                        lastStartDate = firstVisibleDayOnCalendar;
+                        lastEndDate = lastVisibleDayOnCalendar;
+                        // Orders.Modals.updateOrder.getDataForModal(firstCalendarVisibleDate, lastCalendarVisibleDate);
+                    }
+                }
+                isEventDrop = false; // Reset the flag after handling
+            },
             dayMaxEvents: true,
+            // loading: function(isLoading) {
+            //     if (isLoading) {
+            //         $('#loading-spinner').css('display', 'block')
+            //     } else {
+            //         $('#loading-spinner').css('display', 'none')
+            //
+            //     }
+            // },
             events: [],
             eventAllow: function (dropInfo, draggedEvent) {
                 let CouldBeDropped = true;
@@ -81,7 +109,7 @@ let CalendarFunctions = {
 
                 // Check trampolines in the dragged event
 
-                Trampolines.forEach(function (Trampoline) {
+                trampolineID.forEach(function (Trampoline) {
                     draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
                         if (Trampoline.id === AffectedTrampoline.id) {
                             Trampoline.rental_start = dropInfo.startStr
@@ -100,20 +128,7 @@ let CalendarFunctions = {
             }
         });
         Calendar.render();
-        // this.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
-        if (Occupied && Array.isArray(Occupied)) {
-            this.addEvent(Occupied);
-        } else {
-            console.error('Occupied events data is invalid:', Occupied);
-        }
-
-        if (Event && Array.isArray(Event)) {
-            this.addEvent(Event);
-        } else if (Event && typeof Event === 'object') {
-            this.addEvent([Event]);
-        } else {
-            console.error('Event data is invalid:', Event);
-        }
+        Orders.Modals.updateOrder.getDataForModal()
     },
     updateEvents: function (targetStartDate, targetEndDate){
         $.ajax({
@@ -460,8 +475,7 @@ let Orders = {
             init: function () {
                 this.Events.init()
                 document.getElementById('updateOrderModal').addEventListener('shown.bs.modal', event => {
-                    console.log('Modal i opened => getDataForModal !')
-                    this.getDataForModal()
+                    CalendarFunctions.populateFullCalendar()
                 })
             },
             prepareModal: function (OrderID) {
@@ -469,20 +483,26 @@ let Orders = {
                 this.element.show()
             },
             getDataForModal: function () {
+                $('#spinner').show();
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     dataType: 'json',
                     method: "GET",
                     url: "/orders/admin/order/getOrderUpdateData",
                     data: {
-                        order_id: Orders.Modals.updateOrder.orderIdToUpdate
+                        order_id: Orders.Modals.updateOrder.orderIdToUpdate,
+                        target_start_date: firstVisibleDayOnCalendar,
+                        target_end_date: lastVisibleDayOnCalendar
                     }
                 }).done((response) => {
                     if (response.status) {
-                        console.log('getOrderUpdateData response => ', response)
+                        Occupied = response.Occupied
                         this.fillDataForm(response.order)
                         trampolineID = response.Trampolines
-                        CalendarFunctions.populateFullCalendar(response.Dates, response.Occupied, response.Events, response.Trampolines)
+                        Calendar.removeAllEvents()
+                        CalendarFunctions.addEvent(response.Occupied)
+                        CalendarFunctions.addEvent(response.Events)
+                        $('#spinner').hide();
                     } else {
                         console.error("Failed to fetch data: ", response.message);
                     }
@@ -518,6 +538,12 @@ let Orders = {
                         event.stopPropagation()
                         this.updateOrder()
                     })
+                    $('#updateOrderModal .modalClose').on('click', (event) =>{
+                        event.stopPropagation()
+                        console.log('Modal destroyed')
+                        $('.confirmation-container').css('display', 'none');
+                        Calendar.destroy()
+                    })
                 },
                 updateOrder: function () {
                     let form_data = Variables.getOrderFormInputs('updateOrderModal')
@@ -539,6 +565,8 @@ let Orders = {
                             $('#updateOrderModal form input[type=text], #updateOrderModal form input[type=number], #updateOrderModal form textarea').val('');
                             $('#updateOrderModal form input').removeClass('is-invalid');
                             Orders.Modals.updateOrder.element.hide()
+                            $('.confirmation-container').css('display', 'none');
+                            Calendar.destroy()
                         }
                         Orders.Table.Table.draw()
                     })
