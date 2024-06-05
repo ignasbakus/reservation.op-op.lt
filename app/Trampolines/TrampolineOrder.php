@@ -3,12 +3,15 @@
 namespace App\Trampolines;
 
 use App\Interfaces\Order;
+use App\Mail\OrderDeleted;
+use App\Mail\OrderPlaced;
 use App\Models\Client;
 use App\Models\ClientAddress;
 use App\Models\OrdersTrampoline;
 use App\Models\Trampoline;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -121,7 +124,16 @@ class TrampolineOrder implements Order
             'total_sum' => $OrderTotalSum,
             'rental_duration' => $OrderRentalDuration
         ]);
+
+        $this->Order->load('trampolines');
+
         $this->status = true;
+//        $test = $this->Order->trampolines;
+//        dd($test->pivot->rental_start);
+        /*Create interface NotificationsInterface [base methods : notify , checkStatus]*/
+        /*Create class EmailNotification -> implements NotificationsInterface []*/
+//        Mail::to($Client->email)->send(new OrderPlaced($this->Order));
+
         return $this;
     }
 
@@ -164,15 +176,16 @@ class TrampolineOrder implements Order
         );
         $OrderTotalSum = 0;
         $OrderRentalDuration = 0;
-
         try {
             foreach ($trampolineOrderData->Trampolines as $trampoline) {
                 $RentalStart = Carbon::parse($trampoline['rental_start'] ?? OrdersTrampoline::where('orders_id', $trampolineOrderData->orderID)->first()->rental_start);
                 $RentalDuration = $RentalStart->diffInDays(Carbon::parse($trampoline['rental_end'] ?? OrdersTrampoline::where('orders_id', $trampolineOrderData->orderID)->first()->rental_end));
                 $Trampoline = \App\Models\Trampoline::with('Parameter')->find($trampoline['id']);
+//                dd($Trampoline);
                 $this->OrderTrampolines[] = OrdersTrampoline::updateOrCreate(
                     [
                         'orders_id' => $Order->id,
+                        'trampolines_id' => $Trampoline->id,
                     ],
                     [
                         'rental_start' => Carbon::parse($trampoline['rental_start'] ?? OrdersTrampoline::where('orders_id', $trampolineOrderData->orderID)->first()->rental_start)->format('Y-m-d'),
@@ -197,7 +210,7 @@ class TrampolineOrder implements Order
             'rental_duration' => $OrderRentalDuration
             ]
         );
-
+//        dd($this);
         $this->status = true;
         $this->Messages[] = 'Užsakymas atnaujintas sėkmingai !';
         return $this;
@@ -208,6 +221,8 @@ class TrampolineOrder implements Order
         try {
 
             $order = \App\Models\Order::find($orderID);
+
+            Mail::to($order->client->email)->send(new OrderDeleted($order));
 
             $order->trampolines()->delete();
             $order->client()->delete();

@@ -7,7 +7,6 @@ use App\Models\Trampoline;
 use App\Trampolines\BaseTrampoline;
 use App\Trampolines\BaseTrampolineData;
 use App\Trampolines\DataTablesProcessing;
-use App\Trampolines\Services\TrampolineManagementService;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Contracts\View\View;

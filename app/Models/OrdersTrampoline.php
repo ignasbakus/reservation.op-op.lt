@@ -18,5 +18,9 @@ class OrdersTrampoline extends Model
         'total_sum',
     ];
 
+    public function trampoline(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Trampoline::class, 'trampolines_id');
+    }
 
 }

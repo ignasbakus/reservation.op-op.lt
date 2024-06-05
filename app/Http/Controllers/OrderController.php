@@ -12,7 +12,6 @@ use App\Trampolines\OccupationTimeFrames;
 use App\Trampolines\TrampolineOrder;
 use App\Trampolines\TrampolineOrderData;
 use Carbon\Carbon;
-use http\Env\Response;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Application;
@@ -187,22 +186,18 @@ class OrderController extends Controller
         ]);
     }
 
-    public function orderInsert(Request $request): JsonResponse
+    public function orderInsert(): JsonResponse
     {
 
-        /*Send notification on order create*/
-
-//        $Order = Order::find(33);
-//        $Result = Mail::to($Order->client->email)->send(new OrderPlaced($Order));
-//        dd($Result);
         $firstVisibleDay = Carbon::parse(\request()->get('firstVisibleDay', null));
         $lastVisibleDay = Carbon::parse(\request()->get('lastVisibleDay', null));
         $NewOrderEventBackgroundColor = 'green';
         $NewOrderEventTitle = 'Jūsų užsakymas';
-        $Order = (new TrampolineOrder())->create((new TrampolineOrderData($request)));
+        $Order = (new TrampolineOrder())->create((new TrampolineOrderData(\request())));
+//        dd($Order);
         $trampolines_id = [];
 
-        foreach ($request->get('trampolines', []) as $Trampoline) {
+        foreach (\request()->get('trampolines', []) as $Trampoline) {
             $trampolines_id[] = $Trampoline['id'];
         }
         $Trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolines_id)->get();
@@ -224,21 +219,40 @@ class OrderController extends Controller
                 ]
             ];
         }
+        Log::info('Trampolines =>', $Trampolines->toArray());
+        Log::info('first visible day =>', $firstVisibleDay->toArray());
+        Log::info('last visible day =>', $lastVisibleDay->toArray());
 
-
-        return response()->json([
-            'failed_input' => $Order->failedInputs,
-            'status' => $Order->status,
-            'Occupied' => (new BaseTrampoline())->getOccupation(
+        if ($firstVisibleDay < Carbon::now()){
+            $Occupied = (new BaseTrampoline())->getOccupation(
+                $Trampolines,
+                OccupationTimeFrames::MONTH,
+                $Order->Order,
+                true,
+                Carbon::now()->startOfDay(),
+                $lastVisibleDay
+            );
+        } else {
+            $Occupied = (new BaseTrampoline())->getOccupation(
                 $Trampolines,
                 OccupationTimeFrames::MONTH,
                 $Order->Order,
                 true,
                 $firstVisibleDay,
                 $lastVisibleDay
-            ),
+            );
+        }
+
+        return response()->json([
+            'failed_input' => $Order->failedInputs,
+            'status' => $Order->status,
+            'Occupied' => $Occupied,
             'Events' => $Events,
-            'OrderId' => $Order->Order->id
+            'OrderId' => $Order->Order->id,
+            'view' => \view('orders.public.order_info', [
+                'Order' => (new Order())->newQuery()->with('trampolines')->with('client')
+                    ->with('address')->whereIn('id', $Order->Order->id, [])->get(),
+            ])->render()
         ]);
     }
 
@@ -247,7 +261,6 @@ class OrderController extends Controller
         $Order = (new TrampolineOrder())->update(new TrampolineOrderData(\request()));
 //        dd($Order);
 
-        // Ensure Order is initialized
         if (!isset($Order->Order)) {
             return response()->json([
                 'status' => false,
@@ -268,7 +281,6 @@ class OrderController extends Controller
 
         $trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolines_id)->get();
 
-        // Ensure OrderTrampolines is initialized and not empty before accessing it
         if (!isset($Order->OrderTrampolines) || count($Order->OrderTrampolines) === 0) {
             return response()->json([
                 'status' => false,
@@ -294,28 +306,41 @@ class OrderController extends Controller
             ]
         ];
 
-        return response()->json([
-            'Event' => $Event,
-            'failed_input' => $Order->failedInputs,
-            'status' => $Order->status,
-            'Occupied' => (new BaseTrampoline())->getOccupation(
+        if ($firstVisibleDay < carbon::now()) {
+            $Occupied = (new BaseTrampoline())->getOccupation(
+                $trampolines,
+                OccupationTimeFrames::MONTH,
+                $Order->Order,
+                true,
+                Carbon::now()->startOfDay(),
+                $lastVisibleDay
+            );
+        } else {
+            $Occupied = (new BaseTrampoline())->getOccupation(
                 $trampolines,
                 OccupationTimeFrames::MONTH,
                 $Order->Order,
                 true,
                 $firstVisibleDay,
                 $lastVisibleDay
-            ),
+            );
+        }
+
+        return response()->json([
+            'Event' => $Event,
+            'failed_input' => $Order->failedInputs,
+            'status' => $Order->status,
+            'Occupied' => $Occupied,
             'OrderID' => $Order->Order->id
         ]);
     }
 
 
-    public function orderDelete(Request $request): JsonResponse
+    public function orderDelete(): JsonResponse
     {
         //$DeleteResult = (new TrampolineOrder())->delete((new TrampolineOrderData()));
 //        dd($request);
-        $deleteResult = (new TrampolineOrder())->delete($request->input('orderID'));
+        $deleteResult = (new TrampolineOrder())->delete(\request()->input('orderID'));
         return response()->json($deleteResult);
     }
 
@@ -352,6 +377,7 @@ class OrderController extends Controller
 
 
             $Trampolines = (new Trampoline())->newQuery()->whereIn('id', $trampolineIds)->get();
+//            dd($Trampolines);
             $event = (object)[
                 'id' => $order->id,
                 'extendedProps' => [

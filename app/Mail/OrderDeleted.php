@@ -11,7 +11,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderPlaced extends Mailable
+class OrderDeleted extends Mailable
 {
     use Queueable, SerializesModels;
 
@@ -35,7 +35,7 @@ class OrderPlaced extends Mailable
             replyTo: [
                 new Address('uzsakymai@op-op.lt', 'OPOP LT administratorius'),
             ],
-            subject: 'Užsakymas pateiktas',
+            subject: 'Užsakymas atšauktas',
         );
     }
 
@@ -45,8 +45,7 @@ class OrderPlaced extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.orders.order-placed',
-            //text: 'mail.orders.order-placed'
+            view: 'mail.orders.order-deleted',
         );
     }
 

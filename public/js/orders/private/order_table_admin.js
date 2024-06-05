@@ -6,6 +6,7 @@ let trampolineID;
 let trampolines;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
+today.setHours(today.getHours() + 3); // Adjust for timezone offset
 today = today.toISOString().split('T')[0];
 
 /* JS classes */
@@ -42,14 +43,19 @@ let CalendarFunctions = {
             locale: 'lt',
             editable: true,
             selectable: true,
+            validRange: {
+              start: today
+            },
             eventDrop: function (dropInfo) {
                 isEventDrop = true;
                 let droppedDate = dropInfo.event.start;
                 let currentMonth = Calendar.getDate().getMonth();
                 let droppedMonth = droppedDate.getMonth();
+
                 console.log('Dropped date =>', droppedDate);
                 console.log('Dropped month =>', droppedMonth);
                 console.log('current month =>', currentMonth);
+
                 if (droppedMonth < currentMonth) {
                     Calendar.prev();
                     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
@@ -58,17 +64,12 @@ let CalendarFunctions = {
                     CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar);
                 }
             },
-            eventChange: function (changeInfo) {
-                let newStartDate = new Date(changeInfo.event.start);
-                if (newStartDate < new Date(today)) {
-                    changeInfo.revert();
-                }
-            },
             datesSet: function (info) {
                 let firstCalendarVisibleDate = info.start;
                 let lastCalendarVisibleDate = info.end;
                 FirstAndLastDays.formCorrectFirstDate(firstCalendarVisibleDate);
                 FirstAndLastDays.formCorrectLastDay(lastCalendarVisibleDate);
+
                 console.log('First calendar day => ', firstVisibleDayOnCalendar);
                 console.log('Last calendar day => ', lastVisibleDayOnCalendar);
 
@@ -82,16 +83,27 @@ let CalendarFunctions = {
             eventAllow: function (dropInfo, draggedEvent) {
                 let dropStart = new Date(dropInfo.startStr);
                 let dropEnd = new Date(dropInfo.endStr);
+                let draggedEndMinusOneHour = new Date(draggedEvent.endStr)
+                let dropEndMinusOneHour = new Date(dropInfo.endStr)
+                dropEndMinusOneHour.setDate(dropEndMinusOneHour.getDate() - 1)
+                draggedEndMinusOneHour.setDate(draggedEndMinusOneHour.getDate() - 1)
+                dropEndMinusOneHour.setUTCHours(dropEndMinusOneHour.getUTCHours() + 3)
+                draggedEndMinusOneHour.setUTCHours(draggedEndMinusOneHour.getUTCHours() + 3)
+                let dropEndForDisplay = dropEndMinusOneHour.toISOString().split('T')[0]
+                let draggedEndForDisplay = draggedEndMinusOneHour.toISOString().split('T')[0]
 
                 let CouldBeDropped = true;
                 Occupied.forEach(function (Occupation) {
                     let OccupationStart = new Date(Occupation.start);
                     let OccupationEnd = new Date(Occupation.end);
-                    if ((dropStart >= OccupationStart && dropStart < OccupationEnd) || (dropEnd > OccupationStart && dropEnd <= OccupationEnd) || (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
+                    if ((dropStart >= OccupationStart && dropStart < OccupationEnd) ||
+                        (dropEnd > OccupationStart && dropEnd <= OccupationEnd) ||
+                        (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
                         CouldBeDropped = false;
                         return false;
                     }
                 });
+
                 if (CouldBeDropped) {
                     trampolines.forEach(function (Trampoline) {
                         console.log('admin trampolines => ', trampolines)
@@ -101,7 +113,7 @@ let CalendarFunctions = {
                                 Trampoline.rental_end = dropInfo.endStr;
                                 console.log('admin startStr => ', dropInfo.startStr)
                                 console.log('admin endStr => ', dropInfo.endStr)
-                                Orders.Modals.updateOrder.Events.DisplayConfirmationElement(dropInfo.startStr, dropInfo.endStr);
+                                Orders.Modals.updateOrder.Events.DisplayConfirmationElement(dropInfo.startStr, dropEndForDisplay);
                             }
                         });
                     });
@@ -109,8 +121,8 @@ let CalendarFunctions = {
                     trampolines.forEach(function (Trampoline) {
                         Trampoline.rental_start = draggedEvent.startStr;
                         Trampoline.rental_end = draggedEvent.endStr;
-                        Orders.Modals.updateOrder.Events.DisplayConfirmationElement(draggedEvent.startStr, draggedEvent.endStr);
-                    })
+                        Orders.Modals.updateOrder.Events.DisplayConfirmationElement(draggedEvent.startStr, draggedEndForDisplay);
+                    });
                 }
                 return CouldBeDropped;
             },
@@ -259,20 +271,6 @@ let Orders = {
             element: new bootstrap.Modal('#removeOrderModal'),
             prepareModal: function (OrderID) {
                 this.orderIdToDelete = OrderID
-                /*$.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    dataType: 'json',
-                    method: "GET",
-                    url: "/orders/admin/order",
-                    data: {
-                        order_id: OrderID
-                    }
-                }).done((response) => {
-                    if (response.status) {
-                        console.log('AJAX success:', response);
-                    }
-                })*/
-
                 $('#removeOrderModal .modal-body .editable').html('Ar tikrai norite ištrinti užsakymą Nr: "' + OrderID + '"?')
                 this.element.show()
 

@@ -272,7 +272,7 @@ class BaseTrampoline implements Trampoline
                     'order_id' => $Order->id,
                     'type_custom' => 'orderEvent'
                 ],
-                'title' => 'Kliento užsakymas',
+                'title' => 'Jūsų užsakymas',
                 'start' => $todayStart->format('Y-m-d'),
                 'end' => $todayEnd->format('Y-m-d'),
                 'backgroundColor' => 'green'

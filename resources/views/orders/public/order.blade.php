@@ -1,37 +1,13 @@
 @extends('layouts.layout')
 
+@section('custom_css')
+    <link href="/css/order/public/public_order_view.css" rel="stylesheet" crossorigin="anonymous">
+@endsection
+
 @section('content')
     <div class="row">
         <div class="col-4" id="columnAfterSentOrder" style="display: none">
-            <div id="thankYouDiv" style="display: none" class="ms-5">
-                <div class="px-4 py-5">
-                    <h5 class="text-uppercase">Jonathan Adler</h5>
-                    <h4 class="mt-5 theme-color mb-5">Thanks for your order</h4>
-                    <span class="theme-color">Payment Summary</span>
-                    <div class="mb-3">
-                        <hr class="new1">
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <span class="font-weight-bold">Ether Chair(Qty:1)</span>
-                        <span class="text-muted">$1750.00</span>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small>Shipping</small>
-                        <small>$175.00</small>
-                    </div>
-                    <div class="d-flex justify-content-between">
-                        <small>Tax</small>
-                        <small>$200.00</small>
-                    </div>
-                    <div class="d-flex justify-content-between mt-3">
-                        <span class="font-weight-bold">Total</span>
-                        <span class="font-weight-bold theme-color">$2125.00</span>
-                    </div>
-                    <div class="text-center mt-5">
-                        <button class="btn btn-primary btn-thankYou">Track your order</button>
-                    </div>
-                </div>
-            </div>
+            <div id="thankYouDiv" class="ms-5"></div>
             <div id="confirmationContainer" class="confirmation-container ms-5 mt-3" style="display: none">
                 <button class="btn-close close-button confirmationClose" aria-label="Close"></button>
                 <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>

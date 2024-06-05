@@ -1,5 +1,9 @@
 @extends('layouts.layout')
 
+@section('custom_css')
+    <link href="/css/trampolines/public/public_index.css" rel="stylesheet" crossorigin="anonymous">
+@endsection
+
 @section('content')
     <div class="container">
         <div class="row">
@@ -38,7 +42,7 @@
                         <span class="visually-hidden">Next</span>
                     </button>
                 </div>
-                <button id="selectTrampoline" type="button" class="col btn opacity-50 btn-light chooseButton"
+                <button id="selectTrampoline" type="button" class="col btn opacity-60 btn-primary chooseButton"
                         style="width: 100%">
                     Pasirinkti batuta
                 </button>
@@ -61,26 +65,25 @@
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h1 class="modal-title fs-5" id="exampleModalLabel">Batutas</h1>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
+                    {{--                    <div class="modal-header">--}}
+                    {{--                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>--}}
+                    {{--                    </div>--}}
                     <div class="modal-body">
                         <div id="carouselExample" class="carousel slide">
                             <div class="carousel-inner">
                                 <div class="carousel-item active">
                                     <img
                                         src="https://bouncycastlenetwork-res.cloudinary.com/image/upload/f_auto,q_auto,c_limit,w_1100/12e885a2ce90725ddac404eff42cef7e"
-                                        class="d-block w-100" alt="...">
+                                        class="d-block w-100 modal-image" alt="...">
                                 </div>
                                 <div class="carousel-item">
                                     <img src="https://m.media-amazon.com/images/I/71voD+9xCRL._AC_UF894,1000_QL80_.jpg"
-                                         class="d-block w-100" alt="...">
+                                         class="d-block w-100 modal-image" alt="...">
                                 </div>
                                 <div class="carousel-item">
                                     <img
                                         src="https://bouncycastlenetwork-res.cloudinary.com/316d6265d4ec22b8f761b96d7b521d22.jpg"
-                                        class="d-block w-100" alt="...">
+                                        class="d-block w-100 modal-image" alt="...">
                                 </div>
                             </div>
                             <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample"

@@ -7,7 +7,7 @@
     <link href="/frameworks/bootstrap-5.3.3/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="/frameworks/jquery-ui-1.13.2/jquery-ui.min.css" rel="stylesheet" crossorigin="anonymous">
     <link href="/frameworks/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" crossorigin="anonymous">
-    <link href="/css/order/public/public_order_view.css" rel="stylesheet" crossorigin="anonymous">
+    @yield('custom_css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <style>
         .navbar-lightblue {

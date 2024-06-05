@@ -85,6 +85,7 @@ let Trampolines = {
             }
         }).done((response) => {
             console.log("response : ", response);
+            console.log(Trampolines.chosen)
             $('#SelectedTrampolines').html(response.view)
             this.initEventsAfterHtmlUpdate();
         }).fail(function (jqXHR, textStatus) {

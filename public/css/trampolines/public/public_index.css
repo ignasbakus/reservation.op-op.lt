@@ -1,0 +1,84 @@
+.modal-image {
+    height: 400px; /* Adjust the height as needed */
+}
+
+/* Ensure the list items have consistent padding and margins */
+.list-group-item {
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+}
+
+/* Make the title stand out more */
+.list-group-item .fw-bold {
+    font-size: 1.2rem;
+}
+
+/* Adjust the badge styling */
+.badge.text-bg-primary {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+}
+
+/* Style the remove button */
+.btn-outline-danger {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Adjust the SVG icon size */
+.bi-trash3 {
+    width: 16px;
+    height: 16px;
+}
+/* Ensure the list items have consistent padding and margins */
+.trampoline-item {
+    padding: 20px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Make the title stand out more */
+.trampoline-item .fw-bold {
+    font-size: 1.2rem;
+}
+
+/* Adjust the badge styling */
+.price-badge {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    margin-left: 1rem;
+}
+
+/* Style the remove button */
+.btn-outline-danger {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+    border: 1px solid #dc3545;
+}
+
+.btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+/* Adjust the SVG icon size */
+.bi-trash3 {
+    width: 16px;
+    height: 16px;
+}
