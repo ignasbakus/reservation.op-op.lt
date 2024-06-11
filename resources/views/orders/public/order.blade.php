@@ -10,14 +10,12 @@
             <div class="col-lg-4" id="columnAfterSentOrder" style="display: none">
                 <div id="thankYouDiv" class="ms-lg-5"></div>
                 <div id="confirmationContainer" class="confirmation-container ms-lg-5 mt-3" style="display: none">
-                    <button class="btn-close close-button confirmationClose" aria-label="Close"></button>
                     <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>
-                    <div class="dates-info">
-                        <p class="date-label">Užsakymo datas bus pakeistos į:</p>
-                        <div class="dates"></div>
-                    </div>
-                    <div class="checkbox-container">
-                        <button type="button" class="btn btn-primary confirmChanges mr-2 confirmDatesChange">
+                    <div class="checkbox-container d-flex justify-content-end mt-2">
+                        <button type="button" class="btn btn-danger me-2 confirmationClose">
+                            Atšaukti
+                        </button>
+                        <button type="button" class="btn btn-primary confirmChanges confirmDatesChange">
                             Pakeisti
                         </button>
                     </div>

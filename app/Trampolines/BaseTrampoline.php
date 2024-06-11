@@ -227,6 +227,9 @@ class BaseTrampoline implements Trampoline
 
         $availableDates = [];
         $occupiedDates = $this->getOccupation($Trampolines, OccupationTimeFrames::MONTH, new Order(), false, $fromDate,$tillDate);
+        $occupiedDates = collect($occupiedDates)->filter(function($occupiedDate) use ($Order) {
+            return $occupiedDate->orders_id !== $Order->id;
+        })->all();
 //        dd($occupiedDates);
         $isDateRangeOccupied = function (Carbon $start, Carbon $end) use ($occupiedDates) {
             foreach ($occupiedDates as $occupiedDate) {

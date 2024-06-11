@@ -194,6 +194,7 @@ class OrderController extends Controller
 
         $firstVisibleDay = Carbon::parse(\request()->get('firstVisibleDay', null));
         $lastVisibleDay = Carbon::parse(\request()->get('lastVisibleDay', null));
+//        dd(\request());
         $NewOrderEventBackgroundColor = 'green';
         $NewOrderEventTitle = 'Jūsų užsakymas';
         $Order = (new TrampolineOrder())->create((new TrampolineOrderData(\request())));
@@ -267,6 +268,7 @@ class OrderController extends Controller
 
     public function orderUpdate(): JsonResponse
     {
+//        dd(\request());
         $Order = (new TrampolineOrder())->update(new TrampolineOrderData(\request()));
 //        dd($Order);
 

@@ -12,11 +12,9 @@
     padding: 20px; /* Add padding */
 }
 
-
 .thankYouDiv {
     background-color: #fff;
     border-color: #fff;
-
 }
 
 .theme-color {
@@ -28,7 +26,6 @@ hr.new1 {
     margin: 0.4rem 0;
 }
 
-
 .btn-thankYou {
     color: #fff;
     background-color: #004cb9;
@@ -37,7 +34,6 @@ hr.new1 {
     border-radius: 1px;
     font-size: 17px;
 }
-
 
 .btn-thankYou:hover {
     color: #fff;

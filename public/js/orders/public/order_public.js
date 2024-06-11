@@ -14,15 +14,16 @@ let Variables = {
     orderFormInput: [
         'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity', 'customerDeliveryPostCode', 'customerDeliveryAddress'
     ],
-    formInputValues: {},
     getOrderFormInputs: function () {
         let values = {};
+        console.log('Trampolines => ', Trampolines)
         this.orderFormInput.forEach(function (inputName) {
             values[inputName] = $('#orderForm input[name="' + inputName + '"]').val();
         });
+
         values.trampolines = Trampolines;
-        this.formInputValues = values;
         console.log('values => ', values)
+        console.log('saved values => ', this.formInputValues)
         return values;
     },
     getTrampolines: function () {
@@ -115,10 +116,11 @@ let CalendarFunctions = {
                     });
                     if (CouldBeDropped) {
                         Trampolines.forEach(function (Trampoline) {
-                            console.log('dragged event trampolines before = ', draggedEvent.extendedProps.trampolines)
-
+                            // console.log('dragged event trampolines before = ', draggedEvent.extendedProps.trampolines)
                             draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
                                 if (Trampoline.id === AffectedTrampoline.id) {
+                                    console.log('drop info startStr = ', dropInfo.startStr)
+                                    console.log('drop info endSTr = ', dropInfo.endStr)
                                     Trampoline.rental_start = dropInfo.startStr
                                     Trampoline.rental_end = dropInfo.endStr
                                     AffectedTrampoline.rental_start = dropInfo.startStr
@@ -131,9 +133,9 @@ let CalendarFunctions = {
                                 }
                             })
                         })
-                        // @todo Pasiziureti
                         console.log('dragged event trampolines after = ', draggedEvent.extendedProps.trampolines)
                     } else {
+                        // console.log('pasiekem')
                         Trampolines.forEach(function (Trampoline) {
                             Trampoline.rental_start = draggedEvent.startStr
                             Trampoline.rental_end = draggedEvent.endStr
@@ -207,6 +209,7 @@ let CalendarFunctions = {
                 // TrampolineOrder.FormSendOrder.Event.DisplayConfirmationElement(response.Availability[0].start, response.Availability[0].end)
                 this.addEvent(response.Occupied);
                 this.addEvent(response.Availability);
+                Trampolines = response.Trampolines
             }
         }).always((instance) => {
             // console.log("always => response : ", instance);
@@ -226,8 +229,8 @@ let TrampolineOrder = {
             element: $('#sendOrderColumn form')
         },
         Event: {
-            OccupiedFromCreate: '',
-            EventFromCreate: '',
+            OccupiedFromCreate: '', /* Sitaip neveiks, jeigu atnaujinsim i kita menesi diena */
+            EventFromCreate: '', /* Sitaip neveiks, jeigu atnaujinsim i kita menesi diena */
             init: function () {
                 $('#orderForm .orderSameDay').on('change', function () {
                     if (!$(this).is(':checked')) {
@@ -261,7 +264,7 @@ let TrampolineOrder = {
                         })
                     }
                     if (response.status) {
-                        $('form input[type=text], form input[type=number], #createTrampolineModal form textarea').val('');
+                        // $('form input[type=text], form input[type=number], #createTrampolineModal form textarea').val('');
                         $('form input').removeClass('is-invalid');
                         $('.infoBeforeSuccessfulOrder').css('display', 'none');
                         $('#columnAfterSentOrder').css('display', 'block')
@@ -318,7 +321,7 @@ let TrampolineOrder = {
                 })
             },
             updateOrder: function () {
-                let form_data = Variables.formInputValues
+                let form_data = Variables.getOrderFormInputs()
                 form_data.orderID = TrampolineOrder.UpdateOrder.OrderIdToUpdate
                 form_data.firstVisibleDay = firstVisibleDayOnCalendar
                 form_data.lastVisibleDay = lastVisibleDayOnCalendar
