@@ -1,4 +1,7 @@
 @extends('layouts.admin_panel_layout')
+@section('custom_css')
+    <link href="/css/order/admin/admin_order_calendar.css" rel="stylesheet" crossorigin="anonymous">
+@endsection
 @section('content')
     <div class="row mb-5">
         <div class="col-4">
@@ -140,6 +143,14 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert" style="display: none;">
+        <span id="failedAlertMessage"></span>
+        <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show custom-alert" id="successAlert" role="alert" style="display: none;">
+        <span id="successAlertMessage"></span>
+        <button type="button" class="btn-close" aria-label="Close" onclick="$('#successAlert').hide()"></button>
     </div>
 @endsection
 @section('custom_js')

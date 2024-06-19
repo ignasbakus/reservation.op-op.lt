@@ -148,20 +148,31 @@ let Trampolines = {
                         $('#overlay').hide();
                         console.log("response : ", response);
                         if (response.status === false) {
-
                             $('#createTrampolineModal form input').removeClass('is-invalid');
-
                             Object.keys(response.failed_input).forEach(function (FailedInput) {
                                 $('#createTrampolineModal form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
                                 $('#createTrampolineModal form input[name=' + FailedInput + ']').addClass('is-invalid');
                             })
                         }
                         if (response.status) {
+                            $('#successAlertMessage').text('Batutas sukurtas sėkmingai!')
+                            $('#successAlert').show().css('display', 'flex')
                             $('#createTrampolineModal form input[type=text], #createTrampolineModal form input[type=number], #createTrampolineModal form textarea').val('');
                             $('#createTrampolineModal form input').removeClass('is-invalid');
                             Trampolines.Modals.addTrampoline.element.hide();
                         }
                         Trampolines.Table.Table.draw()
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Trampolines.Modals.addTrampoline.element.hide();
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko sukurti batuto: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko sukurti batuto: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
                     })
                 }
             }
@@ -243,8 +254,17 @@ let Trampolines = {
                         this.fillDataForm(response.trampoline)
                         Trampolines.Modals.updateTrampoline.element.show()
                     }
-                }).always((response) => {
-                    console.log("always => response : ", response);
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                    Trampolines.Modals.addTrampoline.element.hide();
+                    let errorMessage = 'An error occurred';
+                    if (jqXHR.responseJSON) {
+                        errorMessage = 'Nepavyko atidaryti modalo: ' + jqXHR.responseJSON.message;
+                    } else if (jqXHR.responseText) {
+                        errorMessage = 'Nepavyko atidaryti modalo: ' + jqXHR.responseText;
+                    }
+                    $('#failedAlertMessage').text(errorMessage);
+                    $('#failedAlert').show().css('display', 'flex');
                 })
             },
             Events: {
@@ -274,11 +294,24 @@ let Trampolines = {
                             })
                         }
                         if (response.status) {
+                            $('#successAlertMessage').text('Batutas atnaujintas sėkmingai!')
+                            $('#successAlert').show().css('display', 'flex')
                             $('#updateTrampolineModal form input[type=text], #updateTrampolineModal form input[type=number], #updateTrampolineModal form textarea').val('');
                             $('#updateTrampolineModal form input').removeClass('is-invalid');
                             Trampolines.Modals.updateTrampoline.element.hide()
                         }
                         Trampolines.Table.Table.draw()
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Trampolines.Modals.updateTrampoline.element.hide();
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko atnaujinti batuto: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko atnaujinti batuto: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
                     })
                 }
             }
@@ -304,6 +337,17 @@ let Trampolines = {
                         html('Ar tikrai norite ištrinti batutą "' + response.trampoline.title + '"?');
                         this.element.show()
                     }
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                    Trampolines.Modals.updateTrampoline.element.hide();
+                    let errorMessage = 'An error occurred';
+                    if (jqXHR.responseJSON) {
+                        errorMessage = 'Nepavyko atidaryti modalo: ' + jqXHR.responseJSON.message;
+                    } else if (jqXHR.responseText) {
+                        errorMessage = 'Nepavyko atidaryti modalo: ' + jqXHR.responseText;
+                    }
+                    $('#failedAlertMessage').text(errorMessage);
+                    $('#failedAlert').show().css('display', 'flex');
                 })
             },
             Events: {
@@ -326,9 +370,22 @@ let Trampolines = {
                     }).done((response) => {
                         $('#overlay').hide();
                         if (response.status) {
+                            $('#successAlertMessage').text('Batutas ištrintas sėkmingai!')
+                            $('#successAlert').show().css('display', 'flex')
                             Trampolines.Modals.deleteTrampoline.element.hide()
                         }
                         Trampolines.Table.Table.draw()
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Trampolines.Modals.deleteTrampoline.element.hide();
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko ištrinti batuto: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko ištrinti batuto: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
                     })
                 }
             }

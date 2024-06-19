@@ -84,3 +84,26 @@ label[for="showConfirmation"] input[type="checkbox"] {
 .btn-secondary {
     margin-right: auto;
 }
+
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    right: -350px; /* Start hidden off the right side */
+    width: 300px;
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    z-index: 1060; /* Higher than Bootstrap modal's z-index */
+    border-radius: 10px;
+    transition: right 0.5s ease; /* Smooth slide-in effect */
+}
+.custom-alert.show {
+    right: 20px; /* Slide in to the right position */
+}
+.custom-alert .btn-close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}

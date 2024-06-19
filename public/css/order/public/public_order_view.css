@@ -129,7 +129,7 @@ hr.new1 {
     align-items: center;
     justify-content: center;
     text-align: center;
-    z-index: 1050; /* Ensure it appears above other elements */
+    z-index: 1060; /* Higher than Bootstrap modal's z-index */
     border-radius: 10px;
     transition: right 0.5s ease; /* Smooth slide-in effect */
 }

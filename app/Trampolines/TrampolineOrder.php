@@ -47,8 +47,13 @@ class TrampolineOrder implements Order
             $trampolineId = $trampoline['id'];
             $rentalStart = Carbon::parse($trampoline['rental_start'])->format('Y-m-d');
             $rentalEnd = Carbon::parse($trampoline['rental_end'])->format('Y-m-d');
+            $orderId = $trampolineOrderData->orderID ?? null; // check if orderID exists
             $overlappingRentals = DB::table('orders_trampolines')
                 ->where('trampolines_id', $trampolineId)
+                ->when($orderId, function ($query, $orderId) {
+                    // exclude the current order from the check if orderID exists
+                    return $query->where('orders_id', '!=', $orderId);
+                })
                 ->where(function ($query) use ($rentalStart, $rentalEnd) {
                     $query->where(function ($query) use ($rentalStart) {
                         // rental_start is between existing rental_start and rental_end
@@ -66,7 +71,7 @@ class TrampolineOrder implements Order
                             ->where('rental_end', '<=', $rentalEnd);
                     });
                 })
-                ->orWhere(function ($query) use ($rentalStart, $rentalEnd){
+                ->orWhere(function ($query) use ($rentalStart, $rentalEnd) {
                     $query->where('rental_start', $rentalStart)->where('rental_end', $rentalEnd);
                 })
                 ->exists();
@@ -200,6 +205,11 @@ class TrampolineOrder implements Order
 
     public function update(TrampolineOrderData $trampolineOrderData): static
     {
+        if (!$trampolineOrderData->ValidationStatus) {
+            $this->failedInputs = $trampolineOrderData->failedInputs;
+            $this->status = false;
+            return $this;
+        }
         $order = \App\Models\Order::find($trampolineOrderData->orderID);
         if (!$order) {
             $this->status = false;
@@ -236,13 +246,6 @@ class TrampolineOrder implements Order
             }
         }
 
-
-        if (!$trampolineOrderData->ValidationStatus) {
-            $this->failedInputs = $trampolineOrderData->failedInputs;
-            $this->status = false;
-//            dd($this);
-            return $this;
-        }
         $Order = \App\Models\Order::updateOrCreate(
             [
                 'id' => $trampolineOrderData->orderID

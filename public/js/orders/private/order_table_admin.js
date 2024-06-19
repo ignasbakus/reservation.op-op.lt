@@ -321,9 +321,22 @@ let Orders = {
                     }).done((response) => {
                         $('#overlay').hide();
                         if (response.status) {
+                            $('#successAlertMessage').text('Užsakymas atšauktas')
+                            $('#successAlert').show().css('display', 'flex')
                             Orders.Modals.deleteOrder.element.hide()
                         }
                         Orders.Table.Table.draw()
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Orders.Modals.deleteOrder.element.hide()
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko atšaukti užsakymo: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko atšaukti užsakymo: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
                     })
                 }
             }
@@ -404,16 +417,27 @@ let Orders = {
                         order_id: Orders.Modals.updateOrder.orderIdToUpdate,
                     }
                 }).done((response) => {
+                    $('#overlay').hide();
                     if (response.status) {
                         CalendarFunctions.Calendar.initializeCalendar(response.Dates.CalendarInitial)
                     } else {
                         console.error("Failed to fetch data: ", response.message);
                     }
-                }).always((instance) => {
-                    console.log("always => response : ", instance);
-                });
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                    Orders.Modals.updateOrder.element.hide()
+                    let errorMessage = 'An error occurred';
+                    if (jqXHR.responseJSON) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseJSON.message;
+                    } else if (jqXHR.responseText) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseText;
+                    }
+                    $('#failedAlertMessage').text(errorMessage);
+                    $('#failedAlert').show().css('display', 'flex');
+                })
             },
             getDataForModal: function () {
+                $('#overlay').css('display', 'flex')
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     dataType: 'json',
@@ -441,9 +465,18 @@ let Orders = {
                     } else {
                         console.error("Failed to fetch data: ", response.message);
                     }
-                }).always((instance) => {
-                    console.log("always => response : ", instance);
-                });
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                    Orders.Modals.updateOrder.element.hide()
+                    let errorMessage = 'An error occurred';
+                    if (jqXHR.responseJSON) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseJSON.message;
+                    } else if (jqXHR.responseText) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseText;
+                    }
+                    $('#failedAlertMessage').text(errorMessage);
+                    $('#failedAlert').show().css('display', 'flex');
+                })
             },
             Events: {
                 init: function () {
@@ -499,9 +532,18 @@ let Orders = {
                             Object.keys(response.failed_input).forEach(function (FailedInput) {
                                 $('#updateOrderModal form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
                                 $('#updateOrderModal form input[name=' + FailedInput + ']').addClass('is-invalid');
+                                if (response.failed_input.error) {
+                                    $('#failedAlertMessage').text(response.failed_input.error[0]);
+                                    $('#failedAlert').show().css('display', 'flex');
+                                    CalendarFunctions.Calendar.calendar.removeAllEvents()
+                                    Orders.Modals.updateOrder.Events.DisplayConfirmationElement('none')
+                                    Orders.Modals.updateOrder.getDataForModal()
+                                }
                             })
                         }
                         if (response.status) {
+                            $('#successAlertMessage').text('Užsakymas atnaujintas sėkmingai!')
+                            $('#successAlert').show().css('display', 'flex')
                             eventDay = response.Event[0].start
                             $('#updateOrderModal form input').removeClass('is-invalid');
                             this.DisplayConfirmationElement('none')
@@ -511,6 +553,17 @@ let Orders = {
                             Orders.Modals.updateOrder.OccupiedWhenCancelled = response.Occupied
                             Orders.Modals.updateOrder.EventWhenCancelled = response.Event
                         }
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Orders.Modals.updateOrder.element.hide()
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
                     })
                 },
                 DisplayConfirmationElement: function (displayValue) {
@@ -530,8 +583,8 @@ let Orders = {
     }
 }
 
-    /* Document ready function */
-    $(document).ready(function () {
-        Orders.init();
-        console.log("/js/orders/private/order_table_admin.js -> ready!");
-    });
+/* Document ready function */
+$(document).ready(function () {
+    Orders.init();
+    console.log("/js/orders/private/order_table_admin.js -> ready!");
+});

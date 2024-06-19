@@ -86,9 +86,13 @@
             <div class="col me-5">
                 <div id="calendar"></div>
             </div>
-            <div class="alert alert-warning alert-dismissible fade show custom-alert" id="customAlert" role="alert" style="display: none;">
-                <span id="alertMessage"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="hideAlert()"></button>
+            <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert" style="display: none;">
+                <span id="failedAlertMessage"></span>
+                <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
+            </div>
+            <div class="alert alert-success alert-dismissible fade show custom-alert" id="successfulDateChangeAlert" role="alert" style="display: none;">
+                <span id="dateChangeAlertMessage"></span>
+                <button type="button" class="btn-close" aria-label="Close" onclick="$('#successfulDateChangeAlert').hide()"></button>
             </div>
         </div>
     </div>

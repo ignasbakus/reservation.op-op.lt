@@ -189,7 +189,7 @@ let CalendarFunctions = {
             }
         });
     },
-    updateEventsPrivate: function (firstVisibleDay, lastVisibleDay, firstMonthDay) {
+    updateEventsPrivate: function (firstVisibleDay, lastVisibleDay, firstMonthDay, hasFailedUpdate = false) {
         $('#overlay').css('display', 'flex')
         $.ajax({
             headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
@@ -204,10 +204,15 @@ let CalendarFunctions = {
         }).done((response) => {
             $('#overlay').hide();
             if (response.status) {
+                Occupied = response.Occupied;
                 this.Calendar.calendar.removeAllEvents();
                 this.addEvent(response.Occupied);
+                console.log('Occupied => ', response.Occupied)
                 this.addEvent(response.Availability);
                 Trampolines = response.Trampolines;
+                if (hasFailedUpdate) {
+                    TrampolineOrder.FormSendOrder.Event.OccupiedFromCreate = response.Occupied;
+                }
             }
         });
     },
@@ -259,9 +264,8 @@ let TrampolineOrder = {
                             $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
                             $('form input[name=' + FailedInput + ']').addClass('is-invalid');
                         });
-                        // CalendarFunctions.Calendar.calendar.removeAllEvents()
-                        $('#alertMessage').text(response.failed_input.error[0])
-                        $('#customAlert').show().css('display', 'flex');
+                        $('#failedAlertMessage').text(response.failed_input.error[0])
+                        $('#failedAlert').show().css('display', 'flex');
                         CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
                     }
                     if (response.status) {
@@ -333,7 +337,8 @@ let TrampolineOrder = {
                     $('#overlay').hide();
                     if (response.status) {
                         eventDay = response.Event[0].start
-                        console.log('event day = ', eventDay)
+                        $('#dateChangeAlertMessage').text('Rezervacijos dienos sėkmingai atnaujintos!')
+                        $('#successfulDateChangeAlert').show().css('display', 'flex');
                         $('#confirmationContainer').css('display', 'none');
                         $('#thankYouDiv').html(response.view);
                         CalendarFunctions.Calendar.calendar.removeAllEvents();
@@ -343,9 +348,9 @@ let TrampolineOrder = {
                         TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Event;
                     }
                     if (!response.status) {
-                        $('#alertMessage').text(response.failed_input.error[0])
-                        $('#customAlert').show().css('display', 'flex');
-                        CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
+                        $('#failedAlertMessage').text(response.failed_input.error[0])
+                        $('#failedAlert').show().css('display', 'flex');
+                        CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay, true)
                     }
                 });
             },

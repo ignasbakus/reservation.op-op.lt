@@ -1,4 +1,7 @@
 @extends('layouts.admin_panel_layout')
+@section('custom_css')
+    <link href="/css/trampolines/admin/admin_index.css" rel="stylesheet" crossorigin="anonymous">
+@endsection
 @section('content')
     <div class="container flex-grow-1">
         <div class="row mb-5">
@@ -259,6 +262,14 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert" style="display: none;">
+            <span id="failedAlertMessage"></span>
+            <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
+        </div>
+        <div class="alert alert-success alert-dismissible fade show custom-alert" id="successAlert" role="alert" style="display: none;">
+            <span id="successAlertMessage"></span>
+            <button type="button" class="btn-close" aria-label="Close" onclick="$('#successAlert').hide()"></button>
         </div>
     </div>
 @endsection
