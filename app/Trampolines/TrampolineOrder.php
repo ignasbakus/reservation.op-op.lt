@@ -82,6 +82,13 @@ class TrampolineOrder implements Order
         return ['status' => true];
     }
 
+    public static function calculateAdvanceSum($totalSum): float
+    {
+        $advancePercentage = config('trampolines.advance_percentage');
+        $advancePayment = $totalSum * $advancePercentage;
+        return round($advancePayment, -1);
+    }
+
     public function create(TrampolineOrderData $trampolineOrderData): static
     {
         $checkResult = self::canRegisterOrder($trampolineOrderData);
@@ -137,6 +144,7 @@ class TrampolineOrder implements Order
                 'delivery_address_id' => $ClientAddress->id,
                 'advance_sum' => 0,
                 'total_sum' => 0,
+                'advance_status' => false,
                 'client_id' => $Client->id
             ]);
 
@@ -157,6 +165,7 @@ class TrampolineOrder implements Order
                         'rental_end' => $RentalEnd->format('Y-m-d'),
                         'rental_duration' => $RentalDuration,
                         'total_sum' => $RentalDuration * $Trampoline->Parameter->price,
+//                        'advance_status' => false
                     ]);
 
                     $OrderTotalSum += $RentalDuration * $Trampoline->Parameter->price;
@@ -171,10 +180,11 @@ class TrampolineOrder implements Order
                     throw $e;
                 }
             }
-
+            $advanceSUm = self::calculateAdvanceSum($OrderTotalSum);
             $this->Order->update([
                 'total_sum' => $OrderTotalSum,
-                'rental_duration' => $OrderRentalDuration
+                'rental_duration' => $OrderRentalDuration,
+                'advance_sum' => $advanceSUm
             ]);
 
             DB::commit();
@@ -340,5 +350,43 @@ class TrampolineOrder implements Order
     public function read($orderID): Model|Collection|Builder|array|null
     {
         return \App\Models\Order::with('trampolines', 'client', 'address')->find($orderID);
+    }
+
+    public function deleteUnpaidOrders(): static
+    {
+        // Get the current date and time
+        $now = Carbon::now();
+
+        // Retrieve all orders where advance_status is 0
+        $unpaidOrders = \App\Models\Order::where('advance_status', 0)->get();
+//        dd($unpaidOrders);
+//        dd($unpaidOrders);
+        // Iterate over the unpaid orders
+        foreach ($unpaidOrders as $order) {
+            // Parse the order_date to a Carbon instance
+            $orderDate = Carbon::parse($order->order_date);
+//            dd($orderDate);
+
+//            dd($now);
+//            dd($orderDate);
+            dd([
+                'now' => $now->toDateTimeString(),
+                'now_time_zone' => $now->getTimezone(),
+                'order_date' => $orderDate->toDateTimeString(),
+                'order_date_time_zone' => $orderDate->getTimezone(),
+                'diff_in_hours' => $now->diffInHours($orderDate, false), // Set false to see the actual difference, including negative values
+            ]);
+            // Check if the order_date is older than 48 hours
+            if ($now->diffInHours($orderDate) > 48) {
+//                dd('It is');
+                // If it is, delete the order
+                $order->trampolines()->delete();
+                $order->client()->delete();
+                $order->address()->delete();
+                $this->status = $order->delete();
+                $this->Messages[] = 'Neapmokėti užsakymai ištrinti sėkmingai !';
+            }
+        }
+        return $this;
     }
 }

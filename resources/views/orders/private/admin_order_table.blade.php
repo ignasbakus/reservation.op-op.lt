@@ -8,6 +8,9 @@
             <button id="refreshTable" class="btn btn-secondary">
                 Atnaujinti lentelė
             </button>
+            <button id="deleteUnpaidOrders" class="btn btn-secondary">
+                Ištrinti neapmokėtus užsakymus
+            </button>
         </div>
     </div>
     <div class="row mb-5">

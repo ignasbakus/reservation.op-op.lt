@@ -439,4 +439,13 @@ class OrderController extends Controller
             ], 400);
         }
     }
+    public function checkForUnpaidOrders(): JsonResponse
+    {
+        $unpaidOrders = (new TrampolineOrder())->deleteUnpaidOrders();
+        return response()->json($unpaidOrders);
+//        return response()->json([
+//            'status' => true,
+//            'unpaidOrders' => $unpaidOrders
+//        ]);
+    }
 }

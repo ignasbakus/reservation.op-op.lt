@@ -51,7 +51,6 @@ class TrampolineOrderData
                 'customerDeliveryAddress.required' => 'Adresas privalomas',
                 'customerDeliveryAddress.min' => 'Adresas per trumpas'
             ]);
-//            dd($validator->errors());
             if($validator->fails()) {
                 Log::info('Didnt pass validator');
                 $this->ValidationStatus = false;
@@ -59,6 +58,7 @@ class TrampolineOrderData
 //                dd($this);
                 return $this;
             } else {
+                Log::info('Passed validator');
                 $this->ValidationStatus = true;
                 //Order id
                 $this->orderID = $request->get('orderID', 0);

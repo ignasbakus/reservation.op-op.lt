@@ -18,6 +18,7 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
             Route::get('getCalendarInitial', 'initializeOrderUpdateCalendar');
             Route::post('private_calendar/get', 'privateUpdateCalendar');
             Route::post('datatable/get', 'adminGetDatatable');
+            Route::delete('deleteUnpaidOrders', 'checkForUnpaidOrders');
 //            Route::post('admin_calendar/get', 'adminGetCalendar');
             //http://locahost:8000/orders/admin/order [CRUD]
             Route::get('/', 'orderGet');

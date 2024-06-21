@@ -33,11 +33,11 @@
     @endforeach
     <div class="d-flex justify-content-between mt-3">
         <span class="font-weight-bold">Avansas</span>
-        <span class="font-weight-bold">30 €</span>
+        <span class="font-weight-bold">{{number_format($Order->advance_sum, 2)}}</span>
     </div>
     <div class="d-flex justify-content-between mt-3">
         <span class="font-weight-bold">Galutinė mokama suma</span>
-        <span class="font-weight-bold theme-color">{{ number_format($Order->total_sum - 30, 2) }} €</span>
+        <span class="font-weight-bold theme-color">{{ number_format($Order->total_sum - $Order->advance_sum, 2) }} €</span>
     </div>
     <div class="text-center mt-5">
         <button class="btn btn-primary btn-thankYou">Apmokėti avansą</button>
