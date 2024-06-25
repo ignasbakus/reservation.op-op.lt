@@ -2,7 +2,6 @@
 let firstVisibleDayOnCalendar;
 let lastVisibleDayOnCalendar;
 let isEventDrop = false;
-let shouldUpdateEvents = false;
 let isCancelButtonClicked = false;
 let modalPopulated = false;
 let trampolineID;
@@ -11,7 +10,7 @@ let trampolines;
 let firstMonthDay;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
-today.setHours(today.getHours() + 3); // Adjust for timezone offset
+today.setHours(today.getHours() + 3);
 today = today.toISOString().split('T')[0];
 
 /* JS classes */
@@ -25,8 +24,6 @@ let Variables = {
             values[inputName] = $('#' + ModalID + ' input[name=' + inputName + ']').val()
         })
         values.trampolines = trampolines
-        console.log('trampolines admin => ', trampolines)
-        console.log('Values  => ', values)
         return values
     }
 }
@@ -57,25 +54,15 @@ let CalendarFunctions = {
                 },
                 eventDrop: function (dropInfo) {
                     isEventDrop = true;
-                    shouldUpdateEvents = true;  // Set the flag to true
                     let droppedDate = dropInfo.event.start;
                     let currentMonth = this.getDate().getMonth();
                     let droppedMonth = droppedDate.getMonth();
-
-                    console.log('Dropped date =>', droppedDate);
-                    console.log('Dropped month =>', droppedMonth);
-                    console.log('current month =>', currentMonth);
-
                     if (droppedMonth < currentMonth) {
                         this.prev();
-                        CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                     } else if (droppedMonth > currentMonth) {
                         this.next();
-                        CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                     }
                     isEventDrop = false
-                    shouldUpdateEvents = false
-
                 },
                 datesSet: function (info) {
                     let firstDayMonth = new Date(info.view.currentStart)
@@ -84,12 +71,6 @@ let CalendarFunctions = {
                     FormatDays.formCorrectFirstVisibleDay(firstCalendarVisibleDate);
                     FormatDays.formCorrectLastVisibleDay(lastCalendarVisibleDate);
                     FormatDays.formCorrectFirstMonthDay(firstDayMonth)
-
-
-                    console.log('First calendar day => ', firstVisibleDayOnCalendar);
-                    console.log('Last calendar day => ', lastVisibleDayOnCalendar);
-                    console.log('first month day => ', firstMonthDay)
-
                     if (!isCancelButtonClicked && modalPopulated) {
                         CalendarFunctions.updateEvents(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
                         Orders.Modals.updateOrder.Events.DisplayConfirmationElement('block')
@@ -125,13 +106,10 @@ let CalendarFunctions = {
 
                     if (CouldBeDropped) {
                         trampolines.forEach(function (Trampoline) {
-                            console.log('admin trampolines => ', trampolines)
                             draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
                                 if (Trampoline.id === AffectedTrampoline.id) {
                                     Trampoline.rental_start = dropInfo.startStr;
                                     Trampoline.rental_end = dropInfo.endStr;
-                                    console.log('admin startStr => ', dropInfo.startStr)
-                                    console.log('admin endStr => ', dropInfo.endStr)
                                     Orders.Modals.updateOrder.Events.DisplayConfirmationElement('block');
                                 }
                             });
@@ -180,7 +158,6 @@ let CalendarFunctions = {
                 trampolines = response.Trampolines
             }
         }).always((instance) => {
-            // console.log("always => response : ", instance);
         });
     },
     addEvent: function (EventsToAdd) {
@@ -427,7 +404,6 @@ let Orders = {
             },
             fillDataForm: function (BackendResponse) {
                 this.dataForm.customerName.set(BackendResponse.client.name)
-                // console.log(BackendResponse.name)
                 this.dataForm.customerSurname.set(BackendResponse.client.surname)
                 this.dataForm.customerPhoneNumber.set(BackendResponse.client.phone)
                 this.dataForm.customerEmail.set(BackendResponse.client.email)
@@ -535,7 +511,6 @@ let Orders = {
                         CalendarFunctions.Calendar.calendar.destroy()
                         $('#updateOrderForm input').val('')
                         Orders.Table.Table.draw()
-                        shouldUpdateEvents = false;
                     })
                     $('#confirmationContainer .confirmationClose').on('click', (event) => {
                         event.preventDefault()
@@ -609,7 +584,6 @@ let Orders = {
                             $('#confirmationContainer').css('display', 'none');
                             break;
                         default:
-                            console.log('Unexpected display value: ' + displayValue);
                     }
                 }
             }

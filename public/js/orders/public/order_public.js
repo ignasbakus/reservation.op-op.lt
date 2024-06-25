@@ -24,7 +24,6 @@ let Variables = {
         });
 
         values.trampolines = Trampolines;
-        console.log('values => ', values);
         return values;
     },
     getTrampolines: function () {
@@ -47,12 +46,9 @@ let CalendarFunctions = {
                     let droppedDate = dropInfo.event.start;
                     let currentMonth = this.getDate().getMonth();
                     let droppedMonth = droppedDate.getMonth();
-                    console.log('current month =>', currentMonth);
-                    console.log('dropped month =>', droppedMonth);
                     if (droppedMonth < currentMonth) {
                         this.prev();
                         if (reservationSent) {
-                            console.log('patekom');
                             CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                         } else {
                             CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
@@ -60,7 +56,6 @@ let CalendarFunctions = {
                     } else if (droppedMonth > currentMonth) {
                         this.next();
                         if (reservationSent) {
-                            console.log('patekom');
                             CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                         } else {
                             CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
@@ -81,15 +76,11 @@ let CalendarFunctions = {
                     firstMonthDay = firstDayMonth.toISOString().split('T')[0]
                     firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
                     lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
-                    console.log('First month day => ', firstMonthDay)
-                    console.log('isEventDrop => ', isEventDrop)
-                    console.log('isCancelButtonClicked => ', isCancelButtonClicked)
                     if (!isEventDrop && !isCancelButtonClicked) {
                         if (reservationSent) {
                             CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                             TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement();
                         } else {
-                            console.log('naudojamas next mygtukas')
                             CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                         }
                     }
@@ -124,8 +115,6 @@ let CalendarFunctions = {
                         Trampolines.forEach(function (Trampoline) {
                             draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
                                 if (Trampoline.id === AffectedTrampoline.id) {
-                                    console.log('drop info startStr = ', dropInfo.startStr);
-                                    console.log('drop info endSTr = ', dropInfo.endStr);
                                     Trampoline.rental_start = dropInfo.startStr;
                                     Trampoline.rental_end = dropInfo.endStr;
                                     // AffectedTrampoline.rental_start = dropInfo.startStr;
@@ -207,7 +196,6 @@ let CalendarFunctions = {
                 Occupied = response.Occupied;
                 this.Calendar.calendar.removeAllEvents();
                 this.addEvent(response.Occupied);
-                console.log('Occupied => ', response.Occupied)
                 this.addEvent(response.Availability);
                 Trampolines = response.Trampolines;
                 if (hasFailedUpdate) {
@@ -260,13 +248,14 @@ let TrampolineOrder = {
                     if (response.status === false) {
                         $('form input').removeClass('is-invalid');
                         Object.keys(response.failed_input).forEach(function (FailedInput) {
-                            console.log('Failed input =>', FailedInput);
                             $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
                             $('form input[name=' + FailedInput + ']').addClass('is-invalid');
                         });
-                        $('#failedAlertMessage').text(response.failed_input.error[0])
-                        $('#failedAlert').show().css('display', 'flex');
-                        CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
+                        if (response.failed_input.error) {
+                            $('#failedAlertMessage').text(response.failed_input.error[0])
+                            $('#failedAlert').show().css('display', 'flex');
+                            CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
+                        }
                     }
                     if (response.status) {
                         $('form input').removeClass('is-invalid');
@@ -327,7 +316,6 @@ let TrampolineOrder = {
                 form_data.orderID = TrampolineOrder.UpdateOrder.OrderIdToUpdate;
                 form_data.firstVisibleDay = firstVisibleDayOnCalendar;
                 form_data.lastVisibleDay = lastVisibleDayOnCalendar;
-                console.log('form data PUT => ', form_data);
                 $.ajax({
                     headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
                     method: 'PUT',

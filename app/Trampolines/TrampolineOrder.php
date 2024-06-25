@@ -193,6 +193,8 @@ class TrampolineOrder implements Order
 
             $this->status = true;
 
+            Mail::to($this->Order->client->email)->send(new OrderPlaced($this->Order));
+
             return $this;
         } catch (QueryException $e) {
             if ($e->errorInfo[1] == 1062) {
@@ -354,32 +356,11 @@ class TrampolineOrder implements Order
 
     public function deleteUnpaidOrders(): static
     {
-        // Get the current date and time
         $now = Carbon::now();
-
-        // Retrieve all orders where advance_status is 0
         $unpaidOrders = \App\Models\Order::where('advance_status', 0)->get();
-//        dd($unpaidOrders);
-//        dd($unpaidOrders);
-        // Iterate over the unpaid orders
         foreach ($unpaidOrders as $order) {
-            // Parse the order_date to a Carbon instance
             $orderDate = Carbon::parse($order->order_date);
-//            dd($orderDate);
-
-//            dd($now);
-//            dd($orderDate);
-            dd([
-                'now' => $now->toDateTimeString(),
-                'now_time_zone' => $now->getTimezone(),
-                'order_date' => $orderDate->toDateTimeString(),
-                'order_date_time_zone' => $orderDate->getTimezone(),
-                'diff_in_hours' => $now->diffInHours($orderDate, false), // Set false to see the actual difference, including negative values
-            ]);
-            // Check if the order_date is older than 48 hours
-            if ($now->diffInHours($orderDate) > 48) {
-//                dd('It is');
-                // If it is, delete the order
+            if (abs($now->diffInHours($orderDate, false)) > 48) {
                 $order->trampolines()->delete();
                 $order->client()->delete();
                 $order->address()->delete();

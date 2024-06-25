@@ -13,13 +13,13 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For admin usage (authenticated user)*/
     Route::prefix('admin')->group(function () {
         Route::get('/', 'adminGetIndex')->name("orderTableIndex"); //http://locahost:8000/orders/admin
+        /* Route for admin managing of orders */
         Route::prefix('order')->group(function () {
             Route::get('getOrderUpdateData', 'prepareOrderUpdateModalInfo');
             Route::get('getCalendarInitial', 'initializeOrderUpdateCalendar');
             Route::post('private_calendar/get', 'privateUpdateCalendar');
             Route::post('datatable/get', 'adminGetDatatable');
             Route::delete('deleteUnpaidOrders', 'checkForUnpaidOrders');
-//            Route::post('admin_calendar/get', 'adminGetCalendar');
             //http://locahost:8000/orders/admin/order [CRUD]
             Route::get('/', 'orderGet');
             Route::post('/', 'orderInsert');
@@ -30,15 +30,34 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For customer usage (no authentication)*/
     Route::prefix('public')->group(function () {
         Route::get('/', 'publicGetIndex'); //http://locahost:8000/orders/public
+        /* Route for new orders/customers */
         Route::prefix('order')->group(function () {
             Route::post('public_calendar/get', 'publicUpdateCalendar');
-            //http://locahost:8000/orders/public/order [CRUD]
+            //http://locahost:8000/orders/public/order [CRUD] without UUID
             Route::get('/', 'orderGet');
             Route::post('/', 'orderInsert');
             Route::put('/', 'orderUpdate');
             Route::delete('/', 'orderDelete');
+
+            //http://locahost:8000/orders/public/order/view [CRUD] with UUID
+            Route::get('/view/{order_number}', 'publicGetIndexViaEmail')->name('publicGetIndexViaEmail');
+            //Route::post('/view/{order_number}', 'orderInsert');
+            //Route::put('/view/{order_number}', 'orderUpdate');
+            //Route::delete('/view/{order_number}', 'orderDelete');
         });
     });
+
+    /* For customers which come from email link */
+//    Route::prefix('public_via_email')->group(function () {
+//        Route::get('/', 'publicGetIndexViaEmail');
+//        /* Route for customers coming from the email link */
+//        Route::prefix('order_via_email')->group(function () {
+//            Route::get('/', 'orderGet');
+//            Route::post('/', 'orderInsert');
+//            Route::put('/', 'orderUpdate');
+//            Route::delete('/', 'orderDelete');
+//        });
+//    });
 });
 
 Route::controller(TrampolinesController::class)->group(function () {

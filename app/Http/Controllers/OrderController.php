@@ -65,6 +65,36 @@ class OrderController extends Controller
             ]
         ]);
     }
+    public function publicGetIndexViaEmail($order_number): \Illuminate\Contracts\Foundation\Application|Factory|View|Application
+    {
+        $order = Order::where('order_number', $order_number)->first();
+        if (!$order) {
+            return view('orders.public.order_not_found');
+        }
+        $client = $order->client()->first();
+        $clientAddress = $order->address()->first();
+
+        $orderTrampoline = \App\Models\OrdersTrampoline::where('orders_id', $order->id)->first();
+        $orderView = \view('orders.public.order_info', [
+            'Order' => (new Order())->newQuery()->with('trampolines')->with('client')
+                ->with('address')->find($order->id),
+        ])->render();
+
+
+        return view('orders.public.registered_order', [
+            'Availability' => [],
+            'Occupied' => [],
+            'view' => $orderView,
+            'Order_trampolines' => $orderTrampoline,
+            'Client' => $client,
+            'ClientAddress' => $clientAddress,
+            'Order_id' => $order->id,
+            'Dates' => (object)[
+                'CalendarInitial' => Carbon::now()->format('Y-m-d')
+            ]
+        ]);
+    }
+
 
     public function publicUpdateCalendar(): JsonResponse
     {
@@ -217,9 +247,6 @@ class OrderController extends Controller
                 ]
             ];
         }
-        Log::info('Trampolines =>', $Trampolines->toArray());
-        Log::info('first visible day =>', $firstVisibleDay->toArray());
-        Log::info('last visible day =>', $lastVisibleDay->toArray());
 
         if ($firstVisibleDay < Carbon::now()){
             $Occupied = (new BaseTrampoline())->getOccupation(
@@ -262,9 +289,7 @@ class OrderController extends Controller
 
     public function orderUpdate(): JsonResponse
     {
-//        dd(\request());
         $Order = (new TrampolineOrder())->update(new TrampolineOrderData(\request()));
-//        dd($Order);
 
         if (!isset($Order->Order)) {
             return response()->json([
@@ -351,7 +376,6 @@ class OrderController extends Controller
         $orderID = \request()->get('order_id');
         $order = (new TrampolineOrder())->read($orderID);
         $rentalStart = $order->trampolines()->pluck('rental_start')->first();
-//        dd(Carbon::parse($rentalStart));
 
         return response()->json([
             'status' => true,
@@ -416,13 +440,13 @@ class OrderController extends Controller
                     'order_id' => $order->id,
                     'type_custom' => 'orderEvent'
                 ],
-                'title' => 'Kliento užsakymas',
+                'title' => 'Jūsų užsakymas',
                 'start' => Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d'),
                 'end' => Carbon::parse($order->trampolines->first()->rental_end)->format('Y-m-d'),
                 'backgroundColor' => 'green'
             ];
 
-
+//            dd($Trampolines);
 
             return response()->json([
                 'status' => true,

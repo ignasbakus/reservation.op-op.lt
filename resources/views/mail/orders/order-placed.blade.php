@@ -59,7 +59,10 @@
     <div class="header">
         <h1>Ačiū už Jūsų rezervaciją!</h1>
     </div>
-
+    <div>
+        <h2>Užsakymą apmokėti ir peržiūrėti galite čia: <a
+                href="{{ url('/orders/public/order/view/' . $order->order_number) }}">Spauskite čia</a></h2>
+    </div>
     <div class="order-details">
         <h2>Užsakymo detalės</h2>
         <table>
@@ -136,10 +139,10 @@
                 </tr>
             @endforeach
         </table>
-        <div class="footeris">
-            <p>Jeigu turite klausimų, susisiekite su mumis el. paštu uzsakymai@op-op.lt arba telefonu +370 600 00000</p>
-            <p>Ačiū, kad rinkotės mus!</p>
-        </div>
+    </div>
+    <div class="footeris">
+        <p>Jeigu turite klausimų, susisiekite su mumis el. paštu uzsakymai@op-op.lt arba telefonu +370 600 00000</p>
+        <p>Ačiū, kad rinkotės mus!</p>
     </div>
 </div>
 </body>
