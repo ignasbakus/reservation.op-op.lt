@@ -95,6 +95,24 @@
                 <button type="button" class="btn-close" aria-label="Close" onclick="$('#successfulDateChangeAlert').hide()"></button>
             </div>
         </div>
+        <div class="modal fade" id="cancelOrderModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Atšaukimas</h3>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h5>Ar tikrai norite atšaukti užsakymą?</h5>
+                        <p style="color: red">Jei iki pirmosios rezervacijos dienos yra likusios mažiau nei 3 dienos, užsakymo atšaukti neleis</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Išeiti</button>
+                        <button type="submit" class="btn btn-danger cancelOrderModalButton">Atšaukti</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 

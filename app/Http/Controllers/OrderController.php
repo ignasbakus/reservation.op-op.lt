@@ -68,13 +68,15 @@ class OrderController extends Controller
     public function publicGetIndexViaEmail($order_number): \Illuminate\Contracts\Foundation\Application|Factory|View|Application
     {
         $order = Order::where('order_number', $order_number)->first();
-        if (!$order) {
+        $orderId = $order->id;
+        $orderTrampolines = OrdersTrampoline::where('orders_id', $orderId)->where('is_active', 1)->first();
+
+        if (!$order || !$orderTrampolines) {
             return view('orders.public.order_not_found');
         }
         $client = $order->client()->first();
         $clientAddress = $order->address()->first();
 
-        $orderTrampoline = \App\Models\OrdersTrampoline::where('orders_id', $order->id)->first();
         $orderView = \view('orders.public.order_info', [
             'Order' => (new Order())->newQuery()->with('trampolines')->with('client')
                 ->with('address')->find($order->id),
@@ -85,7 +87,7 @@ class OrderController extends Controller
             'Availability' => [],
             'Occupied' => [],
             'view' => $orderView,
-            'Order_trampolines' => $orderTrampoline,
+            'Order_trampolines' => $orderTrampolines,
             'Client' => $client,
             'ClientAddress' => $clientAddress,
             'Order_id' => $order->id,
@@ -369,7 +371,19 @@ class OrderController extends Controller
     }
     public function orderCancel(): JsonResponse
     {
-        return response()->json((new TrampolineOrder())->cancel(\request()->input('order_id')));
+        $cancelledOrder = (new TrampolineOrder())->cancel(\request()->input('order_id'));
+        if ($cancelledOrder->status) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Order cancelled successfully',
+                'view' => view('orders.public.successful_cancellation')->render()
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'failed_inputs' => $cancelledOrder->failedInputs
+            ]);
+        }
     }
 
     public function initializeOrderUpdateCalendar(): JsonResponse

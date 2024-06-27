@@ -2,7 +2,7 @@
 return [
 
     /*Custom params, variables of Trampoline rent business*/
-    'currency' => env('TRAMPOLINES_TRANSACTIONS_CURRENCY', 'eur'),
+    'currency' => env('TRAMPOLINES_TRANSACTIONS_CURRENCY', '€'),
 
     /* Custom param, which declares minimum rental duration to 1 */
     'rental_duration' => env('TRAMPOLINES_RENTAL_DURATION', 1),

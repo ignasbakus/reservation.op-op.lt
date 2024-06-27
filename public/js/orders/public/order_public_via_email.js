@@ -41,14 +41,14 @@ let Variables = {
     getTrampolines: function () {
         return Trampolines;
     },
-    setClientDetails: function(client) {
+    setClientDetails: function (client) {
         this.client = client;
         $('#orderForm input[name="customerName"]').val(client.name);
         $('#orderForm input[name="customerSurname"]').val(client.surname);
         $('#orderForm input[name="customerPhoneNumber"]').val(client.phone);
         $('#orderForm input[name="customerEmail"]').val(client.email);
     },
-    setClientAddressDetails: function(address) {
+    setClientAddressDetails: function (address) {
         this.clientAddress = address;
         $('#orderForm input[name="customerDeliveryCity"]').val(address.address_town);
         $('#orderForm input[name="customerDeliveryPostCode"]').val(address.address_postcode);
@@ -199,7 +199,7 @@ let TrampolineOrder = {
     init: function () {
         $('#thankYouDiv').html(view);
         this.UpdateOrder.init();
-        this.CancelOrder.init()
+        this.CancelOrderModal.init()
         Variables.setClientDetails(Client);
         Variables.setClientAddressDetails(ClientAddress);
     },
@@ -335,13 +335,14 @@ let TrampolineOrder = {
             },
         },
     },
-    CancelOrder: {
+    CancelOrderModal: {
         init: function () {
             this.Event.init()
         },
+        element: new bootstrap.Modal('#cancelOrderModal'),
         Event: {
             init: function () {
-                $('#orderButtons .cancelOrder').on('click', (event) => {
+                $('#cancelOrderModal .cancelOrderModalButton').on('click', (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     this.cancelOrder();
@@ -358,10 +359,14 @@ let TrampolineOrder = {
                     },
                 }).done((response) => {
                     $('#overlay').hide();
+                    TrampolineOrder.CancelOrderModal.element.hide()
                     if (response.status) {
-                        $('#dateChangeAlertMessage').text('Užsakymas atšauktas!');
-                        $('#successfulDateChangeAlert').show().css('display', 'flex');
-                        console.log("atsakymas atsauktas")
+                        $('#content-wrap').replaceWith($(response.view).find('#content-wrap'));
+                    }
+                    if (!response.status) {
+                        console.log('patekom')
+                        $('#failedAlertMessage').text(response.failed_inputs.error[0])
+                        $('#failedAlert').show().css('display', 'flex');
                     }
                 })
             }
@@ -370,7 +375,7 @@ let TrampolineOrder = {
 }
 
 $(document).ready(function () {
-    console.log("/js/trampolines/public/order_public.js -> ready!");
+    console.log("/js/trampolines/public/order_public_via_email.js -> ready!");
     TrampolineOrder.init();
 });
 

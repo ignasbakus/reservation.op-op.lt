@@ -215,10 +215,11 @@ class TrampolineOrder implements Order
             $this->status = false;
             return $this;
         }
+
         $order = \App\Models\Order::find($trampolineOrderData->orderID);
-        if (!$order) {
+        if (!$order || $order->order_status === 'Atšauktas') {
             $this->status = false;
-            $this->failedInputs->add('error', 'Order not found.');
+            $this->failedInputs->add('error', 'Nepavyko atnaujinti. Užsakymas nerastas/atšauktas.');
             return $this;
         }
         $datesChanged = false;
@@ -304,7 +305,7 @@ class TrampolineOrder implements Order
                 $OrderRentalDuration = $RentalDuration;
             }
         } catch (\Exception $exception) {
-            $this->Errors[] = 'Trinant užsakymą įvyko klaida : ' . $exception->getMessage();
+            $this->Errors[] = 'Atnaujinant užsakymą įvyko klaida : ' . $exception->getMessage();
             $this->status = false;
         }
         $Order->updateOrCreate(
@@ -366,11 +367,19 @@ class TrampolineOrder implements Order
     public function cancel($orderID): static{
         $order = \App\Models\Order::find($orderID);
         $orderTrampolines = OrdersTrampoline::where('orders_id', $orderID)->get();
+        $orderRentalStart = Carbon::parse($orderTrampolines->first()->rental_start)->format('Y-m-d');
+        $now = Carbon::now();
         if (!$order) {
             $this->status = false;
             $this->failedInputs->add('error', 'Order not found.');
             return $this;
         }
+        if ($now->diffInDays($orderRentalStart, false) < 3) {
+            $this->status = false;
+            $this->failedInputs->add('error', 'Užsakymo atšaukti negalima, nes liko mažiau nei 3 dienos iki pirmosios rezervacijos dienos');
+            return $this;
+        }
+
         $order->update(['order_status' => 'Atšauktas']);
         foreach ($orderTrampolines as $orderTrampoline) {
             $orderTrampoline->update(['is_active' => 0]);

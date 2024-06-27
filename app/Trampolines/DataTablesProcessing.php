@@ -85,7 +85,7 @@ class DataTablesProcessing
                         $Height,
                         $Width,
                         $Length,
-                        $Price,
+                        $Price . ' ' . config('trampolines.currency', '€'),
                         '
                   <button data-trampolineid="' . $CollectionItem->id . '" class="btn trampolinePicture">
                     <svg width="20" height="20" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">
@@ -124,8 +124,8 @@ class DataTablesProcessing
                         $CollectionItem->client->phone,
                         $CollectionItem->address->address_street . '<br>' . $CollectionItem->address->address_town . ' <br> ' . $CollectionItem->address->address_postcode,
                         $CollectionItem->rental_duration,
-                        $CollectionItem->total_sum,
-                        $CollectionItem->advance_sum,
+                        $CollectionItem->total_sum . ' ' . config('trampolines.currency', '€'),
+                        $CollectionItem->advance_sum . ' ' . config('trampolines.currency', '€'),
                         $CollectionItem->order_status,
                         '
                   <button data-orderid="' . $CollectionItem->id . '" class="btn orderShow">

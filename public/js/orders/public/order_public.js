@@ -6,6 +6,9 @@ let firstMonthDay;
 let Calendar = null;
 let isEventDrop = false;
 let reservationSent = false;
+let isFirstLoad = true; // Add flag for initial load
+let isNavigating = false; // Add flag for navigation
+let skippedMonth = null; // Add this global variable to track the skipped month
 let isCancelButtonClicked = false;
 let today = new Date();
 today.setHours(0, 0, 0, 0);
@@ -30,6 +33,7 @@ let Variables = {
         return Trampolines;
     },
 };
+
 let CalendarFunctions = {
     Calendar: {
         initialize: function () {
@@ -66,17 +70,22 @@ let CalendarFunctions = {
                 dayMaxEvents: true,
                 events: [],
                 datesSet: function (info) {
-                    let CalendarView = info.view
-                    let firstDayMonth = new Date(CalendarView.currentStart)
+                    let CalendarView = info.view;
+                    let firstDayMonth = new Date(CalendarView.currentStart);
                     let firstCalendarVisibleDate = new Date(info.start);
                     let lastCalendarVisibleDate = new Date(info.end);
-                    firstDayMonth.setUTCHours(firstDayMonth.getUTCHours() + 3)
+                    firstDayMonth.setUTCHours(firstDayMonth.getUTCHours() + 3);
                     firstCalendarVisibleDate.setUTCHours(firstCalendarVisibleDate.getUTCHours() + 3);
                     lastCalendarVisibleDate.setUTCHours(lastCalendarVisibleDate.getUTCHours() + 3);
-                    firstMonthDay = firstDayMonth.toISOString().split('T')[0]
+                    firstMonthDay = firstDayMonth.toISOString().split('T')[0];
                     firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
                     lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
-                    if (!isEventDrop && !isCancelButtonClicked) {
+
+                    console.log('First Month Day: ', firstMonthDay);
+                    console.log('First Visible Day: ', firstVisibleDayOnCalendar);
+                    console.log('Last Visible Day: ', lastVisibleDayOnCalendar);
+
+                    if (!isEventDrop && !isCancelButtonClicked && !isNavigating) {
                         if (reservationSent) {
                             CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                             TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement();
@@ -87,6 +96,19 @@ let CalendarFunctions = {
 
                     isEventDrop = false;
                     isCancelButtonClicked = false;
+
+                    // Disable navigation to the skipped month
+                    if (skippedMonth) {
+                        let prevButton = document.querySelector('.fc-prev-button');
+                        let prevMonth = new Date(CalendarView.currentStart);
+                        prevMonth.setMonth(prevMonth.getMonth() - 1);
+
+                        if (prevMonth.getMonth() === skippedMonth.getMonth() && prevMonth.getFullYear() === skippedMonth.getFullYear()) {
+                            prevButton.disabled = true;
+                        } else {
+                            prevButton.disabled = false;
+                        }
+                    }
                 },
                 eventAllow: function (dropInfo, draggedEvent) {
                     let CouldBeDropped = true;
@@ -117,10 +139,8 @@ let CalendarFunctions = {
                                 if (Trampoline.id === AffectedTrampoline.id) {
                                     Trampoline.rental_start = dropInfo.startStr;
                                     Trampoline.rental_end = dropInfo.endStr;
-                                    // AffectedTrampoline.rental_start = dropInfo.startStr;
-                                    // AffectedTrampoline.rental_end = dropInfo.endStr;
                                     if (reservationSent) {
-                                        TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement()
+                                        TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement();
                                     }
                                 }
                             });
@@ -130,7 +150,7 @@ let CalendarFunctions = {
                             Trampoline.rental_start = draggedEvent.startStr;
                             Trampoline.rental_end = draggedEvent.endStr;
                             if (reservationSent) {
-                                TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement()
+                                TrampolineOrder.UpdateOrder.Event.DisplayConfirmationElement();
                             }
                         });
                     }
@@ -146,18 +166,19 @@ let CalendarFunctions = {
             this.calendar.render();
         },
         goToInitialDates: function () {
-            this.calendar.gotoDate(eventDay)
+            this.calendar.gotoDate(eventDay);
         },
     },
     addEvent: function (EventsToAdd) {
+        console.log("Adding Events: ", EventsToAdd); // Log the events being added
         EventsToAdd.forEach(function (Event) {
             CalendarFunctions.Calendar.calendar.addEvent(Event);
         });
     },
     updateEventsPublic: function (firstVisibleDay, lastVisibleDay, firstMonthDay) {
-        $('#overlay').css('display', 'flex')
+        $('#overlay').css('display', 'flex');
         $.ajax({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
             url: '/orders/public/order/public_calendar/get',
             method: 'POST',
             data: {
@@ -170,18 +191,43 @@ let CalendarFunctions = {
             $('#overlay').hide();
             Occupied = response.Occupied;
             if (response.status) {
+                console.log('Availability = ', response.Availability);
+                console.log('Occupied = ', Occupied);
                 this.Calendar.calendar.removeAllEvents();
                 this.addEvent(Occupied);
                 Availability = response.Availability;
                 this.addEvent(Availability);
                 Trampolines = response.Trampolines;
+
+                // Check if the first available date is in a different month and navigate accordingly
+                if (isFirstLoad && Availability.length > 0) {
+                    let firstAvailableDate = new Date(Availability[0].start);
+                    let currentMonth = new Date(firstVisibleDay).getMonth();
+                    let availableMonth = firstAvailableDate.getMonth();
+                    if (availableMonth > currentMonth) {
+                        isNavigating = true; // Set navigating flag to true
+                        this.Calendar.calendar.next();
+                        // Recalculate the dates after navigation
+                        let newCalendarView = this.Calendar.calendar.view;
+                        let newFirstDayMonth = new Date(newCalendarView.currentStart);
+                        newFirstDayMonth.setUTCHours(newFirstDayMonth.getUTCHours() + 3);
+                        firstMonthDay = newFirstDayMonth.toISOString().split('T')[0];
+
+                        this.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                        isNavigating = false; // Reset navigating flag after update
+                    }
+                    isFirstLoad = false; // Set flag to false after first load
+
+                    // Set skippedMonth to prevent navigation to this month
+                    skippedMonth = new Date(firstVisibleDayOnCalendar);
+                }
             }
         });
     },
     updateEventsPrivate: function (firstVisibleDay, lastVisibleDay, firstMonthDay, hasFailedUpdate = false) {
-        $('#overlay').css('display', 'flex')
+        $('#overlay').css('display', 'flex');
         $.ajax({
-            headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
             url: '/orders/admin/order/private_calendar/get',
             method: 'POST',
             data: {
@@ -205,6 +251,7 @@ let CalendarFunctions = {
         });
     },
 };
+
 let TrampolineOrder = {
     init: function () {
         this.FormSendOrder.init();
@@ -237,9 +284,9 @@ let TrampolineOrder = {
                 let form_data = Variables.getOrderFormInputs();
                 form_data.firstVisibleDay = firstVisibleDayOnCalendar;
                 form_data.lastVisibleDay = lastVisibleDayOnCalendar;
-                $('#overlay').css('display', 'flex')
+                $('#overlay').css('display', 'flex');
                 $.ajax({
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: 'POST',
                     url: '/orders/public/order',
                     data: form_data,
@@ -252,9 +299,9 @@ let TrampolineOrder = {
                             $('form input[name=' + FailedInput + ']').addClass('is-invalid');
                         });
                         if (response.failed_input.error) {
-                            $('#failedAlertMessage').text(response.failed_input.error[0])
+                            $('#failedAlertMessage').text(response.failed_input.error[0]);
                             $('#failedAlert').show().css('display', 'flex');
-                            CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
+                            CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                         }
                     }
                     if (response.status) {
@@ -266,14 +313,14 @@ let TrampolineOrder = {
                     TrampolineOrder.FormSendOrder.Event.OccupiedFromCreate = response.Occupied;
                     TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Events;
                     if (response.status) {
-                        eventDay = response.Events[0].start
+                        eventDay = response.Events[0].start;
                         reservationSent = true;
                         TrampolineOrder.UpdateOrder.OrderIdToUpdate = response.OrderId;
                         CalendarFunctions.Calendar.calendar.removeAllEvents();
                         CalendarFunctions.addEvent(response.Occupied);
                         CalendarFunctions.addEvent(response.Events);
                         $('#thankYouDiv').html(response.view);
-                        TrampolineOrder.CancelOrder.init()
+                        TrampolineOrder.CancelOrder.init();
                     } else {
                         CalendarFunctions.Calendar.calendar.getEvents().forEach(function (event) {
                             if (event.extendedProps.type_custom === 'occ') {
@@ -312,21 +359,21 @@ let TrampolineOrder = {
                 });
             },
             updateOrder: function () {
-                $('#overlay').css('display', 'flex')
+                $('#overlay').css('display', 'flex');
                 let form_data = Variables.getOrderFormInputs();
                 form_data.orderID = TrampolineOrder.UpdateOrder.OrderIdToUpdate;
                 form_data.firstVisibleDay = firstVisibleDayOnCalendar;
                 form_data.lastVisibleDay = lastVisibleDayOnCalendar;
                 $.ajax({
-                    headers: { 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content') },
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: 'PUT',
                     url: '/orders/public/order',
                     data: form_data,
                 }).done((response) => {
                     $('#overlay').hide();
                     if (response.status) {
-                        eventDay = response.Event[0].start
-                        $('#dateChangeAlertMessage').text('Rezervacijos dienos sėkmingai atnaujintos!')
+                        eventDay = response.Event[0].start;
+                        $('#dateChangeAlertMessage').text('Rezervacijos dienos sėkmingai atnaujintos!');
                         $('#successfulDateChangeAlert').show().css('display', 'flex');
                         $('#confirmationContainer').css('display', 'none');
                         $('#thankYouDiv').html(response.view);
@@ -337,9 +384,9 @@ let TrampolineOrder = {
                         TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Event;
                     }
                     if (!response.status) {
-                        $('#failedAlertMessage').text(response.failed_input.error[0])
+                        $('#failedAlertMessage').text(response.failed_input.error[0]);
                         $('#failedAlert').show().css('display', 'flex');
-                        CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay, true)
+                        CalendarFunctions.updateEventsPrivate(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay, true);
                     }
                 });
             },
@@ -350,11 +397,12 @@ let TrampolineOrder = {
     },
     CancelOrder: {
         init: function () {
-            this.Event.init()
+            this.Event.init();
         },
+        element: new bootstrap.Modal('#cancelOrderModal'),
         Event: {
             init: function () {
-                $('#orderButtons .cancelOrder').on('click', (event) => {
+                $('#cancelOrderModal .cancelOrderModalButton').on('click', (event) => {
                     event.preventDefault();
                     event.stopPropagation();
                     this.cancelOrder();
@@ -371,14 +419,16 @@ let TrampolineOrder = {
                     },
                 }).done((response) => {
                     $('#overlay').hide();
+                    TrampolineOrder.CancelOrder.element.hide();
                     if (response.status) {
-                        $('#dateChangeAlertMessage').text('Užsakymas atšauktas!');
-                        $('#successfulDateChangeAlert').show().css('display', 'flex');
-                        setTimeout(function() {
-                            location.reload();
-                        }, 2000);
+                        $('#content-wrap').replaceWith($(response.view).find('#content-wrap'));
                     }
-                })
+                    if (!response.status) {
+                        console.log('patekom');
+                        $('#failedAlertMessage').text(response.failed_inputs.error[0]);
+                        $('#failedAlert').show().css('display', 'flex');
+                    }
+                });
             }
         }
     },

@@ -264,7 +264,7 @@ let Orders = {
                     }).done((response) => {
                         $('#overlay').hide();
                         if (response.status) {
-                            $('#successAlertMessage').text('Užsakymas ištrinti')
+                            $('#successAlertMessage').text('Užsakymai ištrinti')
                             $('#successAlert').show().css('display', 'flex')
                         }
                         Orders.Table.Table.draw()
