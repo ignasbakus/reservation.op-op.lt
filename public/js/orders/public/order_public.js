@@ -320,6 +320,10 @@ let TrampolineOrder = {
                         CalendarFunctions.addEvent(response.Occupied);
                         CalendarFunctions.addEvent(response.Events);
                         $('#thankYouDiv').html(response.view);
+                        // $('#orderButtons .payAdvance').data('payment-url', response.PaymentLink)
+                        $('#orderButtons .payAdvance').click(function() {
+                            window.location.href = response.PaymentLink;
+                        });
                         TrampolineOrder.CancelOrder.init();
                     } else {
                         CalendarFunctions.Calendar.calendar.getEvents().forEach(function (event) {
@@ -432,6 +436,13 @@ let TrampolineOrder = {
             }
         }
     },
+    Events: {
+        // init: function () {
+        //     $('#orderButtons .payAdvance').on('click', function () {
+        //
+        //     }
+        // },
+    }
 };
 
 /* Document ready function */

@@ -6,6 +6,8 @@ use App\Mail\OrderPlaced;
 use App\Models\Order;
 use App\Models\OrdersTrampoline;
 use App\Models\Trampoline;
+use App\MontonioPayments\MontonioPaymentsService;
+use App\StripePayments\StripePaymentsService;
 use App\Trampolines\BaseTrampoline;
 use App\Trampolines\DataTablesProcessing;
 use App\Trampolines\OccupationTimeFrames;
@@ -219,12 +221,11 @@ class OrderController extends Controller
 
         $firstVisibleDay = Carbon::parse(\request()->get('firstVisibleDay', null));
         $lastVisibleDay = Carbon::parse(\request()->get('lastVisibleDay', null));
-//        dd(\request());
         $NewOrderEventBackgroundColor = 'green';
         $NewOrderEventTitle = 'Jūsų užsakymas';
         $Order = (new TrampolineOrder())->create((new TrampolineOrderData(\request())));
-//        dd($Order);
-//        dd($Order);
+        (new MontonioPaymentsService())->createPaymentLink($Order->Order->id);
+        $PaymentLink = (new MontonioPaymentsService())->retrievePaymentLink($Order->Order->id);
         $trampolines_id = [];
 
         foreach (\request()->get('trampolines', []) as $Trampoline) {
@@ -284,6 +285,7 @@ class OrderController extends Controller
             'status' => $Order->status,
             'Occupied' => $Occupied,
             'Events' => $Events,
+            'PaymentLink' => $PaymentLink,
             'OrderId' => $Order->Order->id,
             'view' => $orderView
         ]);

@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StripeWebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
 
@@ -46,18 +47,6 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
             //Route::delete('/view/{order_number}', 'orderDelete');
         });
     });
-
-    /* For customers which come from email link */
-//    Route::prefix('public_via_email')->group(function () {
-//        Route::get('/', 'publicGetIndexViaEmail');
-//        /* Route for customers coming from the email link */
-//        Route::prefix('order_via_email')->group(function () {
-//            Route::get('/', 'orderGet');
-//            Route::post('/', 'orderInsert');
-//            Route::put('/', 'orderUpdate');
-//            Route::delete('/', 'orderDelete');
-//        });
-//    });
 });
 
 Route::controller(TrampolinesController::class)->group(function () {
@@ -82,5 +71,6 @@ Route::controller(TrampolinesController::class)->group(function () {
         });
     });
 });
+
 
 
