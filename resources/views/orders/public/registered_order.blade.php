@@ -62,6 +62,7 @@
     <script>
         let view = {{ Illuminate\Support\Js::from($view) }};
         let Client = {{ Illuminate\Support\Js::from($Client) }};
+        let PaymentLink = {{ Illuminate\Support\Js::from($PaymentLink) }};
         let ClientAddress = {{ Illuminate\Support\Js::from($ClientAddress) }};
         let Order_trampolines = {{ Illuminate\Support\Js::from($Order_trampolines) }};
         let Order_id = {{ Illuminate\Support\Js::from($Order_id) }};

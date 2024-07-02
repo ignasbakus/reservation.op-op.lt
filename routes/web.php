@@ -2,9 +2,12 @@
 
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\StripeWebhookController;
+use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
+
+Route::post('/webhook-endpoint', [WebhookController::class, 'handle']);
+
 
 Route::controller(ClientsController::class)->group(function () {
     Route::get('/clients', 'index')->name('clients');
@@ -37,6 +40,7 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
             //http://locahost:8000/orders/public/order [CRUD] without UUID
             Route::get('/', 'orderGet');
             Route::post('/', 'orderInsert');
+
             Route::put('/', 'orderUpdate');
             Route::delete('/', 'orderDelete');
 

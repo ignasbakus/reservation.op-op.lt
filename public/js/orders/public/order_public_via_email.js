@@ -198,6 +198,9 @@ let CalendarFunctions = {
 let TrampolineOrder = {
     init: function () {
         $('#thankYouDiv').html(view);
+        $('#orderButtons .payAdvance').click(function() {
+            window.location.href = PaymentLink
+        });
         this.UpdateOrder.init();
         this.CancelOrderModal.init()
         Variables.setClientDetails(Client);

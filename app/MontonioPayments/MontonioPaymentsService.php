@@ -21,9 +21,9 @@ class MontonioPaymentsService
             "currency" => "EUR",
             "amount" => 99.99,
             "locale" => "lt",
-            "expiresAt" => "2024-07-01T18:00:00.000Z",
+            "expiresAt" => "2024-07-02T18:00:00.000Z",
             "askAdditionalInfo" => true,
-            "notificationUrl" => 'https://merchant-new.com/notify',
+            "notificationUrl" => 'https://715d-78-60-128-20.ngrok-free.app/webhook-endpoint',
         ];
 
         // Atsiskaitymo budus bus galima keist kai pabaigsim paskyros registracija

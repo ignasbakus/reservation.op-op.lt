@@ -78,7 +78,7 @@ class OrderController extends Controller
         }
         $client = $order->client()->first();
         $clientAddress = $order->address()->first();
-
+        $PaymentLink = (new MontonioPaymentsService())->retrievePaymentLink($orderId);
         $orderView = \view('orders.public.order_info', [
             'Order' => (new Order())->newQuery()->with('trampolines')->with('client')
                 ->with('address')->find($order->id),
@@ -89,6 +89,7 @@ class OrderController extends Controller
             'Availability' => [],
             'Occupied' => [],
             'view' => $orderView,
+            'PaymentLink' => $PaymentLink,
             'Order_trampolines' => $orderTrampolines,
             'Client' => $client,
             'ClientAddress' => $clientAddress,
