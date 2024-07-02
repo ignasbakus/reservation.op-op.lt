@@ -6,7 +6,13 @@ use App\Http\Controllers\WebhookController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
 
-Route::post('/webhook-endpoint', [WebhookController::class, 'handle']);
+Route::post('/webhook/initiated', [WebhookController::class, 'handleInitiated']);
+Route::post('/webhook/opened', [WebhookController::class, 'handleOpened']);
+Route::post('/webhook/processing', [WebhookController::class, 'handleProcessing']);
+Route::post('/webhook/completed', [WebhookController::class, 'handleCompleted']);
+Route::post('/webhook/canceled', [WebhookController::class, 'handleCanceled']);
+Route::post('/webhook/expired', [WebhookController::class, 'handleExpired']);
+
 
 
 Route::controller(ClientsController::class)->group(function () {

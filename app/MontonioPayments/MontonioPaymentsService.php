@@ -5,7 +5,6 @@ namespace App\MontonioPayments;
 use App\Models\MontonioPaymentCreationLog;
 use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
-use http\Env\Request;
 
 class MontonioPaymentsService
 {
@@ -23,7 +22,7 @@ class MontonioPaymentsService
             "locale" => "lt",
             "expiresAt" => "2024-07-02T18:00:00.000Z",
             "askAdditionalInfo" => true,
-            "notificationUrl" => 'https://715d-78-60-128-20.ngrok-free.app/webhook-endpoint',
+            "notificationUrl" => 'https://715d-78-60-128-20.ngrok-free.app/webhook/initiated',
         ];
 
         // Atsiskaitymo budus bus galima keist kai pabaigsim paskyros registracija
