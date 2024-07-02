@@ -14,7 +14,7 @@ class VerifyCsrfToken
      * @var array
      */
     protected array $except = [
-        '/webhook-endpoint', // Add your webhook endpoint here
+        //'/webhook-endpoint', // Add your webhook endpoint here
     ];
 
     /**
