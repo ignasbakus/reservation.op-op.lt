@@ -55,7 +55,7 @@ let Trampolines = {
                     },
                     dataSrc: function (json) {
                         Trampolines.Table.TrampolinesList = json.list;
-                        return json.DATA;
+                        return json.DATA || [];
                     }
                 },
                 columnDefs: [

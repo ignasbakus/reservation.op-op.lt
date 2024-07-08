@@ -24,7 +24,7 @@ class WebhookController extends Controller
         );
 
         $retrieveUuidAndOrderId = (new MontonioPaymentsService())->retrieveUuidAndOrderId($decoded->uuid);
-
+        Log::info('Order id ->' . $retrieveUuidAndOrderId->order_id);
         MontonioPaymentWebhooksLog::create([
             'order_id' => $retrieveUuidAndOrderId->order_id,
             'callback_response' => json_encode($decoded),
@@ -38,11 +38,9 @@ class WebhookController extends Controller
             case 'PAID':
                 (new MontonioPaymentsService())->orderPaid($retrieveUuidAndOrderId->order_id);
                 break;
-            case 'PENDING':
-                Log::info('Payment status -> PENDING');
-                break;
             case 'ABANDONED':
-                Log::info('Payment status -> ABANDONED');
+                Log::info('Užsakymas buvo atšauktas iš webhooko');
+                (new MontonioPaymentsService())->orderAbandoned($retrieveUuidAndOrderId->order_id);
                 break;
             default:
                 Log::info('Payment failed');

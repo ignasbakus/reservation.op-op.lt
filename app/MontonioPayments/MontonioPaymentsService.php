@@ -80,8 +80,8 @@ class MontonioPaymentsService
         $payload = [
             'accessKey' => $accessKey,
             'merchantReference' => $order->order_number,
-            'returnUrl' => 'http://localhost:8000/orders/public/order/view/' . $order->order_number,
-            'notificationUrl' => 'https://3f5a-78-60-128-20.ngrok-free.app/webhook/montonio',
+            'returnUrl' => 'http://localhost:8000/orders/public/order/waiting_confirmation/view/' . $order->order_number,
+            'notificationUrl' => 'https://1c75-85-206-23-106.ngrok-free.app/webhook/montonio',
             'currency' => 'EUR',
             'grandTotal' => (float)$grandTotal,
             'locale' => 'lt',
@@ -172,5 +172,11 @@ class MontonioPaymentsService
     public function orderPaid($orderId): void
     {
         (new TrampolineOrder())->updateOrderStatus($orderId);
+    }
+
+    public function orderAbandoned($orderId): void
+    {
+        Log::info('Iš webhoooko patekom į MontonioPaymentService');
+        (new TrampolineOrder())->cancelOrder($orderId, true);
     }
 }

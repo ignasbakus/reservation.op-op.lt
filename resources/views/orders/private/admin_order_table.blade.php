@@ -4,13 +4,19 @@
 @endsection
 @section('content')
     <div class="row mb-5">
-        <div class="col-4">
-            <button id="refreshTable" class="btn btn-secondary">
-                Atnaujinti lentelė
-            </button>
-            <button id="deleteUnpaidOrders" class="btn btn-secondary">
-                Ištrinti neapmokėtus užsakymus
-            </button>
+        <div class="col-12 col-md-4 custom-col">
+            <div class="button-container">
+                <button id="refreshTable" class="btn btn-secondary">
+                    Atnaujinti lentelė
+                </button>
+                <button id="deleteUnpaidOrders" class="btn btn-secondary">
+                    Ištrinti neapmokėtus užsakymus
+                </button>
+                <div class="form-check form-switch mt-2">
+                    <input class="form-check-input" type="checkbox" id="showWeeklyOrders">
+                    <label class="form-check-label" for="showWeeklyOrders">Rodyti 7 dienų užsakymus</label>
+                </div>
+            </div>
         </div>
     </div>
     <div class="row mb-5">

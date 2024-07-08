@@ -352,12 +352,14 @@ class TrampolineOrder implements Order
         }
         return $this;
     }
-    public function cancelOrder($orderID): static{
+    public function cancelOrder($orderID, $isFromWebhook = false): static{
+        Log::info('Patekom i cancel order is montonioPaymentServices');
         $order = \App\Models\Order::find($orderID);
         $orderTrampolines = OrdersTrampoline::where('orders_id', $orderID)->get();
         $orderRentalStart = Carbon::parse($orderTrampolines->first()->rental_start)->format('Y-m-d');
         $now = Carbon::now();
         if (!$order) {
+            Log::info('neradom orderio');
             $this->status = false;
             $this->failedInputs->add('error', 'Order not found.');
             return $this;
@@ -368,12 +370,17 @@ class TrampolineOrder implements Order
             return $this;
         }
 
-        $order->update(['order_status' => 'Atšauktas']);
+        if (!$isFromWebhook) {
+            $order->update(['order_status' => 'Atšauktas kliento']);
+        } else {
+            $order->update(['order_status' => 'Atšauktas, nes neapmokėtas']);
+        }
         foreach ($orderTrampolines as $orderTrampoline) {
             $orderTrampoline->update(['is_active' => 0]);
         }
         $this->status = true;
         $this->Messages[] = 'Užsakymas atšauktas sėkmingai !';
+        Log::info('Atšaukimo message ->', $this->Messages[0]);
         return $this;
     }
     public function updateOrderStatus($orderId): array

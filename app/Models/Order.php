@@ -42,7 +42,17 @@ class Order extends Model
     {
         return $this->hasMany(MontonioPaymentCreationLog::class);
     }
-    /*hasOne -> client*/
-    /*hasOne -> client_address*/
 
+    public array $FieldRelationsToColumns = [
+        3 => 'orders_trampolines.rental_start'
+    ];
+
+    public function getField($ColumnNumber)
+    {
+        try {
+            return $this->FieldRelationsToColumns[$ColumnNumber];
+        } catch (\Exception $exception) {
+            return null;
+        }
+    }
 }

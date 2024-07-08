@@ -37,16 +37,19 @@ class OrderController extends Controller
             ],
             \request()->get('length', 0),
             \request()->get('start', 0),
-            \request()->get('order', [])
+            \request()->get('order', []),
+            \request()->get('start_date', null),
+            \request()->get('end_date', null),
+            \request()->get('searchValue', '')
         );
 
         return response()->json([
             'status' => true,
-            'DATA' => $Orders->data,
+            'DATA' => $Orders->data ?? [],
             'draw' => \request()->get('draw'),
-            'list' => $Orders->List,
-            'recordsTotal' => $Orders->recordsTotal,
-            'recordsFiltered' => $Orders->recordsFiltered,
+            'list' => $Orders->List ?? [],
+            'recordsTotal' => $Orders->recordsTotal ?? 0,
+            'recordsFiltered' => $Orders->recordsFiltered ?? 0,
         ]);
 
     }
@@ -101,8 +104,26 @@ class OrderController extends Controller
             ]
         ]);
     }
+    public function orderWaitingConfirmation($order_number): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+//        $order = Order::where('order_number', $order_number)->firstOrFail();
+        return \view('orders.public.order_waiting_confirmation', [
+            'order_number' => $order_number
+        ]);
+    }
+    public function checkPaymentStatus ($order_number): JsonResponse
+    {
+        $order = Order::where('order_number', $order_number)->firstOrFail();
+        if ($order->order_status === 'Apmokėtas') {
+            return response()->json([
+                'status' => 'true',
+                'order_number' => $order_number,
+                'private_page' => url('/orders/public/order/view/' . $order_number)
+            ]);
+        }
 
-
+        return response()->json(['status' => 'false']);
+    }
     public function publicUpdateCalendar(): JsonResponse
     {
         $trampolineIds = \request()->get('trampoline_id', []);
@@ -279,16 +300,19 @@ class OrderController extends Controller
                 'Order' => (new Order())->newQuery()->with('trampolines')->with('client')
                     ->with('address')->find($Order->Order->id),
             ])->render();
+            $paymentLink = self::generatePaymentUrl($Order->Order->id);
         } else {
             $orderView = null;
+            $paymentLink = null;
         }
+
 
         return response()->json([
             'failed_input' => $Order->failedInputs,
             'status' => $Order->status,
             'Occupied' => $Occupied,
             'Events' => $Events,
-//            'PaymentLink' => $PaymentLink,
+            'PaymentLink' => $paymentLink,
             'OrderId' => $Order->Order->id,
             'view' => $orderView
         ]);
@@ -492,14 +516,9 @@ class OrderController extends Controller
 //            'unpaidOrders' => $unpaidOrders
 //        ]);
     }
-    public function generatePaymentUrl(): JsonResponse
+    public function generatePaymentUrl($orderId): string
     {
-        $orderId = request()->get('order_id');
         (new MontonioPaymentsService())->createOrder($orderId);
-        $paymentLink = (new MontonioPaymentsService())->retrievePaymentLink($orderId);
-        return response()->json([
-            'status' => true,
-            'paymentLink' => $paymentLink
-        ]);
+        return (new MontonioPaymentsService())->retrievePaymentLink($orderId);
     }
 }

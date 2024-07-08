@@ -315,8 +315,8 @@ let TrampolineOrder = {
                     // TrampolineOrder.FormSendOrder.Event.OccupiedFromCreate = response.Occupied;
                     // TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Events;
                     if (response.status) {
-                        TrampolineOrder.PaymentLink.OrderIdToCreateLinkFor = response.OrderId;
-                        TrampolineOrder.PaymentLink.Event.generatePaymentLink()
+                        // TrampolineOrder.PaymentLink.OrderIdToCreateLinkFor = response.OrderId;
+                        window.location.href = response.PaymentLink
                         // eventDay = response.Events[0].start;
                         // reservationSent = true;
                         // CalendarFunctions.Calendar.calendar.removeAllEvents();
@@ -344,7 +344,7 @@ let TrampolineOrder = {
             $('#orderForm input[required]').each(function () {
                 if ($(this).val().trim() === '') {
                     isValid = false;
-                    return false; // Exit loop if any required input is empty
+                    return false;
                 }
             });
             $('#viewOrderButton').prop('disabled', !isValid);
@@ -446,39 +446,39 @@ let TrampolineOrder = {
     //         }
     //     }
     // },
-    PaymentLink: {
-        OrderIdToCreateLinkFor: 0,
-        init: function () {
-            this.Event.init();
-        },
-        Event: {
-            init: function () {
-                // $('#orderButtons .payAdvance').click(function () {
-                //     TrampolineOrder.PaymentLink.Event.generatePaymentLink()
-                // });
-            },
-            generatePaymentLink: function () {
-                $('#overlay').css('display', 'flex');
-                $.ajax({
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: 'POST',
-                        url: '/orders/public/order/generate_url',
-                        data: {
-                            order_id: TrampolineOrder.PaymentLink.OrderIdToCreateLinkFor
-                        }
-                    },
-                ).done((response) => {
-                    $('#overlay').hide();
-                    if (response.status) {
-                        window.location.href = response.paymentLink;
-                    }
-                }).fail((jqXHR, textStatus, errorThrown) => {
-                    $('#overlay').hide();
-                    alert('Request failed: ' + textStatus);
-                });
-            }
-        }
-    },
+    // PaymentLink: {
+    //     OrderIdToCreateLinkFor: 0,
+    //     init: function () {
+    //         this.Event.init();
+    //     },
+    //     Event: {
+    //         init: function () {
+    //             // $('#orderButtons .payAdvance').click(function () {
+    //             //     TrampolineOrder.PaymentLink.Event.generatePaymentLink()
+    //             // });
+    //         },
+    //         generatePaymentLink: function () {
+    //             $('#overlay').css('display', 'flex');
+    //             $.ajax({
+    //                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+    //                     method: 'POST',
+    //                     url: '/orders/public/order/generate_url',
+    //                     data: {
+    //                         order_id: TrampolineOrder.PaymentLink.OrderIdToCreateLinkFor
+    //                     }
+    //                 },
+    //             ).done((response) => {
+    //                 $('#overlay').hide();
+    //                 if (response.status) {
+    //                     window.location.href = response.paymentLink;
+    //                 }
+    //             }).fail((jqXHR, textStatus, errorThrown) => {
+    //                 $('#overlay').hide();
+    //                 alert('Request failed: ' + textStatus);
+    //             });
+    //         }
+    //     }
+    // },
     ViewOrderModal: {
         init: function () {
             this.Event.init();

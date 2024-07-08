@@ -7,6 +7,7 @@ use App\Models\ClientAddress;
 use App\Models\Order;
 use App\Models\OrdersTrampoline;
 use App\Models\Parameter;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Log;
@@ -24,7 +25,7 @@ class DataTablesProcessing
 
     private string $TableName;
 
-    public function getPaginatedData(Model $model, array $Relations, int $Length, int $Start, array $Ordering = [],): static
+    public function getPaginatedData(Model $model, array $Relations, int $Length, int $Start, array $Ordering = [], $startDate = null, $endDate = null, $searchValue = null): static
     {
         $this->TableName = $model->getTable();
         $Query = $model->newQuery();
@@ -32,14 +33,30 @@ class DataTablesProcessing
             $Query->with($Relations);
         }
         $Query->select([$model->getTable() . '.*']);
+
+        if ($startDate && $endDate) {
+            $startDate = Carbon::parse($startDate)->startOfDay();
+            $endDate = Carbon::parse($endDate)->endOfDay();
+            $Query->whereHas('Trampolines', function($query) use ($startDate, $endDate) {
+                $query->whereBetween('rental_start', [$startDate, $endDate]);
+            });
+        }
+
+        if ($searchValue) {
+            $Query->whereHas('Client', function($query) use ($searchValue) {
+                $query->whereRaw("CONCAT(name, ' ', surname) LIKE ?", ["%{$searchValue}%"])
+                    ->orWhere('email', 'like', '%' . $searchValue . '%')
+                    ->orWhere('phone', 'like', '%' . $searchValue . '%');
+            });
+        }
+
+
         switch ($model->getTable()) {
             case 'trampolines' :
                 $Query->leftJoin((new Parameter())->getTable(), (new Parameter())->getTable() . '.trampolines_id', '=', 'trampolines.id');
                 break;
             case 'orders' :
-                //$Query->leftJoin((new OrdersTrampoline())->getTable(), (new OrdersTrampoline())->getTable() . 'orders_id', '=', 'orders.id');
-                //$Query->leftJoin((new Client())->getTable(), (new Client())->getTable() . 'id', '=', 'orders.client_id');
-                //$Query->leftJoin((new ClientAddress())->getTable(), (new ClientAddress())->getTable() . 'id', '=', 'orders.delivery_address_id');
+                $Query->leftJoin((new OrdersTrampoline())->getTable(), (new OrdersTrampoline())->getTable() . '.orders_id', '=', 'orders.id');
                 break;
         }
         try {
@@ -51,14 +68,19 @@ class DataTablesProcessing
         $Query->offset($Start)->limit($Length);
         $this->List = $Query->get();
         $this->recordsTotal = $model->newQuery()->count();
-        $this->recordsFiltered = $this->recordsTotal;
-        self::generateTableRows();
+        $this->recordsFiltered = $Query->count();
+        if ($this->List->isEmpty()) {
+            $this->data = [];
+        } else {
+            self::generateTableRows();
+        }
         return $this;
     }
 
     private function generateTableRows(): void
     {
         foreach ($this->List as $CollectionItem) {
+//            dd($CollectionItem);
             switch ($this->TableName) {
                 case 'trampolines' :
                     $Parameters = Parameter::where('trampolines_id', $CollectionItem->id)->get();
@@ -110,8 +132,15 @@ class DataTablesProcessing
                     break;
                 case 'orders' :
                     $TrampolineNames = '';
-                    foreach ($CollectionItem->trampolines as $Trampoline) {
-                        $TrampolineNames .= 'Batutas ' . $Trampoline->trampoline->title . '<br>';
+                    $RentalStart = '';
+                    $RentalEnd = '';
+                    if ($CollectionItem->Trampolines->isNotEmpty()) {
+                        $RentalStart = $CollectionItem->Trampolines->first()->rental_start;
+                        $RentalEnd = Carbon::parse($CollectionItem->Trampolines->first()->rental_end)->subDay()->toDateString();
+
+                        foreach ($CollectionItem->Trampolines as $Trampoline) {
+                            $TrampolineNames .= 'Batutas ' . $Trampoline->trampoline->title . '<br>';
+                        }
                     }
 
 
@@ -119,9 +148,10 @@ class DataTablesProcessing
                         $CollectionItem->id,
                         $CollectionItem->order_date,
                         $TrampolineNames,
+                        $RentalStart . '<br>' . $RentalEnd,
                         $CollectionItem->client->name . ' <br> ' . $CollectionItem->client->surname,
-                        $CollectionItem->client->email,
-                        $CollectionItem->client->phone,
+                        $CollectionItem->client->email . '<br>' . $CollectionItem->client->phone,
+//                        $CollectionItem->client->phone,
                         $CollectionItem->address->address_street . '<br>' . $CollectionItem->address->address_town . ' <br> ' . $CollectionItem->address->address_postcode,
                         $CollectionItem->rental_duration,
                         $CollectionItem->total_sum . ' ' . config('trampolines.currency', '€'),

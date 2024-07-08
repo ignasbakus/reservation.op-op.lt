@@ -12,6 +12,7 @@ let today = new Date();
 today.setHours(0, 0, 0, 0);
 today.setHours(today.getHours() + 3);
 today = today.toISOString().split('T')[0];
+let isWeeklyFilterActive = false;
 
 /* JS classes */
 let Variables = {
@@ -180,6 +181,18 @@ let Orders = {
         AXAJData: function (d) {
             d._token = $('meta[name="csrf-token"]').attr('content');
             d.sample_data = 1;
+            if (isWeeklyFilterActive) {
+                let currentDate = new Date();
+                let nextWeekDate = new Date();
+                currentDate.setHours(currentDate.getHours() + 3); // Adjust for Lithuanian time zone
+                nextWeekDate.setDate(currentDate.getDate() + 7);
+                nextWeekDate.setHours(nextWeekDate.getHours() + 3); // Adjust for Lithuanian time zone
+                d.start_date = currentDate.toISOString().split('T')[0];
+                d.end_date = nextWeekDate.toISOString().split('T')[0];
+            }
+
+            d.searchValue = d.search.value || '';
+
             return d;
         },
         init: function () {
@@ -191,7 +204,7 @@ let Orders = {
                 filter: true,
                 responsive: true,
                 language: {search: "_INPUT_", searchPlaceholder: "Ieškoti"},
-                //searchDelay     : 5000,
+                searchDelay     : 1000,
                 order: [],
                 serverSide: true,
                 ajax: {
@@ -206,7 +219,7 @@ let Orders = {
                     },
                     dataSrc: function (json) {
                         Orders.Table.OrderList = json.list;
-                        return json.DATA;
+                        return json.DATA || []; // Ensure DATA is an array
                     }
                 },
                 columnDefs: [],
@@ -220,15 +233,16 @@ let Orders = {
                 },
                 columns: [
                     {title: "Užsakymo<br>Numeris", orderable: false},
-                    {title: "Užsakymo data"},
-                    {title: "Užsakytas batutas"},
+                    {title: "Užsakymo data", orderable: false},
+                    {title: "Užsakytas batutas", orderable: false},
+                    {title: "Užsakyta nuo-iki"},
                     {title: "Klientas", orderable: false},
-                    {title: "Elektroninis paštas", orderable: false},
-                    {title: "Telefonas", orderable: false},
+                    {title: "Elektroninis paštas <br> ir Telefonas", orderable: false},
+                    // {title: "Telefonas", orderable: false},
                     {title: "Adresas", orderable: false},
-                    {title: "Nuomos<br>trukmė"},
-                    {title: "Bendra<br>suma"},
-                    {title: "Avanso<br>suma"},
+                    {title: "Nuomos<br>trukmė", orderable: false},
+                    {title: "Bendra<br>suma", orderable: false},
+                    {title: "Avanso<br>suma", orderable: false},
                     {title: "Užsakymo<br>būsena", orderable: false},
                     {title: "Valdymas", orderable: false}
                 ],
@@ -282,6 +296,11 @@ let Orders = {
                     //     $('#failedAlert').show().css('display', 'flex');
                     // })
                 })
+                $('#showWeeklyOrders').on('change', function () {
+                    isWeeklyFilterActive = $(this).is(':checked');
+                    Orders.Table.Table.draw();
+                });
+
             },
             removeOrder: function (OrderID) {
                 Orders.Modals.deleteOrder.prepareModal(OrderID)

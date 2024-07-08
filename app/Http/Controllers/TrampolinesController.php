@@ -79,16 +79,10 @@ class TrampolinesController extends Controller
             'DATA' => $Trampolines->data,
             'draw' => \request()->get('draw'),
             'list' => $Trampolines->List,
-            'recordsTotal' => $Trampolines->recordsTotal,
-            'recordsFiltered' => $Trampolines->recordsFiltered,
+            'recordsTotal' => $Trampolines->recordsTotal ?? 0,
+            'recordsFiltered' => $Trampolines->recordsFiltered ?? 0,
         ]);
     }
-
-    /**
-     * @throws ContainerExceptionInterface
-     * @throws NotFoundExceptionInterface
-     * @throws ValidationException
-     */
 
     public function adminGet(): JsonResponse
     {
