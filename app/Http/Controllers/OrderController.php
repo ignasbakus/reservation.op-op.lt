@@ -76,10 +76,14 @@ class OrderController extends Controller
         $order = Order::where('order_number', $order_number)->first();
         $orderId = $order->id;
         $orderTrampolines = OrdersTrampoline::where('orders_id', $orderId)->where('is_active', 1)->first();
+//        dd($orderTrampolines);
+
 
         if (!$order || !$orderTrampolines || $order->order_status !== 'Apmokėtas') {
             return view('orders.public.order_not_found');
         }
+        $deliveryTime = $orderTrampolines->first();
+//        dd($deliveryTime);
         $client = $order->client()->first();
         $clientAddress = $order->address()->first();
         $PaymentLink = (new MontonioPaymentsService())->retrievePaymentLink($orderId);
@@ -97,6 +101,7 @@ class OrderController extends Controller
             'Order_trampolines' => $orderTrampolines,
             'Client' => $client,
             'ClientAddress' => $clientAddress,
+            'DeliveryTime' => $deliveryTime,
             'Order_id' => $order->id,
             'Dates' => (object)[
                 'CalendarInitial' => Carbon::now()->format('Y-m-d')

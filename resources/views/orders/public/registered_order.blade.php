@@ -68,6 +68,7 @@
         let Occupied = {{ Illuminate\Support\Js::from($Occupied) }};
         let Dates = {{ Illuminate\Support\Js::from($Dates) }};
         let Availability = {{ Illuminate\Support\Js::from($Availability) }};
+        let DeliveryTime = {{ Illuminate\Support\Js::from($DeliveryTime) }};
     </script>
     <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
     <script src="/js/orders/public/order_public_via_email.js"></script>

@@ -176,7 +176,8 @@ class TrampolinesController extends Controller
 
     public function calendarIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-        return view('trampolines.private.calendar_index', []);
+//        return view('trampolines.private.calendar_index', []);
+        return view('trampolines.private.calendar_index_building', []);
     }
 
 //    public function createOrderForm (): Factory|Application|View|\Illuminate\Contracts\Foundation\Application

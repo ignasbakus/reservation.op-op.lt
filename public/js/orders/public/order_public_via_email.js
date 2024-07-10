@@ -1,4 +1,3 @@
-/* Global variables */
 let eventDay;
 let firstVisibleDayOnCalendar;
 let lastVisibleDayOnCalendar;
@@ -13,13 +12,14 @@ today.setHours(0, 0, 0, 0);
 today.setHours(today.getHours() + 3);
 today = today.toISOString().split('T')[0];
 
-/* JS classes */
 let Variables = {
     orderFormInput: [
-        'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity', 'customerDeliveryPostCode', 'customerDeliveryAddress'
+        'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity',
+        'customerDeliveryPostCode', 'customerDeliveryAddress', 'customerDeliveryTime'
     ],
     client: {},
     clientAddress: {},
+    clientTime: {},
     getOrderFormInputs: function () {
         let values = {};
         this.orderFormInput.forEach(function (inputName) {
@@ -36,6 +36,8 @@ let Variables = {
         values.customerDeliveryCity = this.clientAddress.address_town;
         values.customerDeliveryPostCode = this.clientAddress.address_postcode;
         values.customerDeliveryAddress = this.clientAddress.address_street;
+        values.customerDeliveryTime = this.clientTime.delivery_time;
+
         return values;
     },
     getTrampolines: function () {
@@ -54,6 +56,13 @@ let Variables = {
         $('#orderForm input[name="customerDeliveryPostCode"]').val(address.address_postcode);
         $('#orderForm input[name="customerDeliveryAddress"]').val(address.address_street);
     },
+    setDeliveryTimeDetails: function (time) {
+        this.clientTime = time;
+        $('#orderForm input[name="customerDeliveryTime"]').val(time.delivery_time);
+    },
+    getDeliveryTime: function () {
+        return this.clientTime.delivery_time;
+    },
     populateOrderFormValues: function () {
         return {
             customerName: this.client.name,
@@ -67,6 +76,7 @@ let Variables = {
         };
     }
 };
+
 let CalendarFunctions = {
     Calendar: {
         initialize: function (InitialDate) {
@@ -195,16 +205,15 @@ let CalendarFunctions = {
         });
     },
 };
+
 let TrampolineOrder = {
     init: function () {
         $('#thankYouDiv').html(view);
-        $('#orderButtons .payAdvance').click(function() {
-            window.location.href = PaymentLink
-        });
         this.UpdateOrder.init();
         this.CancelOrderModal.init()
         Variables.setClientDetails(Client);
         Variables.setClientAddressDetails(ClientAddress);
+        Variables.setDeliveryTimeDetails(DeliveryTime);
     },
     UpdateOrder: {
         OccupiedWhenCancelled: '',
@@ -305,6 +314,7 @@ let TrampolineOrder = {
                 form_data.orderID = Order_id;
                 form_data.firstVisibleDay = firstVisibleDayOnCalendar;
                 form_data.lastVisibleDay = lastVisibleDayOnCalendar;
+                form_data.delivery_time = Variables.getDeliveryTime(); // Add delivery_time
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                     method: 'PUT',
@@ -381,5 +391,3 @@ $(document).ready(function () {
     console.log("/js/trampolines/public/order_public_via_email.js -> ready!");
     TrampolineOrder.init();
 });
-
-/* Document ready function */
