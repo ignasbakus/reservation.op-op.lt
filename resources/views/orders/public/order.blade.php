@@ -7,26 +7,24 @@
 
 @section('custom_css')
     <link href="/css/order/public/public_order_view.css" rel="stylesheet" crossorigin="anonymous">
+    <style>
+        /* Additional custom styles for responsiveness */
+        @media (max-width: 768px) {
+            .infoBeforeSuccessfulOrder {
+                margin-left: 0 !important;
+                margin-right: 0 !important;
+            }
+            #calendar {
+                margin-top: 20px;
+            }
+        }
+    </style>
 @endsection
 
 @section('content')
     <div class="container flex-grow-1">
         <div class="row justify-content-center">
-            {{--<div class="col-lg-4" id="columnAfterSentOrder" style="display: none">
-                <div id="thankYouDiv" class="ms-lg-5"></div>
-                <div id="confirmationContainer" class="confirmation-container ms-lg-5 mt-3" style="display: none">
-                    <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>
-                    <div class="checkbox-container d-flex justify-content-end mt-2">
-                        <button type="button" class="btn btn-danger me-2 confirmationClose">
-                            Atšaukti
-                        </button>
-                        <button type="button" class="btn btn-primary confirmChanges confirmDatesChange">
-                            Pakeisti
-                        </button>
-                    </div>
-                </div>
-            </div>--}}
-            <div id="sendOrderColumn" class="col-4 ms-5 infoBeforeSuccessfulOrder" style="display: block">
+            <div id="sendOrderColumn" class="col-lg-4 col-md-6 col-sm-12 infoBeforeSuccessfulOrder" >
                 <h2>Užsakymo Forma</h2>
                 <form id="orderForm" class="needs-validation" novalidate>
                     <div class="row">
@@ -83,52 +81,28 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-4 infoBeforeSuccessfulOrder" style="display: block">
-                            <button class="btn btn-primary mt-3 d-flex align-items-center justify-content-center
-                            viewOrderButton" id="viewOrderButton" data-toggle="modal" data-target="#viewOrderModal"
-                                    disabled>
+                        <div class="col infoBeforeSuccessfulOrder">
+                            <button class="btn btn-primary mt-3 d-flex align-items-center justify-content-center viewOrderButton" id="viewOrderButton" data-toggle="modal" data-target="#viewOrderModal" disabled>
                                 <span id="buttonText">Peržiūrėti užsakymą</span>
                             </button>
                         </div>
-                        <div class="col-6"></div>
                     </div>
                 </form>
             </div>
-            <div class="col-1"></div>
-            <div class="col me-5">
+            <div class="col-lg-7 col-md-6 col-sm-12">
                 <div id="calendar"></div>
             </div>
-            <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert"
+            <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert" role="alert"
                  style="display: none;">
                 <span id="failedAlertMessage"></span>
                 <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
             </div>
-            <div class="alert alert-success alert-dismissible fade show custom-alert" id="successfulDateChangeAlert"
+            <div class="alert alert-success alert-dismissible fade show custom-alert col-12 mt-3" id="successfulDateChangeAlert"
                  role="alert" style="display: none;">
                 <span id="dateChangeAlertMessage"></span>
-                <button type="button" class="btn-close" aria-label="Close"
-                        onclick="$('#successfulDateChangeAlert').hide()"></button>
+                <button type="button" class="btn-close" aria-label="Close" onclick="$('#successfulDateChangeAlert').hide()"></button>
             </div>
         </div>
-        {{--<div class="modal fade" id="cancelOrderModal" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title">Atšaukimas</h3>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <h5>Ar tikrai norite atšaukti užsakymą?</h5>
-                        <p style="color: red">Jei iki pirmosios rezervacijos dienos yra likusios mažiau nei 3 dienos,
-                            užsakymo atšaukti neleis</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Išeiti</button>
-                        <button type="submit" class="btn btn-danger cancelOrderModalButton">Atšaukti</button>
-                    </div>
-                </div>
-            </div>
-        </div>--}}
         <div class="modal fade" id="viewOrderModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel"
              aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered" role="document">

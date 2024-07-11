@@ -38,103 +38,11 @@ let CalendarFunctions = {
     Calendar: {
         initialize: function () {
             this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
-                initialDate: Dates.CalendarInitial,
-                locale: 'lt',
+                timeZone: 'UTC',
+                initialView: 'dayGridMonth',
+                events: 'https://fullcalendar.io/api/demo-feeds/events.json',
                 editable: true,
-                selectable: true,
-                validRange: {
-                    start: today,
-                },
-                eventDrop: function (dropInfo) {
-                    isEventDrop = true;
-                    let droppedDate = dropInfo.event.start;
-                    let currentMonth = this.getDate().getMonth();
-                    let droppedMonth = droppedDate.getMonth();
-                    if (droppedMonth < currentMonth) {
-                        this.prev();
-                        CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                    } else if (droppedMonth > currentMonth) {
-                        this.next();
-                        CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                    }
-                    isEventDrop = false;
-                },
-                dayMaxEvents: true,
-                events: [],
-                datesSet: function (info) {
-                    let CalendarView = info.view;
-                    console.log('CalendarView:', CalendarView)
-                    let firstDayMonth = new Date(CalendarView.currentStart);
-                    let firstCalendarVisibleDate = new Date(info.start);
-                    let lastCalendarVisibleDate = new Date(info.end);
-                    firstDayMonth.setUTCHours(firstDayMonth.getUTCHours() + 3);
-                    firstCalendarVisibleDate.setUTCHours(firstCalendarVisibleDate.getUTCHours() + 3);
-                    lastCalendarVisibleDate.setUTCHours(lastCalendarVisibleDate.getUTCHours() + 3);
-                    firstMonthDay = firstDayMonth.toISOString().split('T')[0];
-                    firstVisibleDayOnCalendar = firstCalendarVisibleDate.toISOString().split('T')[0];
-                    lastVisibleDayOnCalendar = lastCalendarVisibleDate.toISOString().split('T')[0];
-
-                    let currentStart = new Date(CalendarView.currentStart);
-                    let prevButton = document.querySelector('.fc-prev-button');
-                    let todayButton = document.querySelector('.fc-today-button');
-                    if (skippedMonth) {
-                        let prevMonth = new Date(currentStart);
-                        prevMonth.setMonth(prevMonth.getMonth() - 1);
-                        prevButton.disabled = prevMonth.getMonth() === skippedMonth;
-                        todayButton.disabled = true
-                    } else {
-                        prevButton.disabled = false;
-                    }
-                    if (!isNavigating && !isEventDrop && !isCancelButtonClicked) {
-                        CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                    }
-                    isEventDrop = false;
-                    isCancelButtonClicked = false;
-                },
-                eventAllow: function (dropInfo, draggedEvent) {
-                    let CouldBeDropped = true;
-                    let dropStart = new Date(dropInfo.startStr);
-                    let dropEnd = new Date(dropInfo.endStr);
-                    let draggedEndMinusOneHour = new Date(draggedEvent.endStr);
-                    let dropEndMinusOneHour = new Date(dropInfo.endStr);
-                    dropEndMinusOneHour.setDate(dropEndMinusOneHour.getDate() - 1);
-                    draggedEndMinusOneHour.setDate(draggedEndMinusOneHour.getDate() - 1);
-                    dropEndMinusOneHour.setUTCHours(dropEndMinusOneHour.getUTCHours() + 3);
-                    draggedEndMinusOneHour.setUTCHours(draggedEndMinusOneHour.getUTCHours() + 3);
-
-                    Occupied.forEach(function (Occupation) {
-                        let OccupationStart = new Date(Occupation.start);
-                        let OccupationEnd = new Date(Occupation.end);
-                        if ((dropStart >= OccupationStart && dropStart < OccupationEnd) ||
-                            (dropEnd > OccupationStart && dropEnd <= OccupationEnd) ||
-                            (dropStart <= OccupationStart && dropEnd >= OccupationEnd)) {
-                            CouldBeDropped = false;
-                            return false;
-                        }
-                    });
-                    if (CouldBeDropped) {
-                        Trampolines.forEach(function (Trampoline) {
-                            draggedEvent.extendedProps.trampolines.forEach(function (AffectedTrampoline) {
-                                if (Trampoline.id === AffectedTrampoline.id) {
-                                    Trampoline.rental_start = dropInfo.startStr;
-                                    Trampoline.rental_end = dropInfo.endStr;
-                                }
-                            });
-                        });
-                    } else {
-                        Trampolines.forEach(function (Trampoline) {
-                            Trampoline.rental_start = draggedEvent.startStr;
-                            Trampoline.rental_end = draggedEvent.endStr;
-                        });
-                    }
-                    return CouldBeDropped;
-                },
-                eventTimeFormat: {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: false,
-                },
+                selectable: true
             });
             this.calendar.render();
         },

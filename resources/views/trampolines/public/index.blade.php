@@ -44,7 +44,7 @@
                 <div class="row mt-3">
                     <div class="col-12 col-md-8"></div>
                     <div class="col-12 col-md-4 text-end">
-                        <button class="btn btn-primary mt-3 w-100 sendToOrderButton" id="sendToOrderButton" disabled>
+                        <button class="btn btn-primary mt-3 w-100 sendToOrderButton mb-5" id="sendToOrderButton" disabled>
                             <span id="buttonText">Užsakyti</span>
                         </button>
                     </div>
