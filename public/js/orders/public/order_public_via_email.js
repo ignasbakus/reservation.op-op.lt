@@ -185,7 +185,7 @@ let CalendarFunctions = {
         $('#overlay').css('display', 'flex');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-            url: '/orders/admin/order/private_calendar/get',
+            url: '/orders/public/order/private_calendar/get',
             method: 'POST',
             data: {
                 order_id: Order_id,
@@ -228,7 +228,7 @@ let TrampolineOrder = {
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 dataType: 'json',
                 method: "GET",
-                url: "/orders/admin/order/getCalendarInitial",
+                url: "/orders/public/order/getCalendarInitial",
                 data: {
                     order_id: Order_id,
                 }
@@ -258,7 +258,7 @@ let TrampolineOrder = {
                 headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                 dataType: 'json',
                 method: "GET",
-                url: "/orders/admin/order/getOrderUpdateData",
+                url: "/orders/public/order/getOrderUpdateData",
                 data: {
                     order_id: Order_id,
                     target_start_date: firstVisibleDayOnCalendar,
@@ -275,8 +275,12 @@ let TrampolineOrder = {
                     CalendarFunctions.addEvent(response.Occupied);
                     CalendarFunctions.addEvent(response.Events);
                     modalPopulated = true;
-                } else {
-                    console.error("Failed to fetch data: ", response.message);
+                }
+                if (!response.status){
+                    // CalendarFunctions.Calendar.goToInitialDates();
+                    // CalendarFunctions.Calendar.calendar.removeAllEvents();
+                    // CalendarFunctions.addEvent(TrampolineOrder.UpdateOrder.OccupiedWhenCancelled);
+                    // CalendarFunctions.addEvent(TrampolineOrder.UpdateOrder.EventWhenCancelled);
                 }
             }).fail((jqXHR) => {
                 $('#overlay').hide();
@@ -338,8 +342,8 @@ let TrampolineOrder = {
                         $('#failedAlertMessage').text(response.failed_input.error[0]);
                         $('#failedAlert').show().css('display', 'flex');
                         CalendarFunctions.Calendar.calendar.removeAllEvents();
+                        CalendarFunctions.Calendar.goToInitialDates();
                         $('#confirmationContainer').css('display', 'none');
-                        TrampolineOrder.UpdateOrder.getDataForModal();
                     }
                 });
             },
