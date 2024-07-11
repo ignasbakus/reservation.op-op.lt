@@ -12,6 +12,7 @@
         .order-summary hr {
             border-color: #333; /* Darker color */
         }
+
         .order-summary .text-danger {
             font-size: 12px; /* Adjust the font size as needed */
         }
@@ -90,7 +91,8 @@
                 </form>
             </div>
             <div class="col-lg-7 col-md-6 col-sm-12">
-                <div id="calendar"></div>
+                {{--                <div id="calendar"></div>--}}
+                <input type="text" id="litepicker" placeholder="Select Date">
             </div>
             <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert"
                  role="alert"
@@ -129,7 +131,7 @@
                                         class="font-weight-bold trampoline-price">{{ number_format($trampoline->Parameter->price, 2) }}{{$currency}}</span>
                                 </div>
                             @endforeach
-{{--                            <hr>--}}
+                            {{--                            <hr>--}}
                             <h5 class="mb-3">Kainos</h5>
                             <div class="d-flex justify-content-between py-2">
                                 <span class="font-weight-bold">Avansas</span>
@@ -168,5 +170,6 @@
     </script>
     <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
     <script src="/js/orders/public/order_public.js"></script>
 @endsection

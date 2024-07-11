@@ -214,203 +214,214 @@ let flatPicker = {
     }
 }
 
-let TrampolineOrder = {
-    init: function () {
-        this.FormSendOrder.init();
-        // this.UpdateOrder.init();
-        this.ViewOrderModal.init()
-        this.FormSendOrder.checkFormValidity(); // Initial check
-    },
-    FormSendOrder: {
+let litePicker = {
+    initialize: function () {
+        const picker = new Litepicker({
+            element: document.getElementById('litepicker'),
+            singleMode: false, // Set to true for single date selection
+            format: 'YYYY-MM-DD', // Customize the date format
+            // Add more options as needed
+        })
+    }
+}
+
+    let TrampolineOrder = {
         init: function () {
-            this.Event.init();
+            this.FormSendOrder.init();
+            // this.UpdateOrder.init();
+            this.ViewOrderModal.init()
+            this.FormSendOrder.checkFormValidity(); // Initial check
         },
-        dataForm: {
-            element: $('#sendOrderColumn form'),
-        },
-        Event: {
-            OccupiedFromCreate: '',
-            EventFromCreate: '',
+        FormSendOrder: {
             init: function () {
-                $('#orderForm .orderSameDay').on('change', function () {
-                    if (!$(this).is(':checked')) {
-                        $('.showTrampolineSelect').show().click();
-                    } else {
-                        $('.showTrampolineSelect').hide();
-                    }
-                });
-                $('#orderForm .viewOrderButton').on('click', function (event) {
-                    event.preventDefault(); // Prevent the default form submission behavior
-                    TrampolineOrder.ViewOrderModal.element.show();
-                });
-                $('#orderForm input, #orderForm select').on('input change', function () {
-                    TrampolineOrder.FormSendOrder.checkFormValidity();
-                });
+                this.Event.init();
             },
-            addOrder: function () {
-                let form_data = Variables.getOrderFormInputs();
-                form_data.firstVisibleDay = firstVisibleDayOnCalendar;
-                form_data.lastVisibleDay = lastVisibleDayOnCalendar;
-                $('#overlay').css('display', 'flex');
-                $.ajax({
-                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    method: 'POST',
-                    url: '/orders/public/order',
-                    data: form_data,
-                }).done((response) => {
-                    $('#overlay').hide();
-                    if (response.status === false) {
-                        TrampolineOrder.ViewOrderModal.element.hide()
-                        $('form input').removeClass('is-invalid');
-                        Object.keys(response.failed_input).forEach(function (FailedInput) {
-                            $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
-                            $('form input[name=' + FailedInput + ']').addClass('is-invalid');
-                        });
-                        if (response.failed_input.error) {
-                            $('#failedAlertMessage').text(response.failed_input.error[0]);
-                            $('#failedAlert').show().css('display', 'flex');
-                            CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                        }
-                    }
-                    // if (response.status) {
-                    //     // $('form input').removeClass('is-invalid');
-                    //     // $('.infoBeforeSuccessfulOrder').css('display', 'none');
-                    //     // $('#columnAfterSentOrder').css('display', 'block');
-                    //     // $('#thankYouDiv').addClass(' d-flex flex-column justify-content-between');
-                    // }
-                    // TrampolineOrder.FormSendOrder.Event.OccupiedFromCreate = response.Occupied;
-                    // TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Events;
-                    if (response.status) {
-                        window.location.href = response.PaymentLink
-                    }
-                });
+            dataForm: {
+                element: $('#sendOrderColumn form'),
             },
-        },
-        checkFormValidity: function () {
-            let isValid = true;
-            $('#orderForm input[required]').each(function () {
-                if ($(this).val().trim() === '') {
-                    isValid = false;
-                    return false;
-                }
-            });
-            $('#viewOrderButton').prop('disabled', !isValid);
-        }
-    },
-    ViewOrderModal: {
-        init: function () {
-            this.Event.init();
-        },
-        element: new bootstrap.Modal('#viewOrderModal'),
-        Event: {
-            init: function () {
-                $('#viewOrderModal').on('show.bs.modal', function () {
-                    $('.trampoline-name').each(function () {
-                        const originalName = $(this).data('original-name');
-                        if (originalName) {
-                            $(this).text(originalName);
+            Event: {
+                OccupiedFromCreate: '',
+                EventFromCreate: '',
+                init: function () {
+                    $('#orderForm .orderSameDay').on('change', function () {
+                        if (!$(this).is(':checked')) {
+                            $('.showTrampolineSelect').show().click();
+                        } else {
+                            $('.showTrampolineSelect').hide();
                         }
                     });
-                    TrampolineOrder.ViewOrderModal.Event.updateAdvanceSum()
-                });
-                $('#viewOrderModalButtons .payForOrderAdvance').on('click', function (event) {
-                    event.preventDefault();
-                    TrampolineOrder.FormSendOrder.Event.addOrder()
-                })
+                    $('#orderForm .viewOrderButton').on('click', function (event) {
+                        event.preventDefault(); // Prevent the default form submission behavior
+                        TrampolineOrder.ViewOrderModal.element.show();
+                    });
+                    $('#orderForm input, #orderForm select').on('input change', function () {
+                        TrampolineOrder.FormSendOrder.checkFormValidity();
+                    });
+                },
+                addOrder: function () {
+                    let form_data = Variables.getOrderFormInputs();
+                    form_data.firstVisibleDay = firstVisibleDayOnCalendar;
+                    form_data.lastVisibleDay = lastVisibleDayOnCalendar;
+                    $('#overlay').css('display', 'flex');
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: 'POST',
+                        url: '/orders/public/order',
+                        data: form_data,
+                    }).done((response) => {
+                        $('#overlay').hide();
+                        if (response.status === false) {
+                            TrampolineOrder.ViewOrderModal.element.hide()
+                            $('form input').removeClass('is-invalid');
+                            Object.keys(response.failed_input).forEach(function (FailedInput) {
+                                $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
+                                $('form input[name=' + FailedInput + ']').addClass('is-invalid');
+                            });
+                            if (response.failed_input.error) {
+                                $('#failedAlertMessage').text(response.failed_input.error[0]);
+                                $('#failedAlert').show().css('display', 'flex');
+                                CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                            }
+                        }
+                        // if (response.status) {
+                        //     // $('form input').removeClass('is-invalid');
+                        //     // $('.infoBeforeSuccessfulOrder').css('display', 'none');
+                        //     // $('#columnAfterSentOrder').css('display', 'block');
+                        //     // $('#thankYouDiv').addClass(' d-flex flex-column justify-content-between');
+                        // }
+                        // TrampolineOrder.FormSendOrder.Event.OccupiedFromCreate = response.Occupied;
+                        // TrampolineOrder.FormSendOrder.Event.EventFromCreate = response.Events;
+                        if (response.status) {
+                            window.location.href = response.PaymentLink
+                        }
+                    });
+                },
             },
-            updateAdvanceSum: function () {
-                let totalSum = 0;
-                let reservationDays = 0;
-                let startDateText = '';
-                let endDateText = '';
-
-                // Calculate reservation days for the specific event
-                const events = CalendarFunctions.Calendar.calendar.getEvents();
-                console.log("All events: ", events);
-                let reservationEvent = events.find(event => event.extendedProps.type_custom === "trampolineEvent");
-
-                if (reservationEvent) {
-                    console.log("Reservation event found: ", reservationEvent);
-                    let startDate = new Date(reservationEvent.start);
-                    let endDate = new Date(reservationEvent.end);
-                    console.log("Original start date: ", startDate);
-                    console.log("Original end date: ", endDate);
-
-                    // Adjust for Lithuanian time zone (+3 hours)
-                    startDate.setHours(startDate.getHours() + 3);
-                    endDate.setHours(endDate.getHours() + 3);
-                    console.log("Adjusted start date: ", startDate);
-                    console.log("Adjusted end date: ", endDate);
-
-                    // Adjust end date by subtracting one day
-                    endDate.setDate(endDate.getDate() - 1);
-                    console.log("Final end date: ", endDate);
-
-                    reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Convert milliseconds to days and add 1 for inclusive days
-                    console.log("Calculated reservation days: ", reservationDays);
-
-                    // Format the dates for display
-                    startDateText = startDate.toISOString().split('T')[0];
-                    endDateText = endDate.toISOString().split('T')[0];
-                }
-
-                // Update trampoline items with days and calculate total sum
-                $('.trampoline-item').each(function () {
-                    const price = parseFloat($(this).data('price'));
-                    const trampolineNameElement = $(this).find('.trampoline-name');
-                    let originalName = trampolineNameElement.data('original-name');
-
-                    if (!originalName) {
-                        originalName = trampolineNameElement.text();
-                        trampolineNameElement.data('original-name', originalName);
+            checkFormValidity: function () {
+                let isValid = true;
+                $('#orderForm input[required]').each(function () {
+                    if ($(this).val().trim() === '') {
+                        isValid = false;
+                        return false;
                     }
-
-                    if (reservationDays > 1) {
-                        trampolineNameElement.text(`${originalName} (${reservationDays} d.)`);
-                    } else {
-                        trampolineNameElement.text(originalName);
-                    }
-
-                    const totalPrice = price * reservationDays;
-                    console.log("Total price for ", originalName, ": ", totalPrice);
-                    $(this).find('.trampoline-price').text(totalPrice.toFixed(2));
-                    totalSum += totalPrice;
                 });
+                $('#viewOrderButton').prop('disabled', !isValid);
+            }
+        },
+        ViewOrderModal: {
+            init: function () {
+                this.Event.init();
+            },
+            element: new bootstrap.Modal('#viewOrderModal'),
+            Event: {
+                init: function () {
+                    $('#viewOrderModal').on('show.bs.modal', function () {
+                        $('.trampoline-name').each(function () {
+                            const originalName = $(this).data('original-name');
+                            if (originalName) {
+                                $(this).text(originalName);
+                            }
+                        });
+                        TrampolineOrder.ViewOrderModal.Event.updateAdvanceSum()
+                    });
+                    $('#viewOrderModalButtons .payForOrderAdvance').on('click', function (event) {
+                        event.preventDefault();
+                        TrampolineOrder.FormSendOrder.Event.addOrder()
+                    })
+                },
+                updateAdvanceSum: function () {
+                    let totalSum = 0;
+                    let reservationDays = 0;
+                    let startDateText = '';
+                    let endDateText = '';
 
-                // Calculate advance payment
-                const advancePayment = Math.round((totalSum * AdvancePercentage) / 10) * 10;
-                const finalPayment = totalSum - advancePayment;
+                    // Calculate reservation days for the specific event
+                    const events = CalendarFunctions.Calendar.calendar.getEvents();
+                    console.log("All events: ", events);
+                    let reservationEvent = events.find(event => event.extendedProps.type_custom === "trampolineEvent");
 
-                // Debugging logs
-                console.log("Total Sum: ", totalSum);
-                console.log("Reservation Days: ", reservationDays);
-                console.log("Advance Payment: ", advancePayment);
-                console.log("Final Payment: ", finalPayment);
+                    if (reservationEvent) {
+                        console.log("Reservation event found: ", reservationEvent);
+                        let startDate = new Date(reservationEvent.start);
+                        let endDate = new Date(reservationEvent.end);
+                        console.log("Original start date: ", startDate);
+                        console.log("Original end date: ", endDate);
 
-                // Update the modal with the calculated values
-                $('#advance-payment').text(advancePayment.toFixed(2));
-                $('#final-payment').text(finalPayment.toFixed(2));
-                if (reservationDays > 1) {
-                    $('#reservation-dates').text(`${startDateText} - ${endDateText}`);
-                    $('#reservation-label').text('Rezervuotos dienos:');
-                } else {
-                    $('#reservation-dates').text(`${startDateText}`);
-                    $('#reservation-label').text('Rezervuota diena:');
+                        // Adjust for Lithuanian time zone (+3 hours)
+                        startDate.setHours(startDate.getHours() + 3);
+                        endDate.setHours(endDate.getHours() + 3);
+                        console.log("Adjusted start date: ", startDate);
+                        console.log("Adjusted end date: ", endDate);
+
+                        // Adjust end date by subtracting one day
+                        endDate.setDate(endDate.getDate() - 1);
+                        console.log("Final end date: ", endDate);
+
+                        reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Convert milliseconds to days and add 1 for inclusive days
+                        console.log("Calculated reservation days: ", reservationDays);
+
+                        // Format the dates for display
+                        startDateText = startDate.toISOString().split('T')[0];
+                        endDateText = endDate.toISOString().split('T')[0];
+                    }
+
+                    // Update trampoline items with days and calculate total sum
+                    $('.trampoline-item').each(function () {
+                        const price = parseFloat($(this).data('price'));
+                        const trampolineNameElement = $(this).find('.trampoline-name');
+                        let originalName = trampolineNameElement.data('original-name');
+
+                        if (!originalName) {
+                            originalName = trampolineNameElement.text();
+                            trampolineNameElement.data('original-name', originalName);
+                        }
+
+                        if (reservationDays > 1) {
+                            trampolineNameElement.text(`${originalName} (${reservationDays} d.)`);
+                        } else {
+                            trampolineNameElement.text(originalName);
+                        }
+
+                        const totalPrice = price * reservationDays;
+                        console.log("Total price for ", originalName, ": ", totalPrice);
+                        $(this).find('.trampoline-price').text(totalPrice.toFixed(2));
+                        totalSum += totalPrice;
+                    });
+
+                    // Calculate advance payment
+                    const advancePayment = Math.round((totalSum * AdvancePercentage) / 10) * 10;
+                    const finalPayment = totalSum - advancePayment;
+
+                    // Debugging logs
+                    console.log("Total Sum: ", totalSum);
+                    console.log("Reservation Days: ", reservationDays);
+                    console.log("Advance Payment: ", advancePayment);
+                    console.log("Final Payment: ", finalPayment);
+
+                    // Update the modal with the calculated values
+                    $('#advance-payment').text(advancePayment.toFixed(2));
+                    $('#final-payment').text(finalPayment.toFixed(2));
+                    if (reservationDays > 1) {
+                        $('#reservation-dates').text(`${startDateText} - ${endDateText}`);
+                        $('#reservation-label').text('Rezervuotos dienos:');
+                    } else {
+                        $('#reservation-dates').text(`${startDateText}`);
+                        $('#reservation-label').text('Rezervuota diena:');
+                    }
                 }
             }
         }
     }
-}
 
-/* Document ready function */
-$(document).ready(function () {
-    console.log("/js/trampolines/public/order_public.js -> ready!");
-    TrampolineOrder.init();
-    CalendarFunctions.Calendar.initialize();
-    flatPicker.initialize();
-    // CalendarFunctions.TimePicker.initialize();
-    console.log('Trampolines ->', Trampolines);
-});
+    /* Document ready function */
+    $(document).ready(function () {
+        console.log("/js/trampolines/public/order_public.js -> ready!");
+        TrampolineOrder.init();
+        // CalendarFunctions.Calendar.initialize();
+        flatPicker.initialize();
+        litePicker.initialize();
+        console.log('Trampolines ->', Trampolines);
+    });
 
 
 
