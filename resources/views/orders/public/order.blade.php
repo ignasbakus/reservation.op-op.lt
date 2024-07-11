@@ -14,6 +14,7 @@
                 margin-left: 0 !important;
                 margin-right: 0 !important;
             }
+
             #calendar {
                 margin-top: 20px;
             }
@@ -22,85 +23,93 @@
 @endsection
 
 @section('content')
-    <div class="container flex-grow-1">
+    <div class=" flex-grow-1">
         <div class="row justify-content-center">
-            <div id="sendOrderColumn" class="col-lg-4 col-md-6 col-sm-12 infoBeforeSuccessfulOrder" >
-                <h2>Užsakymo Forma</h2>
-                <form id="orderForm" class="needs-validation" novalidate>
-                    <div class="row">
-                        <div class="form-group col-6">
-                            <label for="customerName">Vardas</label>
-                            <input name="customerName" type="text" class="form-control" id="customerName"
-                                   placeholder="Įveskite vardą" required>
-                            <div class="invalid-feedback customerNameInValidFeedback"></div>
+            <div class="container ">
+                <div id="sendOrderColumn" class="col-lg-4 col-md-6 col-sm-12 infoBeforeSuccessfulOrder">
+                    <h2>Užsakymo Forma</h2>
+                    <form id="orderForm" class="needs-validation" novalidate>
+                        <div class="row">
+                            <div class="form-group col-6">
+                                <label for="customerName">Vardas</label>
+                                <input name="customerName" type="text" class="form-control" id="customerName"
+                                       placeholder="Įveskite vardą" required>
+                                <div class="invalid-feedback customerNameInValidFeedback"></div>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="customerSurname">Pavardė</label>
+                                <input name="customerSurname" type="text" class="form-control" id="customerSurname"
+                                       placeholder="Įveskite pavardę" required>
+                                <div class="invalid-feedback customerSurnameInValidFeedback"></div>
+                            </div>
                         </div>
-                        <div class="form-group col-6">
-                            <label for="customerSurname">Pavardė</label>
-                            <input name="customerSurname" type="text" class="form-control" id="customerSurname"
-                                   placeholder="Įveskite pavardę" required>
-                            <div class="invalid-feedback customerSurnameInValidFeedback"></div>
+                        <div class="form-group mt-3">
+                            <label for="customerPhoneNumber">Telefono Numeris</label>
+                            <input name="customerPhoneNumber" type="tel" class="form-control" id="customerPhoneNumber"
+                                   placeholder="Įveskite telefono numerį">
+                            <div class="invalid-feedback customerPhoneNumberInValidFeedback"></div>
                         </div>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="customerPhoneNumber">Telefono Numeris</label>
-                        <input name="customerPhoneNumber" type="tel" class="form-control" id="customerPhoneNumber"
-                               placeholder="Įveskite telefono numerį">
-                        <div class="invalid-feedback customerPhoneNumberInValidFeedback"></div>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="customerEmail">El. Paštas</label>
-                        <input name="customerEmail" type="email" class="form-control" id="customerEmail"
-                               placeholder="Įveskite el. paštą" required>
-                        <div class="invalid-feedback customerEmailInValidFeedback"></div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="form-group col-6">
-                            <label for="customerDeliveryCity">Pristatymo Miestas</label>
-                            <input name="customerDeliveryCity" type="text" class="form-control"
-                                   id="customerDeliveryCity"
-                                   placeholder="Įveskite pristatymo miestą" required>
-                            <div class="invalid-feedback customerDeliveryCityInValidFeedback"></div>
+                        <div class="form-group mt-3">
+                            <label for="customerEmail">El. Paštas</label>
+                            <input name="customerEmail" type="email" class="form-control" id="customerEmail"
+                                   placeholder="Įveskite el. paštą" required>
+                            <div class="invalid-feedback customerEmailInValidFeedback"></div>
                         </div>
-                        <div class="form-group col-6">
-                            <label for="customerDeliveryPostCode">Pašto Kodas</label>
-                            <input name="customerDeliveryPostCode" type="text" class="form-control"
-                                   id="customerDeliveryPostCode" placeholder="Įveskite pašto kodą" required>
-                            <div class="invalid-feedback customerDeliveryPostCodeInValidFeedback"></div>
+                        <div class="row mt-3">
+                            <div class="form-group col-6">
+                                <label for="customerDeliveryCity">Pristatymo Miestas</label>
+                                <input name="customerDeliveryCity" type="text" class="form-control"
+                                       id="customerDeliveryCity"
+                                       placeholder="Įveskite pristatymo miestą" required>
+                                <div class="invalid-feedback customerDeliveryCityInValidFeedback"></div>
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="customerDeliveryPostCode">Pašto Kodas</label>
+                                <input name="customerDeliveryPostCode" type="text" class="form-control"
+                                       id="customerDeliveryPostCode" placeholder="Įveskite pašto kodą" required>
+                                <div class="invalid-feedback customerDeliveryPostCodeInValidFeedback"></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="form-group mt-3">
-                        <label for="customerDeliveryAddress">Pristatymo Adresas</label>
-                        <input name="customerDeliveryAddress" class="form-control" id="customerDeliveryAddress"
-                               placeholder="Įveskite pristatymo adresą" required>
-                        <div class="invalid-feedback customerDeliveryAddressNameInValidFeedback"></div>
-                    </div>
-                    <div class="row mt-3">
-                        <div class="form-group col">
-                            <label for="customerDeliveryTime">Pristatymo laikas</label>
-                            <input name="customerDeliveryTime" class="form-control" type="text" id="customerDeliveryTime" placeholder="Pasirinkite pristatymo laiką" required>
+                        <div class="form-group mt-3">
+                            <label for="customerDeliveryAddress">Pristatymo Adresas</label>
+                            <input name="customerDeliveryAddress" class="form-control" id="customerDeliveryAddress"
+                                   placeholder="Įveskite pristatymo adresą" required>
+                            <div class="invalid-feedback customerDeliveryAddressNameInValidFeedback"></div>
                         </div>
-                    </div>
-                    <div class="row">
-                        <div class="col infoBeforeSuccessfulOrder">
-                            <button class="btn btn-primary mt-3 d-flex align-items-center justify-content-center viewOrderButton" id="viewOrderButton" data-toggle="modal" data-target="#viewOrderModal" disabled>
-                                <span id="buttonText">Peržiūrėti užsakymą</span>
-                            </button>
+                        <div class="row mt-3">
+                            <div class="form-group col">
+                                <label for="customerDeliveryTime">Pristatymo laikas</label>
+                                <input name="customerDeliveryTime" class="form-control" type="text"
+                                       id="customerDeliveryTime" placeholder="Pasirinkite pristatymo laiką" required>
+                            </div>
                         </div>
-                    </div>
-                </form>
+                        <div class="row">
+                            <div class="col infoBeforeSuccessfulOrder">
+                                <button
+                                    class="btn btn-primary mt-3 d-flex align-items-center justify-content-center viewOrderButton"
+                                    id="viewOrderButton" data-toggle="modal" data-target="#viewOrderModal" disabled>
+                                    <span id="buttonText">Peržiūrėti užsakymą</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
             <div class="col-lg-7 col-md-6 col-sm-12">
                 <div id="calendar"></div>
             </div>
-            <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert" role="alert"
+            <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert"
+                 role="alert"
                  style="display: none;">
                 <span id="failedAlertMessage"></span>
                 <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
             </div>
-            <div class="alert alert-success alert-dismissible fade show custom-alert col-12 mt-3" id="successfulDateChangeAlert"
+            <div class="alert alert-success alert-dismissible fade show custom-alert col-12 mt-3"
+                 id="successfulDateChangeAlert"
                  role="alert" style="display: none;">
                 <span id="dateChangeAlertMessage"></span>
-                <button type="button" class="btn-close" aria-label="Close" onclick="$('#successfulDateChangeAlert').hide()"></button>
+                <button type="button" class="btn-close" aria-label="Close"
+                        onclick="$('#successfulDateChangeAlert').hide()"></button>
             </div>
         </div>
         <div class="modal fade" id="viewOrderModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel"
