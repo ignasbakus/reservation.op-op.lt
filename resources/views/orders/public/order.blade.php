@@ -91,8 +91,8 @@
                 </form>
             </div>
             <div class="col-lg-7 col-md-6 col-sm-12">
-                {{--                <div id="calendar"></div>--}}
-                <input type="text" id="litepicker" placeholder="Select Date">
+                <div id="calendar"></div>
+                {{--                <input type="text" id="litepicker" placeholder="Select Date">--}}
             </div>
             <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert"
                  role="alert"

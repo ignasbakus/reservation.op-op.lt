@@ -214,16 +214,16 @@ let flatPicker = {
     }
 }
 
-let litePicker = {
-    initialize: function () {
-        const picker = new Litepicker({
-            element: document.getElementById('litepicker'),
-            singleMode: false, // Set to true for single date selection
-            format: 'YYYY-MM-DD', // Customize the date format
-            // Add more options as needed
-        })
-    }
-}
+// let litePicker = {
+//     initialize: function () {
+//         const picker = new Litepicker({
+//             element: document.getElementById('litepicker'),
+//             singleMode: false, // Set to true for single date selection
+//             format: 'YYYY-MM-DD', // Customize the date format
+//             // Add more options as needed
+//         })
+//     }
+// }
 
     let TrampolineOrder = {
         init: function () {
@@ -417,9 +417,9 @@ let litePicker = {
     $(document).ready(function () {
         console.log("/js/trampolines/public/order_public.js -> ready!");
         TrampolineOrder.init();
-        // CalendarFunctions.Calendar.initialize();
+        CalendarFunctions.Calendar.initialize();
         flatPicker.initialize();
-        litePicker.initialize();
+        // litePicker.initialize();
         console.log('Trampolines ->', Trampolines);
     });
 
