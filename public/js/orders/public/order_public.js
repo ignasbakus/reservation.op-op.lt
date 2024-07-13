@@ -9,6 +9,7 @@ let PcCalendar = false
 let mobileCalendar = false
 let Calendar = null;
 let Picker = null;
+let datePickerNew = null
 let isEventDrop = false;
 let isFirstLoad = true; // Add flag for initial load
 let isNavigating = false; // Add flag for navigation
@@ -54,8 +55,7 @@ let Variables = {
         return Trampolines;
     },
 };
-
-let CalendarFunctions = {
+let CalendarFunctions = {           // Calendar functions
     Calendar: {
         initialize: function () {
             this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -222,8 +222,8 @@ let CalendarFunctions = {
                 if (mobileCalendar) {
                     /* We minus one day from range.end, because in full calendar we use the next days midnight,
                     * here it doesn't work like that */
-                    // lockDays = null
-                    const dateCells = document.querySelectorAll('.litepicker-day'); // Adjust selector as needed
+                    // lite picker logic
+                    /*const dateCells = document.querySelectorAll('.litepicker-day'); // Adjust selector as needed
                     dateCells.forEach(cell => {
                         cell.classList.remove('is-occupied'); // Remove class indicating occupied days
                         cell.removeAttribute('data-event-id'); // Remove any event ID attribute
@@ -241,15 +241,21 @@ let CalendarFunctions = {
                         litePicker.init();
                         PickerInitialized = true;
                     }
-                    Picker.setOptions({ disallowLockDaysInRange: true });
+                    Picker.setOptions({disallowLockDaysInRange: true});
                     Picker.gotoDate(firstMonthDay)
+                    */
+                    // if (!PickerInitialized) {
+                    //     datePicker.initialize()
+                    //     PickerInitialized = true;
+                    // }
+                    flatPickerCalendar.initialize()
                 }
             }
         });
     }
 };
 
-let flatPicker = {
+let flatPickerTime = {
     initialize: function () {
         $('#customerDeliveryTime').flatpickr({
             enableTime: true, // Enable time picker
@@ -258,6 +264,27 @@ let flatPicker = {
             time_24hr: true, // Use 24-hour time format
             minTime: "8:00",
             maxTime: "22:00",
+        })
+    }
+}
+
+let flatPickerCalendar = {
+    initialize: function () {
+        $('#flatPickerCalendar').flatpickr({
+            mode: 'range', // Enables range selection
+            dateFormat: 'Y/m/d', // Date format
+            minDate: "today",
+            disable: [
+                {
+                    from: "2024-07-15",
+                    to: "2024-07-22"
+                },
+                "2024-07-29",
+            ],
+            onChange: function (selectedDates, dateStr, instance) {
+                console.log('Date Range 1 selected:', dateStr);
+                // You can perform actions when dates are selected for the first picker
+            }
         })
     }
 }
@@ -332,6 +359,111 @@ let litePicker = {
         },
     }
 }
+
+// let datePicker = {
+//     initialize: function () {
+//
+//         new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
+//             allowInputToggle: false,
+//             container: undefined,
+//             dateRange: false,
+//             debug: false,
+//             defaultDate: undefined,
+//             display: {
+//                 icons: {
+//                     type: 'icons',
+//                     time: 'fa-solid fa-clock',
+//                     date: 'fa-solid fa-calendar',
+//                     up: 'fa-solid fa-arrow-up',
+//                     down: 'fa-solid fa-arrow-down',
+//                     previous: 'fa-solid fa-chevron-left',
+//                     next: 'fa-solid fa-chevron-right',
+//                     today: 'fa-solid fa-calendar-check',
+//                     clear: 'fa-solid fa-trash',
+//                     close: 'fa-solid fa-xmark'
+//                 },
+//                 sideBySide: false,
+//                 calendarWeeks: false,
+//                 viewMode: 'calendar',
+//                 toolbarPlacement: 'bottom',
+//                 keepOpen: false,
+//                 buttons: {
+//                     today: false,
+//                     clear: false,
+//                     close: false
+//                 },
+//                 components: {
+//                     calendar: true,
+//                     date: true,
+//                     month: true,
+//                     year: true,
+//                     decades: true,
+//                     clock: true,
+//                     hours: true,
+//                     minutes: true,
+//                     seconds: false,
+//                     useTwentyfourHour: undefined
+//                 },
+//                 inline: false,
+//                 theme: 'auto'
+//             },
+//             keepInvalid: false,
+//             localization: {
+//                 clear: 'Clear selection',
+//                 close: 'Close the picker',
+//                 dateFormats: {L: "MM/DD/YYYY"}, // Custom format
+//                 dayViewHeaderFormat: {month: 'long', year: '2-digit'},
+//                 decrementHour: 'Decrement Hour',
+//                 decrementMinute: 'Decrement Minute',
+//                 decrementSecond: 'Decrement Second',
+//                 format: 'MM/DD/YYYY',
+//                 hourCycle: 'h23',
+//                 incrementHour: 'Increment Hour',
+//                 incrementMinute: 'Increment Minute',
+//                 incrementSecond: 'Increment Second',
+//                 locale: 'en',
+//                 nextCentury: 'Next Century',
+//                 nextDecade: 'Next Decade',
+//                 nextMonth: 'Next Month',
+//                 nextYear: 'Next Year',
+//                 ordinal: (number) => number + (number === 1 ? 'st' : number === 2 ? 'nd' : number === 3 ? 'rd' : 'th'),
+//                 pickHour: 'Pick Hour',
+//                 pickMinute: 'Pick Minute',
+//                 pickSecond: 'Pick Second',
+//                 previousCentury: 'Previous Century',
+//                 previousDecade: 'Previous Decade',
+//                 previousMonth: 'Previous Month',
+//                 previousYear: 'Previous Year',
+//                 selectDate: 'Select Date',
+//                 selectDecade: 'Select Decade',
+//                 selectMonth: 'Select Month',
+//                 selectTime: 'Select Time',
+//                 selectYear: 'Select Year',
+//                 startOfTheWeek: 0,
+//                 today: 'Go to today',
+//                 toggleMeridiem: 'Toggle Meridiem'
+//             },
+//             meta: {},
+//             multipleDates: false,
+//             multipleDatesSeparator: '; ',
+//             promptTimeOnDateChange: false,
+//             promptTimeOnDateChangeTransitionDelay: 200,
+//             restrictions: {
+//                 minDate: undefined,
+//                 maxDate: undefined,
+//                 disabledDates: [],
+//                 enabledDates: [],
+//                 daysOfWeekDisabled: [],
+//                 disabledTimeIntervals: [],
+//                 disabledHours: [],
+//                 enabledHours: []
+//             },
+//             stepping: 1,
+//             useCurrent: true,
+//             viewDate: new tempusDominus.DateTime()
+//         })
+//     }
+// }
 
 let TrampolineOrder = {
     init: function () {
@@ -527,9 +659,108 @@ $(document).ready(function () {
     showCalendar.showCalendar()
     TrampolineOrder.init();
     // CalendarFunctions.Calendar.initialize();
-    flatPicker.initialize();
+    flatPickerTime.initialize();
     // $(window).resize(showCalendar.showCalendar())
     console.log('Trampolines ->', Trampolines);
+    // new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
+    //     allowInputToggle: false,
+    //     container: undefined,
+    //     dateRange: true,
+    //     debug: false,
+    //     defaultDate: undefined,
+    //     display: {
+    //         icons: {
+    //             type: 'icons',
+    //             time: 'fas fa-clock',
+    //             date: 'fas fa-calendar',
+    //             up: 'fas fa-arrow-up',
+    //             down: 'fas fa-arrow-down',
+    //             previous: 'fas fa-chevron-left',
+    //             next: 'fas fa-chevron-right',
+    //             today: 'fas fa-calendar-check',
+    //             clear: 'fas fa-trash',
+    //             close: 'fas fa-times'
+    //         },
+    //         sideBySide: false,
+    //         calendarWeeks: false,
+    //         viewMode: 'calendar',
+    //         toolbarPlacement: 'bottom',
+    //         keepOpen: false,
+    //         buttons: {
+    //             today: false,
+    //             clear: false,
+    //             close: false
+    //         },
+    //         components: {
+    //             calendar: true,
+    //             date: true,
+    //             month: true,
+    //             year: true,
+    //             decades: true,
+    //             clock: true,
+    //             hours: true,
+    //             minutes: true,
+    //             seconds: false,
+    //             useTwentyfourHour: undefined
+    //         },
+    //         inline: false,
+    //         theme: 'auto'
+    //     },
+    //     keepInvalid: false,
+    //     localization: {
+    //         clear: 'Clear selection',
+    //         close: 'Close the picker',
+    //         dateFormats: {L: "DD/MM/YYYY"}, // Custom format
+    //         dayViewHeaderFormat: {month: 'long', year: '2-digit'},
+    //         decrementHour: 'Decrement Hour',
+    //         decrementMinute: 'Decrement Minute',
+    //         decrementSecond: 'Decrement Second',
+    //         format: 'DD/MM/YYYY',
+    //         hourCycle: 'h23',
+    //         incrementHour: 'Increment Hour',
+    //         incrementMinute: 'Increment Minute',
+    //         incrementSecond: 'Increment Second',
+    //         locale: 'lt',
+    //         nextCentury: 'Next Century',
+    //         nextDecade: 'Next Decade',
+    //         nextMonth: 'Next Month',
+    //         nextYear: 'Next Year',
+    //         ordinal: (number) => number + (number === 1 ? 'st' : number === 2 ? 'nd' : number === 3 ? 'rd' : 'th'),
+    //         pickHour: 'Pick Hour',
+    //         pickMinute: 'Pick Minute',
+    //         pickSecond: 'Pick Second',
+    //         previousCentury: 'Previous Century',
+    //         previousDecade: 'Previous Decade',
+    //         previousMonth: 'Previous Month',
+    //         previousYear: 'Previous Year',
+    //         selectDate: 'Select Date',
+    //         selectDecade: 'Select Decade',
+    //         selectMonth: 'Select Month',
+    //         selectTime: 'Select Time',
+    //         selectYear: 'Select Year',
+    //         startOfTheWeek: 0,
+    //         today: 'Go to today',
+    //         toggleMeridiem: 'Toggle Meridiem'
+    //     },
+    //     meta: {},
+    //     multipleDates: false,
+    //     multipleDatesSeparator: '; ',
+    //     promptTimeOnDateChange: false,
+    //     promptTimeOnDateChangeTransitionDelay: 200,
+    //     restrictions: {
+    //         minDate: undefined,
+    //         maxDate: undefined,
+    //         disabledDates: [],
+    //         enabledDates: [],
+    //         daysOfWeekDisabled: [],
+    //         disabledTimeIntervals: [],
+    //         disabledHours: [],
+    //         enabledHours: []
+    //     },
+    //     stepping: 1,
+    //     useCurrent: true,
+    //     viewDate: new tempusDominus.DateTime()
+    // })
 });
 
 

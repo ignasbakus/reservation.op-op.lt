@@ -12,9 +12,11 @@
         .order-summary hr {
             border-color: #333; /* Darker color */
         }
+
         .order-summary .text-danger {
             font-size: 12px; /* Adjust the font size as needed */
         }
+
         .is-locked {
             background-color: #f8d7da; /* Red color */
             color: #999;
@@ -78,8 +80,8 @@
                     </div>
                     <div class="row mt-3" id="orderDates">
                         <div class="form-group col">
-                            <label for="litepicker">Užsakymo datos</label>
-                            <input name="litepicker" class="form-control" type="text" id="litepicker"
+                            <label for="flatPickerCalendar">Užsakymo datos</label>
+                            <input name="flatPickerCalendar" class="form-control" type="text" id="flatPickerCalendar"
                                    placeholder="Pasirinkite datas" required>
                         </div>
                     </div>
@@ -181,5 +183,9 @@
     <script src='/frameworks/fullcalendar6111/dist/index.global.js'></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://cdn.jsdelivr.net/npm/litepicker/dist/litepicker.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/js/tempus-dominus.min.js"
+            crossorigin="anonymous"></script>
     <script src="/js/orders/public/order_public.js"></script>
 @endsection

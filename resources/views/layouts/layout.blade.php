@@ -10,6 +10,7 @@
           crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/litepicker/dist/css/litepicker.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@eonasdan/tempus-dominus@6.9.4/dist/css/tempus-dominus.min.css" crossorigin="anonymous">
     <link href="/css/layout/layout.css" rel="stylesheet" crossorigin="anonymous">
     @yield('custom_css')
     <meta name="csrf-token" content="{{ csrf_token() }}">
