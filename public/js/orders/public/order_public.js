@@ -281,10 +281,6 @@ let flatPickerCalendar = {
                 },
                 "2024-07-29",
             ],
-            onChange: function (selectedDates, dateStr, instance) {
-                console.log('Date Range 1 selected:', dateStr);
-                // You can perform actions when dates are selected for the first picker
-            }
         })
     }
 }

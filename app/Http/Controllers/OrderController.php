@@ -567,4 +567,8 @@ class OrderController extends Controller
         (new MontonioPaymentsService())->createOrder($orderId);
         return (new MontonioPaymentsService())->retrievePaymentLink($orderId);
     }
+    public function test(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    {
+        return \view('test.test');
+    }
 }

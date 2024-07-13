@@ -38,6 +38,7 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
         Route::get('/', 'publicGetIndex'); //http://locahost:8000/orders/public
         /* Route for new orders/customers */
         Route::prefix('order')->group(function () {
+            Route::get('test', 'test');
             Route::get('getCalendarInitial', 'initializeOrderUpdateCalendar');
             Route::get('getOrderUpdateData', 'prepareOrderUpdateModalInfo');
             Route::get('waiting_confirmation/view/{order_number}', 'orderWaitingConfirmation');
