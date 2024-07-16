@@ -270,7 +270,7 @@ let CalendarFunctions = {           // Calendar functions
         return processedDates;
     }
 };
-
+//@todo Add time picker and calendar picker into one class
 let flatPickerTime = {
     initialize: function () {
         $('#customerDeliveryTime').flatpickr({
@@ -284,7 +284,6 @@ let flatPickerTime = {
         })
     }
 }
-
 let flatPickerCalendar = {
     disabledDaysArray: [],
     monthChangeTo: 0,
@@ -346,7 +345,7 @@ let flatPickerCalendar = {
                         console.log('current month', instance.currentMonth)
                         instance.changeMonth(flatPickerCalendar.monthChangeTo, true);
                         // flatPicker.close()
-                        CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                        // CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                         console.log('Updated events after clearing selection.');
                         console.log('First month day:', firstMonthDay);
                         alert('The selected range includes disabled dates. Please select a valid range.');
@@ -368,7 +367,6 @@ let flatPickerCalendar = {
                 console.log('month change to: from initial + ', flatPickerCalendar.monthChangeTo)
                 flatPickerCalendar.logVisibleDays(); // Log the visible days when the month changes
                 CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
-
             },
             onOpen: function (selectedDates, dateStr, instance) {
                 if (!isFirstMonthCaptured) {
@@ -376,7 +374,6 @@ let flatPickerCalendar = {
                     isFirstMonthCaptured = true
                 }
             },
-
         })
     },
     isDateDisabled: function (date, disabledDates) {
@@ -458,182 +455,6 @@ let flatPickerCalendar = {
         flatPicker.set('disable', newDisabledDates);
     }
 }
-
-// let litePicker = {
-//     init: function () {
-//         this.initialize()
-//         this.Events.init()
-//     },
-//     initialize: function () {
-//         Picker = new Litepicker({
-//             element: document.getElementById('litepicker'),
-//             singleMode: false, // Set to true for single date selection
-//             format: 'YYYY-MM-DD',
-//             lockDays: lockDays,
-//             disallowLockDaysInRange: true,
-//             minDate: today,
-//             autoApply: false,
-//             zIndex: 9998,
-//             lockDaysFilter: (date) => {
-//                 if (!lockDays.length) return false; // Return false if lockDays is empty
-//
-//                 return lockDays.some(range => {
-//                     if (Array.isArray(range)) {
-//                         const start = new Date(range[0]);
-//                         const end = new Date(range[1]);
-//                         return date.getTime() >= start.getTime() && date.getTime() <= end.getTime();
-//                     } else {
-//                         return date.format('YYYY-MM-DD') === range;
-//                     }
-//                 });
-//             },
-//         })
-//     },
-//     Events: {
-//         init: function () {
-//             Picker.on('render', function () {
-//                 litePicker.Events.findFirstLastVisibleDay()
-//             });
-//             $(document).on('click', '.button-next-month', function () {
-//                 console.log('Next month button clicked');
-//                 CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-//             });
-//         },
-//         findFirstLastVisibleDay: function () {
-//             console.log('Litepicker rendered');
-//             const calendarEl = document.querySelector('.litepicker');
-//             console.log('Calendar element:', calendarEl);
-//             if (calendarEl) {
-//                 const firstDay = calendarEl.querySelector('.day-item:not(.is-locked)');
-//                 const lastDay = calendarEl.querySelector('.day-item:not(.is-locked):last-child');
-//
-//                 if (firstDay && lastDay) {
-//                     const firstVisibleDay = new Date(parseInt(firstDay.getAttribute('data-time')));
-//                     const lastVisibleDay = new Date(parseInt(lastDay.getAttribute('data-time')));
-//
-//                     // Add 3 hours for Vilnius timezone (GMT+3)
-//                     firstVisibleDay.setHours(firstVisibleDay.getHours() + 3);
-//                     lastVisibleDay.setHours(lastVisibleDay.getHours() + 3);
-//
-//                     // Format dates as YYYY-MM-DD
-//                     const firstVisibleFormatted = firstVisibleDay.toISOString().split('T')[0];
-//                     const lastVisibleFormatted = lastVisibleDay.toISOString().split('T')[0];
-//                     firstVisibleDayOnCalendar = firstVisibleFormatted;
-//                     lastVisibleDayOnCalendar = lastVisibleFormatted;
-//                     firstMonthDay = firstVisibleFormatted
-//
-//                     console.log('First visible day:', firstVisibleFormatted);
-//                     console.log('Last visible day:', lastVisibleFormatted);
-//                 }
-//             }
-//         },
-//     }
-// }
-
-// let datePicker = {
-//     initialize: function () {
-//
-//         new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
-//             allowInputToggle: false,
-//             container: undefined,
-//             dateRange: false,
-//             debug: false,
-//             defaultDate: undefined,
-//             display: {
-//                 icons: {
-//                     type: 'icons',
-//                     time: 'fa-solid fa-clock',
-//                     date: 'fa-solid fa-calendar',
-//                     up: 'fa-solid fa-arrow-up',
-//                     down: 'fa-solid fa-arrow-down',
-//                     previous: 'fa-solid fa-chevron-left',
-//                     next: 'fa-solid fa-chevron-right',
-//                     today: 'fa-solid fa-calendar-check',
-//                     clear: 'fa-solid fa-trash',
-//                     close: 'fa-solid fa-xmark'
-//                 },
-//                 sideBySide: false,
-//                 calendarWeeks: false,
-//                 viewMode: 'calendar',
-//                 toolbarPlacement: 'bottom',
-//                 keepOpen: false,
-//                 buttons: {
-//                     today: false,
-//                     clear: false,
-//                     close: false
-//                 },
-//                 components: {
-//                     calendar: true,
-//                     date: true,
-//                     month: true,
-//                     year: true,
-//                     decades: true,
-//                     clock: true,
-//                     hours: true,
-//                     minutes: true,
-//                     seconds: false,
-//                     useTwentyfourHour: undefined
-//                 },
-//                 inline: false,
-//                 theme: 'auto'
-//             },
-//             keepInvalid: false,
-//             localization: {
-//                 clear: 'Clear selection',
-//                 close: 'Close the picker',
-//                 dateFormats: {L: "MM/DD/YYYY"}, // Custom format
-//                 dayViewHeaderFormat: {month: 'long', year: '2-digit'},
-//                 decrementHour: 'Decrement Hour',
-//                 decrementMinute: 'Decrement Minute',
-//                 decrementSecond: 'Decrement Second',
-//                 format: 'MM/DD/YYYY',
-//                 hourCycle: 'h23',
-//                 incrementHour: 'Increment Hour',
-//                 incrementMinute: 'Increment Minute',
-//                 incrementSecond: 'Increment Second',
-//                 locale: 'en',
-//                 nextCentury: 'Next Century',
-//                 nextDecade: 'Next Decade',
-//                 nextMonth: 'Next Month',
-//                 nextYear: 'Next Year',
-//                 ordinal: (number) => number + (number === 1 ? 'st' : number === 2 ? 'nd' : number === 3 ? 'rd' : 'th'),
-//                 pickHour: 'Pick Hour',
-//                 pickMinute: 'Pick Minute',
-//                 pickSecond: 'Pick Second',
-//                 previousCentury: 'Previous Century',
-//                 previousDecade: 'Previous Decade',
-//                 previousMonth: 'Previous Month',
-//                 previousYear: 'Previous Year',
-//                 selectDate: 'Select Date',
-//                 selectDecade: 'Select Decade',
-//                 selectMonth: 'Select Month',
-//                 selectTime: 'Select Time',
-//                 selectYear: 'Select Year',
-//                 startOfTheWeek: 0,
-//                 today: 'Go to today',
-//                 toggleMeridiem: 'Toggle Meridiem'
-//             },
-//             meta: {},
-//             multipleDates: false,
-//             multipleDatesSeparator: '; ',
-//             promptTimeOnDateChange: false,
-//             promptTimeOnDateChangeTransitionDelay: 200,
-//             restrictions: {
-//                 minDate: undefined,
-//                 maxDate: undefined,
-//                 disabledDates: [],
-//                 enabledDates: [],
-//                 daysOfWeekDisabled: [],
-//                 disabledTimeIntervals: [],
-//                 disabledHours: [],
-//                 enabledHours: []
-//             },
-//             stepping: 1,
-//             useCurrent: true,
-//             viewDate: new tempusDominus.DateTime()
-//         })
-//     }
-// }
 
 let TrampolineOrder = {
     init: function () {

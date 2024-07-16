@@ -236,23 +236,7 @@ hr.new1 {
     opacity: 0.6; /* Slightly transparent */
 }
 
-@media (max-width: 576px) {
-    .fc-day-header {
-        font-size: 100px; /* Example: Increase day header font size */
-    }
-    .fc-daygrid-event {
-        font-size: 10px; /* Example: Decrease event font size */
-        padding: 2px 2px; /* Example: Adjust padding for event items */
-    }
-    .fc-time-grid-event {
-        font-size: 2px; /* Example: Decrease event font size in time grid */
-    }
-    .fc-event-title {
-        white-space: normal; /* Wrap event title on smaller screens */
-    }
-}
-
-#calendar, #orderDates {
+#calendar, #changeOrderDatesMobile, #changeOrderDeliveryTimePc, #dateCalendarForMobile {
     display: none;
 }
 
@@ -261,16 +245,18 @@ hr.new1 {
     #calendar {
         display: block;
     }
+    #changeOrderDeliveryTimePc {
+        display: block;
+    }
 }
 
 /* Show mobile calendar for smaller screens */
 @media (max-width: 767px) {
-    #orderDates {
+    #changeOrderDatesMobile {
         display: block;
     }
-    #orderButtons button {
-        padding: 0.5rem 1rem; /* Adjust padding as needed */
-        font-size: 0.875rem;  /* Adjust font size as needed */
+    #dateCalendarForMobile {
+        display: block;
     }
 }
 

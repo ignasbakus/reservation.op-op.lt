@@ -442,8 +442,9 @@ class OrderController extends Controller
             ])->render()
         ]);
     }
-
-
+//    public function updateDeliveryTime(){
+//
+//    }
     public function orderDelete(): JsonResponse
     {
         return response()->json((new TrampolineOrder())->delete(\request()->input('orderID')));

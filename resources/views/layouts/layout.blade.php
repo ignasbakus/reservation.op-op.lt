@@ -16,7 +16,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
 </head>
 <body>
-<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; background: transparent; z-index: 9999; align-items: center; justify-content: center;">
+<div id="overlay" style="display: none; position: fixed; top: 0; left: 0; height: 100vh; width: 100vw; background: transparent; z-index: 99999; align-items: center; justify-content: center;">
     <div id="spinnerSendOrder" class="spinner-border text-primary" role="status" style="width: 3rem; height: 3rem;"> <!-- Increase size here -->
         {{--        <span class="sr-only">Loading...</span>--}}
     </div>
