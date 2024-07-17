@@ -244,7 +244,8 @@ let flatPickerFunctions = {
                 time_24hr: true, // Use 24-hour time format
                 minTime: "8:00",
                 maxTime: "22:00",
-                // defaultDate: flatPickerFunctions.flatPickerTime.defaultTime
+                defaultDate: flatPickerFunctions.flatPickerTime.defaultTime,
+                appendTo: document.getElementById('updateOrderModal'),
             })
         }
     }
