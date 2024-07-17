@@ -32,21 +32,27 @@ class TrampolineOrderData
 
         if (!is_null($request)) {
             $validator = Validator::make($request->all(), [
-                'customerName' => 'required|min:3',
-                'customerSurname' => 'required|min:3',
-                'customerPhoneNumber' => 'required',
-                'customerDeliveryCity' => 'required|min:4',
+                'customerName' => 'required|min:3|regex:/^[^\d]+$/',
+                'customerSurname' => 'required|min:3|regex:/^[^\d]+$/',
+                'customerPhoneNumber' => 'required|regex:/^\+?(\d{1,3})?\s?\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/',
+                'customerEmail' => 'email',
+                'customerDeliveryCity' => 'required|min:4|regex:/^[^\d]+$/',
                 'customerDeliveryPostCode' => 'required|digits:5|numeric',
                 'customerDeliveryAddress' => 'required|min:5',
                 'customerDeliveryTime' => 'required'
             ], [
                 'customerName.required' => 'Vardas privalomas',
                 'customerName.min' => 'Vardas per trumpas',
+                'customerName.regex' => 'Vardas negali turėti skaičių',
                 'customerSurname.required' => 'Pavardė privaloma',
                 'customerSurname.min' => 'Pavardė per trumpa',
+                'customerSurname.regex' => 'Pavardė negali turėti skaičių',
                 'customerPhoneNumber.required' => 'Telefonas privalomas',
+                'customerPhoneNumber.regex' => 'Neteisingas telefono numerio formatas',
+                'customerEmail.email' => 'Neteisingas el. pašto formatas',
                 'customerDeliveryCity.required' => 'Miestas privalomas',
                 'customerDeliveryCity.min' => 'Miesto pavadinimas per trumpas',
+                'customerDeliveryCity.regex' => 'Miestas negali turėti skaičių',
                 'customerDeliveryPostCode.required' => 'Pašto kodas privalomas',
                 'customerDeliveryPostCode.digits' => 'Pašto kodas turi būti sudarytas iš 5 skaitmenų',
                 'customerDeliveryPostCode.numeric' => 'Naudojami gali būti tik skaičiai',

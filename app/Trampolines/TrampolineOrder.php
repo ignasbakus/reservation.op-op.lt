@@ -24,6 +24,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\Str;
 use Illuminate\Database\QueryException;
+use function PHPUnit\Framework\assertArrayIsEqualToArrayOnlyConsideringListOfKeys;
 
 class TrampolineOrder implements Order
 {
@@ -46,7 +47,6 @@ class TrampolineOrder implements Order
     {
 //        dd($trampolineOrderData);
         $checkResult = self::canRegisterOrder($trampolineOrderData);
-        $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
 //        dd($isTrampolineActive);
         if (!$checkResult['status']) {
             $this->status = false;
@@ -54,19 +54,21 @@ class TrampolineOrder implements Order
             return $this;
         }
 
-        if(!$isTrampolineActive){
-            $this->status = false;
-            $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
-            return $this;
-        }
-
         if (!$trampolineOrderData->ValidationStatus) {
+//            dd('patekom');
             $this->failedInputs = $trampolineOrderData->failedInputs;
             $this->status = false;
             return $this;
         }
 
 
+        $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
+
+        if(!$isTrampolineActive){
+            $this->status = false;
+            $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
+            return $this;
+        }
 
         $Client = (new Client())->updateOrCreate(
             [

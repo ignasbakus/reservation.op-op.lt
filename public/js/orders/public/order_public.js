@@ -514,7 +514,8 @@ let TrampolineOrder = {
                 }).done((response) => {
                     $('#overlay').hide();
                     if (response.status === false) {
-                        if (response.failed_input.error[0] !== 'Batutas neaktyvus, prašome pasirinkti kitą'){
+                        if (!response.failed_input.error) {
+                            console.log('patekom i failed input vieta')
                             TrampolineOrder.ViewOrderModal.element.hide()
                             $('form input').removeClass('is-invalid');
                             Object.keys(response.failed_input).forEach(function (FailedInput) {
@@ -528,12 +529,12 @@ let TrampolineOrder = {
                                 CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
                             }
                         } else {
-                            if (response.failed_input.error) {
+                            if (response.failed_input.error[0] === 'Batutas neaktyvus, prašome pasirinkti kitą') {
                                 $('#failedAlertMessage').text(response.failed_input.error[0]);
                                 $('#failedAlert').show().css('display', 'flex');
                                 TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
                             }
-                            setTimeout(function() {
+                            setTimeout(function () {
                                 window.location.href = response.homeLink;
                             }, 2000);
                         }
@@ -573,6 +574,11 @@ let TrampolineOrder = {
                 $('#viewOrderModalButtons .payForOrderAdvance').on('click', function (event) {
                     event.preventDefault();
                     TrampolineOrder.FormSendOrder.Event.addOrder()
+                })
+                $('#viewOrderModalButtons .closeView').on('click', function (event) {
+                    console.log('paclickinom')
+                    event.preventDefault();
+                    TrampolineOrder.ViewOrderModal.element.hide()
                 })
             },
             updateAdvanceSum: function () {
@@ -620,9 +626,9 @@ let TrampolineOrder = {
         }
     },
     Events: {
-        dismissAlertsAfterTimeout: function (alertId, timeout){
-            setTimeout(function() {
-                $(alertId).fadeOut('slow', function() {
+        dismissAlertsAfterTimeout: function (alertId, timeout) {
+            setTimeout(function () {
+                $(alertId).fadeOut('slow', function () {
                     $(this).alert('close');
                 });
             }, timeout);

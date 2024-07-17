@@ -147,7 +147,7 @@
                         </div>
                     </div>
                     <div id="viewOrderModalButtons" class="modal-footer justify-content-between">
-                        <button type="button" class="btn btn-secondary">Keisti užsakymą</button>
+                        <button type="button" class="btn btn-secondary closeView">Keisti užsakymą</button>
                         <button type="button" class="btn btn-primary payForOrderAdvance">Apmokėti avansą</button>
                     </div>
                 </div>

@@ -450,7 +450,7 @@ let Orders = {
             prepareModal: function (OrderID) {
                 this.orderIdToUpdate = OrderID;
                 this.element.show()
-                this.getInitialDatesCalendar()
+                // this.getInitialDatesCalendar()
             },
             getInitialDatesCalendar: function () {
                 $('#overlay').css('display', 'flex')
@@ -562,6 +562,9 @@ let Orders = {
                         CalendarFunctions.Calendar.calendar.removeAllEvents()
                         CalendarFunctions.addEvent(Orders.Modals.updateOrder.OccupiedWhenCancelled)
                         CalendarFunctions.addEvent(Orders.Modals.updateOrder.EventWhenCancelled)
+                    })
+                    $('#updateOrderModal').on('shown.bs.modal', function () {
+                        Orders.Modals.updateOrder.getInitialDatesCalendar()
                     })
                 },
                 updateOrder: function () {
