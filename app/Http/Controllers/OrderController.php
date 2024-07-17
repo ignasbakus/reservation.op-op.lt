@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\OrderPlaced;
+use App\Models\Client;
 use App\Models\Order;
 use App\Models\OrdersTrampoline;
 use App\Models\Trampoline;
@@ -299,6 +300,7 @@ class OrderController extends Controller
 //        dd(\request()->all());
         $Order = (new TrampolineOrder())->create((new TrampolineOrderData(\request())));
 //        dd($Order);
+//        dd($Order);
         $trampolines_id = [];
 
         foreach (\request()->get('trampolines', []) as $Trampoline) {
@@ -350,6 +352,10 @@ class OrderController extends Controller
                     ->with('address')->find($Order->Order->id),
             ])->render();
             $paymentLink = self::generatePaymentUrl($Order->Order->id);
+            $clientEmail = (new Client())->newQuery()->where('id', $Order->Order->client_id)->first()->email;
+            if (config('mail.send_email') === true){
+                Mail::to($clientEmail)->send(new OrderPlaced($Order->Order, $paymentLink));
+            }
         } else {
             $orderView = null;
             $paymentLink = null;
@@ -363,7 +369,8 @@ class OrderController extends Controller
             'Events' => $Events,
             'PaymentLink' => $paymentLink,
             'OrderId' => $Order->Order->id,
-            'view' => $orderView
+            'view' => $orderView,
+            'homeLink' => config('app.link_to_homepage')
         ]);
     }
 
@@ -587,6 +594,7 @@ class OrderController extends Controller
     public function generatePaymentUrl($orderId): string
     {
         (new MontonioPaymentsService())->createOrder($orderId);
+//        dd((new MontonioPaymentsService())->retrievePaymentLink($orderId));
         return (new MontonioPaymentsService())->retrievePaymentLink($orderId);
     }
     public function deliveryPricesIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application

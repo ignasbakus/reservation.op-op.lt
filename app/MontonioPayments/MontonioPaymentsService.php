@@ -151,17 +151,17 @@ class MontonioPaymentsService
         return $body;
     }
 
-    public function retrievePaymentLink($orderId)
+    public function retrievePaymentLink($orderId, $fromHtml = null)
     {
         // Query the database for the payment link with the specified orderId
         $logEntry = MontonioPaymentCreationLog::where('order_id', $orderId)->first();
+//        dd($logEntry);
 
         if ($logEntry) {
             // Decode the payment creation response to get the URL
             $paymentCreationResponse = json_decode($logEntry->payment_creation_response, true);
             return $paymentCreationResponse['paymentUrl'] ?? null;
         }
-
         return null;
     }
 

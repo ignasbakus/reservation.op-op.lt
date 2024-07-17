@@ -5,25 +5,24 @@ namespace App\Mail;
 use App\Models\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
+use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class OrderPlaced extends Mailable
+class OrderPaid extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public Order $order;
-    public string $paymentLink;
     /**
      * Create a new message instance.
      */
-    public function __construct(Order $order, string $paymentLink)
+    public function __construct(
+        public Order $order
+    )
     {
-        $this->order = $order;
-        $this->paymentLink = $paymentLink;
+        //
     }
 
     /**
@@ -36,7 +35,7 @@ class OrderPlaced extends Mailable
             replyTo: [
                 new Address('uzsakymai@op-op.lt', 'OPOP LT administratorius'),
             ],
-            subject: 'Užsakymas pateiktas',
+            subject: 'Užsakymas apmokėtas',
         );
     }
 
@@ -46,12 +45,7 @@ class OrderPlaced extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'mail.orders.order-placed',
-            with: [
-                'order' => $this->order,
-                'paymentLink' => $this->paymentLink,
-            ],
-            //text: 'mail.orders.order-placed'
+            view: 'mail.payments.payment_received',
         );
     }
 

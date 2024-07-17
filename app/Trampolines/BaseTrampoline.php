@@ -97,6 +97,11 @@ class BaseTrampoline implements Trampoline
     {
         // TODO: Implement onHold() method.
     }
+    public function isTrampolineActive($TrampolineID){
+    return \App\Models\Parameter::where('trampolines_id', $TrampolineID)
+                                ->where('activity', 1)
+                                ->exists();
+}
 
     public function getOccupation(Collection $Trampolines, OccupationTimeFrames $TimeFrame, Order $Order, $FullCalendarFormat = false, Carbon $TargetDateStart = null, Carbon $TargetDateEnd = null): array
     {

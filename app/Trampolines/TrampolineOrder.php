@@ -4,11 +4,13 @@ namespace App\Trampolines;
 
 use App\Interfaces\Order;
 use App\Mail\OrderDeleted;
+use App\Mail\OrderPaid;
 use App\Mail\OrderPlaced;
 use App\Models\Client;
 use App\Models\ClientAddress;
 use App\Models\OrdersTrampoline;
 use App\Models\Trampoline;
+use App\MontonioPayments\MontonioPaymentsService;
 use Carbon\Carbon;
 use http\Env\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,10 +43,19 @@ class TrampolineOrder implements Order
     }
     public function create(TrampolineOrderData $trampolineOrderData): static
     {
+//        dd($trampolineOrderData);
         $checkResult = self::canRegisterOrder($trampolineOrderData);
+        $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
+//        dd($isTrampolineActive);
         if (!$checkResult['status']) {
             $this->status = false;
             $this->failedInputs->add('error', $checkResult['message']);
+            return $this;
+        }
+
+        if(!$isTrampolineActive){
+            $this->status = false;
+            $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
             return $this;
         }
 
@@ -53,6 +64,8 @@ class TrampolineOrder implements Order
             $this->status = false;
             return $this;
         }
+
+
 
         $Client = (new Client())->updateOrCreate(
             [
@@ -131,15 +144,9 @@ class TrampolineOrder implements Order
             DB::commit();
 
             $this->Order->load('trampolines');
-
-            Log::info('mail.send_email = '.config('mail.send_email'));
             $this->status = true;
-            if (config('mail.send_email') === true){
-                $sendResult = Mail::to($this->Order->client->email)->send(new OrderPlaced($this->Order));
-                Log::info('sendResult = '.json_encode($sendResult->getDebug()));
-
-            }
             return $this;
+//            dd($this);
         } catch (QueryException|\Exception $e) {
             DB::rollBack();
             Log::error('An error occurred while creating the order', ['error' => $e->getMessage()]);
@@ -406,7 +413,11 @@ class TrampolineOrder implements Order
             ];
         }
 
+
         $order->update(['order_status' => 'Apmokėtas']);
+        if (config('mail.send_email') === true){
+            Mail::to($order->client->email)->send(new OrderPaid($order));
+        }
         return [
             'status' => true,
             'message' => 'Order status updated to Apmokėta successfully.'

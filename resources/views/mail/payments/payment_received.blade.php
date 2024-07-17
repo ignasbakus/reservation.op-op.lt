@@ -1,9 +1,7 @@
-@php use App\MontonioPayments\MontonioPaymentsService;
- @endphp
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
-    <title>Užsakymas pateiktas</title>
+    <title>Užsakymas apmokėtas</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -29,7 +27,7 @@
             color: #333;
         }
 
-        .order-details, .customer-info, .trampolines, .address-info .importantInfo {
+        .order-details, .customer-info, .trampolines, .address-info {
             margin-bottom: 20px;
         }
 
@@ -59,13 +57,13 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>Jūsų užsakymas buvo gautas!</h1>
+        <h1>Jūsų užsakymas yra apmokėtas!</h1>
     </div>
     <div>
-        <h2>Avansą apmokėti galite čia: <a
-                href="{{ $paymentLink }}">Spauskite čia</a></h2>
+        <h2>Savo užsakymą galite peržiūrėti čia: <a
+                href="{{ url('/orders/public/order/view/' . $order->order_number) }}">Spauskite čia</a></h2>
         <br>
-        <h4>Jei neapmokėsite avanso per X min, jūsų užsakymas bus atšauktas</h4>
+        <h4>Svarbu! Atšaukus užakymą, avansas negražinamas</h4>
     </div>
     <div class="order-details">
         <h2>Užsakymo detalės</h2>
@@ -79,14 +77,22 @@
                 <td>{{ $order->created_at->format('Y-m-d') }}</td>
             </tr>
             <tr>
-                <th>Avanso suma</th>
-                <td>{{ number_format($order->advance_sum, 2) }} €</td>
+                <th>Sumokėta avanso suma</th>
+                <td>{{ number_format($order->advance_sum, 2) }}{{config('trampolines.currency')}}</td>
             </tr>
             <tr>
                 <th>Bendra suma</th>
-                <td>{{ number_format($order->total_sum, 2) }} €</td>
+                <td>{{ number_format($order->total_sum, 2) }}{{config('trampolines.currency')}}</td>
+            </tr>
+            <tr>
+                <th>Galutinė mokama suma vietoje</th>
+                <td>{{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{config('trampolines.currency')}}</td>
             </tr>
         </table>
+        <h6>
+            Prie galutinės užsakymo sumos prisidės pristatymo kaina. Apytiksles kainas į didžiuosius Lietuvos miestus <a href="{{route('deliveryPricesIndex')}}">rasite čia</a>. <br>
+            Jeigu savo miesto nerandate, prašome susisiekti su mumis el. paštu: op-op.lt arba telefonu: +370 600 00000
+        </h6>
     </div>
 
     <div class="customer-info">
@@ -149,10 +155,6 @@
                 </tr>
             @endforeach
         </table>
-    </div>
-    <div class="importantInfo">
-        <h4>Naudinga informacija</h4>
-        <p>Jeigu nuspręsite užsakymą atšaukti, pinigai už avansą negražinami</p>
     </div>
     <div class="footeris">
         <p>Jeigu turite klausimų, susisiekite su mumis el. paštu uzsakymai@op-op.lt arba telefonu +370 600 00000</p>

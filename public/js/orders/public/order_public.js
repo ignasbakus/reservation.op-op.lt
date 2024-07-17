@@ -288,6 +288,8 @@ let flatPickerCalendar = {
     disabledDaysArray: [],
     monthChangeTo: 0,
     initialMonth: 0,
+    flatPickerRangeStart: 0,
+    flatPickerRangeEnd: 0,
     initialize: function (disabledDates) {
         flatPickerCalendar.disabledDaysArray = disabledDates;
         flatPicker = $('#flatPickerCalendar').flatpickr({
@@ -355,8 +357,8 @@ let flatPickerCalendar = {
                             Trampoline.rental_start = formattedStartDate;
                             Trampoline.rental_end = formattedEndDate;
                         })
-                        TrampolineOrder.flatPickerRangeStart = formattedStartDate;
-                        TrampolineOrder.flatPickerRangeEnd = formattedEndDate;
+                        flatPickerCalendar.flatPickerRangeStart = formattedStartDate;
+                        flatPickerCalendar.flatPickerRangeEnd = formattedEndDate;
                     }
                 }
             },
@@ -470,6 +472,16 @@ let TrampolineOrder = {
         dataForm: {
             element: $('#sendOrderColumn form'),
         },
+        checkFormValidity: function () {
+            let isValid = true;
+            $('#orderForm input[required]:visible').each(function () {
+                if ($(this).val().trim() === '') {
+                    isValid = false;
+                    return false;
+                }
+            });
+            $('#viewOrderButton').prop('disabled', !isValid);
+        },
         Event: {
             OccupiedFromCreate: '',
             EventFromCreate: '',
@@ -502,18 +514,30 @@ let TrampolineOrder = {
                 }).done((response) => {
                     $('#overlay').hide();
                     if (response.status === false) {
-                        TrampolineOrder.ViewOrderModal.element.hide()
-                        $('form input').removeClass('is-invalid');
-                        Object.keys(response.failed_input).forEach(function (FailedInput) {
-                            $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
-                            $('form input[name=' + FailedInput + ']').addClass('is-invalid');
-                        });
-                        if (response.failed_input.error) {
-                            $('#failedAlertMessage').text(response.failed_input.error[0]);
-                            $('#failedAlert').show().css('display', 'flex');
-                            TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
-                            CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                        if (response.failed_input.error[0] !== 'Batutas neaktyvus, prašome pasirinkti kitą'){
+                            TrampolineOrder.ViewOrderModal.element.hide()
+                            $('form input').removeClass('is-invalid');
+                            Object.keys(response.failed_input).forEach(function (FailedInput) {
+                                $('form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
+                                $('form input[name=' + FailedInput + ']').addClass('is-invalid');
+                            });
+                            if (response.failed_input.error) {
+                                $('#failedAlertMessage').text(response.failed_input.error[0]);
+                                $('#failedAlert').show().css('display', 'flex');
+                                TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
+                                CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                            }
+                        } else {
+                            if (response.failed_input.error) {
+                                $('#failedAlertMessage').text(response.failed_input.error[0]);
+                                $('#failedAlert').show().css('display', 'flex');
+                                TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
+                            }
+                            setTimeout(function() {
+                                window.location.href = response.homeLink;
+                            }, 2000);
                         }
+
                     }
                     // if (response.status) {
                     //     // $('form input').removeClass('is-invalid');
@@ -529,19 +553,7 @@ let TrampolineOrder = {
                 });
             },
         },
-        checkFormValidity: function () {
-            let isValid = true;
-            $('#orderForm input[required]:visible').each(function () {
-                if ($(this).val().trim() === '') {
-                    isValid = false;
-                    return false;
-                }
-            });
-            $('#viewOrderButton').prop('disabled', !isValid);
-        }
     },
-    flatPickerRangeStart: 0,
-    flatPickerRangeEnd: 0,
     ViewOrderModal: {
         init: function () {
             this.Event.init();
@@ -579,8 +591,8 @@ let TrampolineOrder = {
                         reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Convert milliseconds to days and add 1 for inclusive days
                     }
                 } else {
-                    startDate = new Date(TrampolineOrder.flatPickerRangeStart);
-                    endDate = new Date(TrampolineOrder.flatPickerRangeEnd);
+                    startDate = new Date(flatPickerCalendar.flatPickerRangeStart);
+                    endDate = new Date(flatPickerCalendar.flatPickerRangeEnd);
                     reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
                     endDate.setDate(endDate.getDate() - 1);
                 }
