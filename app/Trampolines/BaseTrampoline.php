@@ -173,6 +173,7 @@ class BaseTrampoline implements Trampoline
             $occupiedDates = array_merge($occupiedDates, $events);
         }
 
+//        dd($occupiedDates);
         return $occupiedDates;
     }
 

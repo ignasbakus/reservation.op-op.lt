@@ -11,9 +11,9 @@ Route::controller(WebhookController::class)->group(function () {
 //    Route::post('/webhook/montonio/pending', 'paymentPending');
 });
 
-Route::controller(ClientsController::class)->group(function () {
-    Route::get('/clients', 'index')->name('clients');
-});
+//Route::controller(ClientsController::class)->group(function () {
+//    Route::get('/clients', 'index')->name('clients');
+//});
 
 Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For admin usage (authenticated user)*/
@@ -36,12 +36,19 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For customer usage (no authentication)*/
     Route::prefix('public')->group(function () {
         Route::get('/', 'publicGetIndex'); //http://locahost:8000/orders/public
+        Route::get('delivery_prices', 'deliveryPricesIndex')->name('deliveryPricesIndex');
+        Route::get('contacts', 'contactsIndex')->name('contactsIndex');
         /* Route for new orders/customers */
         Route::prefix('order')->group(function () {
+            Route::get('test', 'test');
+            Route::get('getCalendarInitial', 'initializeOrderUpdateCalendar');
+            Route::get('getOrderUpdateData', 'prepareOrderUpdateModalInfo');
             Route::get('waiting_confirmation/view/{order_number}', 'orderWaitingConfirmation');
             Route::get('check_payment_status/view/{order_number}', 'checkPaymentStatus');
             Route::post('generate_url', 'generatePaymentUrl');
+            Route::post('private_calendar/get', 'privateUpdateCalendar');
             Route::post('public_calendar/get', 'publicUpdateCalendar');
+//            Route::post('updateDeliveryTime', 'updateDeliveryTime');
             //http://locahost:8000/orders/public/order [CRUD] without UUID
             Route::get('/', 'orderGet');
             Route::post('/', 'orderInsert');

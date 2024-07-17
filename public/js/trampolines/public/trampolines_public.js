@@ -1,9 +1,20 @@
 let Actions = {
     InitActions: function () {
+        ToolTip.init();
         Carousels.trampolinesCarousel.init();
         Trampolines.init();
         Trampolines.SendOrder.Events.init();
         Trampolines.Modals.showTrampoline.Events.init();
+    }
+}
+let ToolTip = {
+    init: function () {
+        if (window.innerWidth > 768) {
+            let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        }
     }
 }
 
@@ -26,7 +37,8 @@ let Carousels = {
 }
 
 let Trampolines = {
-    init: function () {},
+    init: function () {
+    },
     chosen: [],
     Modals: {
         showTrampoline: {
@@ -70,9 +82,9 @@ let Trampolines = {
     },
     updateOrderButtonState: function () {
         if (this.chosen.length > 0) {
-            $('#sendToOrderButton').removeAttr('disabled');
+            $('#sendToOrderButton').show();
         } else {
-            $('#sendToOrderButton').attr('disabled', 'disabled');
+            $('#sendToOrderButton').hide();
         }
     },
     initEventsAfterHtmlUpdate: function () {

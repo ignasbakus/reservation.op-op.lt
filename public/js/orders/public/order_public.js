@@ -3,7 +3,12 @@ let eventDay;
 let firstVisibleDayOnCalendar;
 let lastVisibleDayOnCalendar;
 let firstMonthDay;
+let PickerInitialized = false
+let PcCalendar = false
+let mobileCalendar = false
+let isFirstMonthCaptured = false
 let Calendar = null;
+let flatPicker = null;
 let isEventDrop = false;
 let isFirstLoad = true; // Add flag for initial load
 let isNavigating = false; // Add flag for navigation
@@ -15,6 +20,22 @@ today.setHours(today.getHours() + 3);
 today = today.toISOString().split('T')[0];
 
 /* JS classes */
+let showCalendar = {
+    showCalendar: function () {
+        if ($(window).width() >= 768) {
+            $('#calendar').css('display', 'block');
+            $('#orderDates').css('display', 'none');
+            PcCalendar = true;
+            mobileCalendar = false;
+        } else {
+            $('#calendar').css('display', 'none');
+            $('#orderDates').css('display', 'block');
+            mobileCalendar = true;
+            PcCalendar = false;
+        }
+        CalendarFunctions.Calendar.initialize()
+    }
+}
 let Variables = {
     orderFormInput: [
         'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity',
@@ -33,12 +54,12 @@ let Variables = {
         return Trampolines;
     },
 };
-
-let CalendarFunctions = {
+let CalendarFunctions = {           // Calendar functions
     Calendar: {
         initialize: function () {
             this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialDate: Dates.CalendarInitial,
+                initialView: 'dayGridMonth',
                 locale: 'lt',
                 editable: true,
                 selectable: true,
@@ -59,7 +80,7 @@ let CalendarFunctions = {
                     }
                     isEventDrop = false;
                 },
-                dayMaxEvents: true,
+                // dayMaxEvents: true,
                 events: [],
                 datesSet: function (info) {
                     let CalendarView = info.view;
@@ -148,6 +169,8 @@ let CalendarFunctions = {
         });
     },
     updateEventsPublic: function (firstVisibleDay, lastVisibleDay, firstMonthDay) {
+        // console.log('firstVisibleDay:', firstVisibleDay)
+        // console.log('lastVisibleDay:', lastVisibleDay)
         $('#overlay').css('display', 'flex');
         $.ajax({
             headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -165,51 +188,271 @@ let CalendarFunctions = {
             let Availability = response.Availability;
             Trampolines = response.Trampolines;
             if (response.status) {
-                this.Calendar.calendar.removeAllEvents();
-                this.addEvent(Occupied);
-                this.addEvent(Availability);
+                if (PcCalendar) {
+                    this.Calendar.calendar.removeAllEvents();
+                    this.addEvent(Occupied);
+                    this.addEvent(Availability);
+                    if (isFirstLoad && Availability.length > 0) {
+                        let firstAvailableDate = new Date(Availability[0].start);
+                        let availableMonth = firstAvailableDate.getMonth();
+                        let currentMonth = new Date(firstMonthDay).getMonth();
+                        if (availableMonth > currentMonth) {
+                            // Set navigating flag to true
+                            isNavigating = true;
+                            skippedMonth = new Date(firstMonthDay).getMonth();
+                            // Navigate to next month
+                            this.Calendar.calendar.next();
 
-                // Handle navigation logic for first load and availability check
-                if (isFirstLoad && Availability.length > 0) {
-                    let firstAvailableDate = new Date(Availability[0].start);
-                    let availableMonth = firstAvailableDate.getMonth();
-                    let currentMonth = new Date(firstMonthDay).getMonth();
-                    if (availableMonth > currentMonth) {
-                        // Set navigating flag to true
-                        isNavigating = true;
-                        skippedMonth = new Date(firstMonthDay).getMonth();
-                        // Navigate to next month
-                        this.Calendar.calendar.next();
+                            // Recalculate the dates after navigation
+                            let newCalendarView = this.Calendar.calendar.view;
+                            let newFirstDayMonth = new Date(newCalendarView.currentStart);
+                            newFirstDayMonth.setUTCHours(newFirstDayMonth.getUTCHours() + 3);
+                            let firstMonthDayNew = newFirstDayMonth.toISOString().split('T')[0];
 
-                        // Recalculate the dates after navigation
-                        let newCalendarView = this.Calendar.calendar.view;
-                        let newFirstDayMonth = new Date(newCalendarView.currentStart);
-                        newFirstDayMonth.setUTCHours(newFirstDayMonth.getUTCHours() + 3);
-                        let firstMonthDayNew = newFirstDayMonth.toISOString().split('T')[0];
+                            // Update events for the new month
+                            this.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDayNew);
 
-                        // Update events for the new month
-                        this.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDayNew);
-
-                        // Reset navigating flag after update
-                        isNavigating = false;
+                            // Reset navigating flag after update
+                            isNavigating = false;
+                        }
+                        isFirstLoad = false;
                     }
-                    isFirstLoad = false;
+                }
+                if (mobileCalendar) {
+                    /* We minus one day from range.end, because in full calendar we use the next days midnight,
+                    * here it doesn't work like that */
+                    // lite picker logic
+                    /*const dateCells = document.querySelectorAll('.litepicker-day'); // Adjust selector as needed
+                    dateCells.forEach(cell => {
+                        cell.classList.remove('is-occupied'); // Remove class indicating occupied days
+                        cell.removeAttribute('data-event-id'); // Remove any event ID attribute
+                    });
+                    lockDays = response.Occupied ? response.Occupied.map(range => {
+                        const endDate = new Date(range.end);
+                        endDate.setDate(endDate.getDate() - 1); // Subtract one day
+                        console.log('range start', range.start)
+                        let newRangeStart = [range.start, endDate.toISOString().split('T')[0]]; // Format back to 'YYYY-MM-DD'
+                        console.log('newRangeStart', newRangeStart)
+                        return newRangeStart
+                    }) : [];
+                    console.log('Lock days: ', lockDays);
+                    if (!PickerInitialized) {
+                        litePicker.init();
+                        PickerInitialized = true;
+                    }
+                    Picker.setOptions({disallowLockDaysInRange: true});
+                    Picker.gotoDate(firstMonthDay)
+                    */
+                    // if (!PickerInitialized) {
+                    //     datePicker.initialize()
+                    //     PickerInitialized = true;
+                    // }
+                    let disabledDates = CalendarFunctions.processOccupiedDates(response.Occupied);
+                    if (!PickerInitialized) {
+                        flatPickerCalendar.initialize(disabledDates)
+                        PickerInitialized = true;
+                    } else {
+                        flatPickerCalendar.updateDisabledDates(disabledDates);
+                    }
+                    // flatPickerCalendar.disabledDaysArray = response.Occupied
                 }
             }
         });
+    },
+    processOccupiedDates: function (occupiedDates) {
+        let processedDates = occupiedDates.map(occupied => ({
+            from: new Date(new Date(occupied.start).getTime() - 3 * 60 * 60 * 1000), // Subtract 3 hours
+            to: new Date(new Date(occupied.end).getTime() - 24 * 60 * 60 * 1000) // Subtract 1 day
+        }));
+        // Log the processed dates
+        console.log('Processed Dates:', processedDates);
+
+        return processedDates;
     }
 };
-
-let flatPicker = {
+//@todo Add time picker and calendar picker into one class
+let flatPickerTime = {
     initialize: function () {
         $('#customerDeliveryTime').flatpickr({
             enableTime: true, // Enable time picker
             noCalendar: true, // Hide calendar
+            disableMobile: "true",
             dateFormat: "H:i", // Format displayed time (24-hour)
             time_24hr: true, // Use 24-hour time format
             minTime: "8:00",
             maxTime: "22:00",
         })
+    }
+}
+let flatPickerCalendar = {
+    disabledDaysArray: [],
+    monthChangeTo: 0,
+    initialMonth: 0,
+    initialize: function (disabledDates) {
+        flatPickerCalendar.disabledDaysArray = disabledDates;
+        flatPicker = $('#flatPickerCalendar').flatpickr({
+            mode: 'range', // Enables range selection
+            dateFormat: 'Y/m/d', // Date format
+            minDate: "today",
+            // locale: 'lt',
+            // disableMobile: true, // Force Flatpickr to use its own picker on mobile devices
+            disable: flatPickerCalendar.disabledDaysArray,
+            onChange: function (selectedDates, dateStr, instance) {
+                // Ensure range selection does not include disabled dates
+                console.log('disabled days: ', flatPickerCalendar.disabledDaysArray)
+                console.log('patekom i on change')
+                if (selectedDates.length === 2) {
+                    console.log('Selected dates:', selectedDates);
+
+                    let startDate = selectedDates[0];
+                    let endDate = selectedDates[1];
+                    let isValidRange = true;
+
+                    console.log('Start date:', startDate);
+                    console.log('End date:', endDate);
+
+                    // Create new Date objects for manipulation
+                    let startDateToAjax = new Date(startDate);
+                    let endDateToAjax = new Date(endDate);
+
+                    startDateToAjax.setHours(startDateToAjax.getHours() + 3);
+
+                    endDateToAjax.setHours(endDateToAjax.getHours() + 3);
+                    endDateToAjax.setDate(endDateToAjax.getDate() + 1);
+
+                    let formattedStartDate = startDateToAjax.toISOString().substring(0, 10);
+
+                    let formattedEndDate = endDateToAjax.toISOString().substring(0, 10);
+
+                    console.log('Formatted Start Date:', formattedStartDate);
+                    console.log('Formatted End Date:', formattedEndDate);
+
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        console.log('Checking date in range:', d);
+
+                        if (flatPickerCalendar.isDateDisabled(d, flatPickerCalendar.disabledDaysArray)) {
+                            console.log('Found a disabled date in range:', d);
+                            isValidRange = false;
+                            break;
+                        }
+                    }
+
+                    if (!isValidRange) {
+                        console.log('Invalid date range. Clearing selection and updating events.');
+                        // flatPicker.changeMonth(instance.currentMonth, false)
+                        // instance.destroy()
+                        instance.clear();
+                        console.log('current month', instance.currentMonth)
+                        instance.changeMonth(flatPickerCalendar.monthChangeTo, true);
+                        // flatPicker.close()
+                        // CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
+                        console.log('Updated events after clearing selection.');
+                        console.log('First month day:', firstMonthDay);
+                        alert('The selected range includes disabled dates. Please select a valid range.');
+                    } else {
+                        console.log('Valid date range selected:', selectedDates);
+                        Trampolines.forEach(function (Trampoline) {
+                            Trampoline.rental_start = formattedStartDate;
+                            Trampoline.rental_end = formattedEndDate;
+                        })
+                        TrampolineOrder.flatPickerRangeStart = formattedStartDate;
+                        TrampolineOrder.flatPickerRangeEnd = formattedEndDate;
+                    }
+                }
+            },
+            onMonthChange: function (selectedDates, dateStr, instance) {
+                flatPickerCalendar.monthChangeTo = instance.currentMonth - flatPickerCalendar.initialMonth
+                console.log('current month: ', instance.currentMonth)
+                console.log('initial month: ', flatPickerCalendar.initialMonth)
+                console.log('month change to: from initial + ', flatPickerCalendar.monthChangeTo)
+                flatPickerCalendar.logVisibleDays(); // Log the visible days when the month changes
+                CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay)
+            },
+            onOpen: function (selectedDates, dateStr, instance) {
+                if (!isFirstMonthCaptured) {
+                    flatPickerCalendar.initialMonth = instance.currentMonth
+                    isFirstMonthCaptured = true
+                }
+            },
+        })
+    },
+    isDateDisabled: function (date, disabledDates) {
+        for (let entry of disabledDates) {
+            if (entry instanceof Object && entry.from && entry.to) {
+                if (date >= entry.from && date <= entry.to) {
+                    return true;
+                }
+            } else if (entry instanceof Date) {
+                if (date.toDateString() === entry.toDateString()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    },
+    logVisibleDays: function () {
+        // Assuming flatPicker is your Flatpickr instance
+        // Get the days container element
+        const daysContainer = flatPicker.calendarContainer.querySelector('.flatpickr-days');
+
+        // Find all visible day elements
+        const allDayElements = daysContainer.querySelectorAll('.flatpickr-day');
+
+        // Initialize variables to hold first and last visible day elements
+        let firstVisibleDayElement = null;
+        let lastVisibleDayElement = null;
+
+        // Loop through all day elements to find first and last visible ones
+        allDayElements.forEach(dayElement => {
+            // Check if the element is visible (not previous or next month)
+            if (dayElement.classList.contains('prevMonthDay') && dayElement.classList.contains('nextMonthDay')) {
+                // If first visible day element is not set, set it
+                if (!firstVisibleDayElement) {
+                    firstVisibleDayElement = dayElement;
+                }
+                // Always update last visible day element until the loop finishes
+                lastVisibleDayElement = dayElement;
+            }
+        });
+
+        // If there are no previous month days, use the first day of the current month
+        if (!firstVisibleDayElement) {
+            firstVisibleDayElement = daysContainer.querySelector('.flatpickr-day:not(.nextMonthDay)');
+        }
+
+        // If there are no next month days, use the last day of the current month
+        if (!lastVisibleDayElement) {
+            const allDayElementsArray = Array.from(allDayElements);
+            lastVisibleDayElement = allDayElementsArray[allDayElementsArray.length - 1];
+        }
+
+        // Function to format date to yyyy-mm-dd HH:MM:ss
+        // Function to format date to yyyy-mm-dd HH:MM:ss and add one day to the last visible day only
+        const formatDate = (dateLabel, isLastVisibleDay) => {
+            const date = new Date(dateLabel);
+            // Add 3 hours to adjust for Lithuanian GMT+3
+            date.setHours(date.getHours() + 3);
+            if (isLastVisibleDay) {
+                date.setDate(date.getDate() + 1);
+            }
+            console.log('Date:', date.toISOString().split('T')[0])
+            return date.toISOString().split('T')[0]; // Extract yyyy-mm-dd from ISO string
+        };
+
+        const firstDateLabel = firstVisibleDayElement.getAttribute('aria-label');
+        const lastDateLabel = lastVisibleDayElement.getAttribute('aria-label');
+
+        // Format dates
+        const formattedFirstDate = formatDate(firstDateLabel, false);
+        const formattedLastDate = formatDate(lastDateLabel, true);
+
+        firstVisibleDayOnCalendar = formattedFirstDate;
+        lastVisibleDayOnCalendar = formattedLastDate;
+        firstMonthDay = formattedFirstDate;
+    },
+    updateDisabledDates: function (newDisabledDates) {
+        flatPickerCalendar.disabledDaysArray = newDisabledDates;
+        flatPicker.set('disable', newDisabledDates);
     }
 }
 
@@ -287,7 +530,7 @@ let TrampolineOrder = {
         },
         checkFormValidity: function () {
             let isValid = true;
-            $('#orderForm input[required]').each(function () {
+            $('#orderForm input[required]:visible').each(function () {
                 if ($(this).val().trim() === '') {
                     isValid = false;
                     return false;
@@ -296,6 +539,8 @@ let TrampolineOrder = {
             $('#viewOrderButton').prop('disabled', !isValid);
         }
     },
+    flatPickerRangeStart: 0,
+    flatPickerRangeEnd: 0,
     ViewOrderModal: {
         init: function () {
             this.Event.init();
@@ -320,82 +565,44 @@ let TrampolineOrder = {
             updateAdvanceSum: function () {
                 let totalSum = 0;
                 let reservationDays = 0;
-                let startDateText = '';
-                let endDateText = '';
+                let startDate, endDate;
 
-                // Calculate reservation days for the specific event
-                const events = CalendarFunctions.Calendar.calendar.getEvents();
-                console.log("All events: ", events);
-                let reservationEvent = events.find(event => event.extendedProps.type_custom === "trampolineEvent");
-
-                if (reservationEvent) {
-                    console.log("Reservation event found: ", reservationEvent);
-                    let startDate = new Date(reservationEvent.start);
-                    let endDate = new Date(reservationEvent.end);
-                    console.log("Original start date: ", startDate);
-                    console.log("Original end date: ", endDate);
-
-                    // Adjust for Lithuanian time zone (+3 hours)
-                    startDate.setHours(startDate.getHours() + 3);
-                    endDate.setHours(endDate.getHours() + 3);
-                    console.log("Adjusted start date: ", startDate);
-                    console.log("Adjusted end date: ", endDate);
-
-                    // Adjust end date by subtracting one day
+                if (PcCalendar) {
+                    const reservationEvent = CalendarFunctions.Calendar.calendar.getEvents().find(event => event.extendedProps.type_custom === "trampolineEvent");
+                    if (reservationEvent) {
+                        startDate = new Date(reservationEvent.start);
+                        endDate = new Date(reservationEvent.end);
+                        startDate.setHours(startDate.getHours() + 3);
+                        endDate.setHours(endDate.getHours() + 3);
+                        endDate.setDate(endDate.getDate() - 1); // Adjust end date by subtracting one day
+                        reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Convert milliseconds to days and add 1 for inclusive days
+                    }
+                } else {
+                    startDate = new Date(TrampolineOrder.flatPickerRangeStart);
+                    endDate = new Date(TrampolineOrder.flatPickerRangeEnd);
+                    reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24);
                     endDate.setDate(endDate.getDate() - 1);
-                    console.log("Final end date: ", endDate);
-
-                    reservationDays = (endDate - startDate) / (1000 * 60 * 60 * 24) + 1; // Convert milliseconds to days and add 1 for inclusive days
-                    console.log("Calculated reservation days: ", reservationDays);
-
-                    // Format the dates for display
-                    startDateText = startDate.toISOString().split('T')[0];
-                    endDateText = endDate.toISOString().split('T')[0];
                 }
 
-                // Update trampoline items with days and calculate total sum
+                // Common code for updating trampoline items and calculating total sum
                 $('.trampoline-item').each(function () {
                     const price = parseFloat($(this).data('price'));
                     const trampolineNameElement = $(this).find('.trampoline-name');
-                    let originalName = trampolineNameElement.data('original-name');
-
-                    if (!originalName) {
-                        originalName = trampolineNameElement.text();
-                        trampolineNameElement.data('original-name', originalName);
-                    }
-
-                    if (reservationDays > 1) {
-                        trampolineNameElement.text(`${originalName} (${reservationDays} d.)`);
-                    } else {
-                        trampolineNameElement.text(originalName);
-                    }
-
+                    let originalName = trampolineNameElement.data('original-name') || trampolineNameElement.text();
+                    trampolineNameElement.data('original-name', originalName);
+                    trampolineNameElement.text(`${originalName} ${reservationDays > 1 ? `(${reservationDays} d.)` : ''}`);
                     const totalPrice = price * reservationDays;
-                    console.log("Total price for ", originalName, ": ", totalPrice);
                     $(this).find('.trampoline-price').text(totalPrice.toFixed(2));
                     totalSum += totalPrice;
                 });
 
-                // Calculate advance payment
+                // Calculate and update advance and final payments
                 const advancePayment = Math.round((totalSum * AdvancePercentage) / 10) * 10;
                 const finalPayment = totalSum - advancePayment;
-
-                // Debugging logs
-                console.log("Total Sum: ", totalSum);
-                console.log("Reservation Days: ", reservationDays);
-                console.log("Advance Payment: ", advancePayment);
-                console.log("Final Payment: ", finalPayment);
-
-                // Update the modal with the calculated values
                 $('#advance-payment').text(advancePayment.toFixed(2));
                 $('#final-payment').text(finalPayment.toFixed(2));
-                if (reservationDays > 1) {
-                    $('#reservation-dates').text(`${startDateText} - ${endDateText}`);
-                    $('#reservation-label').text('Rezervuotos dienos:');
-                } else {
-                    $('#reservation-dates').text(`${startDateText}`);
-                    $('#reservation-label').text('Rezervuota diena:');
-                }
+                $('#reservation-dates').text(`${startDate.toISOString().split('T')[0]} ${reservationDays > 1 ? `- ${endDate.toISOString().split('T')[0]}` : ''}`);
+                $('#reservation-label').text(`Rezervuotos dienos${reservationDays > 1 ? 's' : 'a'}:`);
             }
         }
     }
@@ -404,11 +611,111 @@ let TrampolineOrder = {
 /* Document ready function */
 $(document).ready(function () {
     console.log("/js/trampolines/public/order_public.js -> ready!");
+    showCalendar.showCalendar()
     TrampolineOrder.init();
-    CalendarFunctions.Calendar.initialize();
-    flatPicker.initialize();
-    // CalendarFunctions.TimePicker.initialize();
+    // CalendarFunctions.Calendar.initialize();
+    flatPickerTime.initialize();
+    // $(window).resize(showCalendar.showCalendar())
     console.log('Trampolines ->', Trampolines);
+    // new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
+    //     allowInputToggle: false,
+    //     container: undefined,
+    //     dateRange: true,
+    //     debug: false,
+    //     defaultDate: undefined,
+    //     display: {
+    //         icons: {
+    //             type: 'icons',
+    //             time: 'fas fa-clock',
+    //             date: 'fas fa-calendar',
+    //             up: 'fas fa-arrow-up',
+    //             down: 'fas fa-arrow-down',
+    //             previous: 'fas fa-chevron-left',
+    //             next: 'fas fa-chevron-right',
+    //             today: 'fas fa-calendar-check',
+    //             clear: 'fas fa-trash',
+    //             close: 'fas fa-times'
+    //         },
+    //         sideBySide: false,
+    //         calendarWeeks: false,
+    //         viewMode: 'calendar',
+    //         toolbarPlacement: 'bottom',
+    //         keepOpen: false,
+    //         buttons: {
+    //             today: false,
+    //             clear: false,
+    //             close: false
+    //         },
+    //         components: {
+    //             calendar: true,
+    //             date: true,
+    //             month: true,
+    //             year: true,
+    //             decades: true,
+    //             clock: true,
+    //             hours: true,
+    //             minutes: true,
+    //             seconds: false,
+    //             useTwentyfourHour: undefined
+    //         },
+    //         inline: false,
+    //         theme: 'auto'
+    //     },
+    //     keepInvalid: false,
+    //     localization: {
+    //         clear: 'Clear selection',
+    //         close: 'Close the picker',
+    //         dateFormats: {L: "DD/MM/YYYY"}, // Custom format
+    //         dayViewHeaderFormat: {month: 'long', year: '2-digit'},
+    //         decrementHour: 'Decrement Hour',
+    //         decrementMinute: 'Decrement Minute',
+    //         decrementSecond: 'Decrement Second',
+    //         format: 'DD/MM/YYYY',
+    //         hourCycle: 'h23',
+    //         incrementHour: 'Increment Hour',
+    //         incrementMinute: 'Increment Minute',
+    //         incrementSecond: 'Increment Second',
+    //         locale: 'lt',
+    //         nextCentury: 'Next Century',
+    //         nextDecade: 'Next Decade',
+    //         nextMonth: 'Next Month',
+    //         nextYear: 'Next Year',
+    //         ordinal: (number) => number + (number === 1 ? 'st' : number === 2 ? 'nd' : number === 3 ? 'rd' : 'th'),
+    //         pickHour: 'Pick Hour',
+    //         pickMinute: 'Pick Minute',
+    //         pickSecond: 'Pick Second',
+    //         previousCentury: 'Previous Century',
+    //         previousDecade: 'Previous Decade',
+    //         previousMonth: 'Previous Month',
+    //         previousYear: 'Previous Year',
+    //         selectDate: 'Select Date',
+    //         selectDecade: 'Select Decade',
+    //         selectMonth: 'Select Month',
+    //         selectTime: 'Select Time',
+    //         selectYear: 'Select Year',
+    //         startOfTheWeek: 0,
+    //         today: 'Go to today',
+    //         toggleMeridiem: 'Toggle Meridiem'
+    //     },
+    //     meta: {},
+    //     multipleDates: false,
+    //     multipleDatesSeparator: '; ',
+    //     promptTimeOnDateChange: false,
+    //     promptTimeOnDateChangeTransitionDelay: 200,
+    //     restrictions: {
+    //         minDate: undefined,
+    //         maxDate: undefined,
+    //         disabledDates: [],
+    //         enabledDates: [],
+    //         daysOfWeekDisabled: [],
+    //         disabledTimeIntervals: [],
+    //         disabledHours: [],
+    //         enabledHours: []
+    //     },
+    //     stepping: 1,
+    //     useCurrent: true,
+    //     viewDate: new tempusDominus.DateTime()
+    // })
 });
 
 

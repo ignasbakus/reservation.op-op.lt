@@ -43,7 +43,14 @@
         <span class="font-weight-bold theme-color">{{ number_format($Order->total_sum - $Order->advance_sum, 2) }} {{ $currency }}</span>
     </div>
     <div id="orderButtons" class="text-center mt-5 d-flex justify-content-between">
-{{--        <button class="btn btn-primary btn-thankYou payAdvance">Apmokėti avansą</button>--}}
+        <div id="changeOrderDatesMobile">
+            <button class="btn btn-primary btn-thankYou changeOrderDates" data-bs-toggle="modal"
+                    data-bs-target="#updateOrderModal">Redaguoti užsakymą</button>
+        </div>
+        <div id="changeOrderDeliveryTimePc">
+            <button class="btn btn-primary btn-thankYou changeOrderTime" data-bs-toggle="modal"
+                    data-bs-target="#updateOrderModal">Redaguoti pristatymo laiką</button>
+        </div>
         <button class="btn btn-cancel-order cancelOrder" data-bs-toggle="modal" data-bs-target="#cancelOrderModal">Atšaukti užsakymą</button>
     </div>
 </div>
