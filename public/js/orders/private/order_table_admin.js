@@ -258,7 +258,7 @@ let Orders = {
                     // {title: "Telefonas", orderable: false},
                     {title: "Adresas", orderable: false},
                     {title: "Nuomos<br>trukmė", orderable: false},
-                    {title: "Bendra suma", orderable: false},
+                    {title: "Bendra<br>suma", orderable: false},
                     {title: "Avanso<br>suma", orderable: false},
                     {title: "Užsakymo<br>būsena", orderable: false},
                     {title: "Valdymas", orderable: false}
