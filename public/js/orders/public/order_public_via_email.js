@@ -335,7 +335,7 @@ let TrampolineOrder = {
                         TrampolineOrder.UpdateOrder.EventWhenCancelled = response.Event;
                     }
                     if (!response.status) {
-                        $('#failedAlertMessage').text(response.failed_input.error[0]);
+                        $('#failedA5lertMessage').text(response.failed_input.error[0]);
                         $('#failedAlert').show().css('display', 'flex');
                         CalendarFunctions.Calendar.calendar.removeAllEvents();
                         $('#confirmationContainer').css('display', 'none');
