@@ -33,7 +33,9 @@ class DataTablesProcessing
         array $Ordering = [],
               $startDate = null,
               $endDate = null,
-              $searchValue = null
+              $searchValue = null,
+              $filterActive = false,
+              $filterInactive = false
     ): static
     {
         $this->TableName = $model->getTable();
@@ -48,12 +50,15 @@ class DataTablesProcessing
         if ($this->TableName === 'orders') {
             $fieldsToSelect[] = 'orders_trampolines.rental_start';
         } elseif ($this->TableName === 'trampolines') {
+            $fieldsToSelect[] = 'parameters.activity';
             $fieldsToSelect[] = 'parameters.height';
             $fieldsToSelect[] = 'parameters.width';
             $fieldsToSelect[] = 'parameters.length';
             $fieldsToSelect[] = 'parameters.price';
         }
         $Query->select($fieldsToSelect);
+//        dd($Query->select($fieldsToSelect));
+
 
         if ($startDate && $endDate) {
             $startDate = Carbon::parse($startDate)->startOfDay();
@@ -74,6 +79,33 @@ class DataTablesProcessing
                 });
             }
         }
+//        dd($Query->whereHas('parameter', function ($query) {
+//            $query->where('activity', 1);
+//        }));
+        //
+//        dd($filterActive);
+
+
+        if($filterActive === true){
+            dd('patekom jog filteractive true');
+        }
+
+        if($filterActive === false){
+            dd('patekom jog filteractive false');
+        }
+
+        if ($filterActive && !$filterInactive) {
+//            dd('patekom');
+            $Query->whereHas('parameter', function ($query) {
+                $query->where('activity', 1);
+            });
+        } elseif (!$filterActive && $filterInactive) {
+//            dd('patekom');
+            $Query->whereHas('parameter', function ($query) {
+                $query->where('activity', 0);
+            });
+        }
+
 
         // Handle joins based on the model's table
         switch ($this->TableName) {
@@ -188,13 +220,15 @@ class DataTablesProcessing
                         $RentalStart = $CollectionItem->Trampolines->first()->rental_start;
                         $RentalEnd = Carbon::parse($CollectionItem->Trampolines->first()->rental_end)->subDay()->toDateString();
                         $DeliveryTime = $CollectionItem->Trampolines->first()->delivery_time;
-//                        dd($DeliveryTime);
 
                         foreach ($CollectionItem->Trampolines as $Trampoline) {
-                            $TrampolineNames .= 'Batutas ' . $Trampoline->trampoline->title . '<br>';
+                            if (isset($Trampoline->trampoline->title) && $Trampoline) {
+                                $TrampolineNames .= 'Batutas ' . $Trampoline->trampoline->title . '<br>';
+                            } else {
+                                $TrampolineNames .= 'Batutas nebeegzistuoja!<br>';
+                            }
                         }
                     }
-
 
                     $ROW = [
                         $CollectionItem->id,

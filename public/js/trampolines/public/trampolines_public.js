@@ -2,6 +2,7 @@ let Actions = {
     InitActions: function () {
         ToolTip.init();
         Carousels.trampolinesCarousel.init();
+        Carousels.trampolinesCarousel.ChosenTrampoline = firstTrampolineId
         Trampolines.init();
         Trampolines.SendOrder.Events.init();
         Trampolines.Modals.showTrampoline.Events.init();
@@ -24,7 +25,7 @@ let Carousels = {
             keyboard: true,
             touch: true
         }),
-        ChosenTrampoline: 1,
+        ChosenTrampoline: 0,
         init: function () {
             $('#trampolinesCarousel').on('slide.bs.carousel', event => {
                 this.ChosenTrampoline = $(event.relatedTarget).data('trampolineid');
@@ -32,7 +33,7 @@ let Carousels = {
             $('#selectTrampoline').on('click', () => {
                 Trampolines.addToSelected(this.ChosenTrampoline);
             })
-        }
+        },
     }
 }
 
@@ -43,14 +44,25 @@ let Trampolines = {
     chosen: [],
     Modals: {
         showTrampoline: {
+            descriptionChosenTrampoline: '',
             element: new bootstrap.Modal('#showTrampolineModal'),
             Events: {
                 init: function () {
+                    $('#showTrampolineModal').on('show.bs.modal', (event) => {
+                        this.fetchDescription(event);
+                    })
                     $('#showTrampolineModal .chooseTrampoline').on('click', (event) => {
                         event.stopPropagation();
                         Trampolines.addToSelected(Carousels.trampolinesCarousel.ChosenTrampoline);
                         Trampolines.Modals.showTrampoline.element.hide();
                     });
+                },
+                fetchDescription: function (event) {
+                    const button = $(event.relatedTarget).closest('.carousel-item'); // Closest carousel item
+                    const trampolineId = button.data('trampolineid'); // Extract info from data-* attributes
+                    let trampoline = trampolinesFromDb.find(t => t.id === trampolineId);
+                    let modalDescription = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description h6');
+                    modalDescription.textContent = trampoline.description;
                 }
             }
         }
@@ -126,4 +138,5 @@ let Trampolines = {
 $(document).ready(function () {
     console.log("/js/trampolines/public/trampolines_public.js -> ready!");
     Actions.InitActions();
+    console.log('Trampolines from db: ', trampolinesFromDb)
 });

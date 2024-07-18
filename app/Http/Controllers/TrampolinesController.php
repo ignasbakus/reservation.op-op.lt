@@ -53,7 +53,8 @@ class TrampolinesController extends Controller
             }
         }
         return view('trampolines.public.index', [
-            'Trampolines' => $Trampolines
+            'Trampolines' => $Trampolines,
+            'firstTrampolineId' => $Trampolines->isEmpty() ? null : $Trampolines->first()->id
         ]);
     }
 
@@ -73,7 +74,20 @@ class TrampolinesController extends Controller
 
     public function adminGetDatatable(): JsonResponse
     {
-        $Trampolines = (new DataTablesProcessing())->getPaginatedData(new Trampoline(), ['Parameter'], \request()->get('length', 0), \request()->get('start', 0), \request()->get('order', []));
+//        dd(\request()->get('filterActive'));
+        $Trampolines = (new DataTablesProcessing())->getPaginatedData(
+            new Trampoline(),
+            ['Parameter'],
+            \request()->get('length', 0),
+            \request()->get('start', 0),
+            \request()->get('order', []),
+            null,
+            null,
+            null,
+            \request()->get('filterActive'),
+            \request()->get('filterInactive')
+        );
+
         return response()->json([
             'status' => true,
             'DATA' => $Trampolines->data,

@@ -15,11 +15,14 @@ let Variables = {
     }
 }
 let Trampolines = {
+    filterActive: false,
+    filterInactive: false,
     init: function () {
         this.Modals.addTrampoline.Events.init()
         this.Modals.updateTrampoline.Events.init()
         this.Modals.deleteTrampoline.Events.init()
         this.Table.init()
+        this.Events.init()
     },
     Table: {
         DrawCount: 0,
@@ -28,7 +31,8 @@ let Trampolines = {
         Table: false,
         AXAJData: function (d) {
             d._token = $('meta[name="csrf-token"]').attr('content');
-            d.sample_data = 1;
+            d.filterActive = Trampolines.filterActive;
+            d.filterInactive = Trampolines.filterInactive;
             return d;
         },
         init: function () {
@@ -77,14 +81,14 @@ let Trampolines = {
                 createdRow: function (row, data, index) {},
                 columns: [
                     { title: "Batutas", orderable: false, width: "10%" },
-                    { title: "Aprašymas", orderable: false, width: "10%" },
+                    { title: "Aprašymas", orderable: false, width: "30%" },
                     { title: "Aktyvumas", orderable: false, width: "5%" },
                     { title: "Spalva", orderable: false, width: "7%" },
                     { title: "Aukštis", width: "7%" },
                     { title: "Plotis", width: "7%" },
                     { title: "Ilgis", width: "7%" },
                     { title: "Kaina", width: "7%" },
-                    { title: "Valdymas", orderable: false, width: "10%" }
+                    { title: "Valdymas", orderable: false, width: "15%" }
                 ],
                 bAutoWidth: false,
                 fixedColumns: true,
@@ -408,6 +412,16 @@ let Trampolines = {
         }
     },
     Events: {
+        init: function (){
+          $('#activeTrampolines').on('change', function () {
+              Trampolines.filterActive = $(this).is(':checked');
+              Trampolines.Table.Table.draw();
+          });
+            $('#inactiveTrampolines').on('change', function () {
+                Trampolines.filterInactive = $(this).is(':checked');
+                Trampolines.Table.Table.draw();
+            });
+        },
         dismissAlertsAfterTimeout: function (alertId, timeout){
             setTimeout(function() {
                 $(alertId).fadeOut('slow', function() {

@@ -2,183 +2,83 @@
     height: 400px; /* Adjust the height as needed */
 }
 
-/* Ensure the list items have consistent padding and margins */
-.list-group-item {
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f9fa;
+/* Ensure consistent styling for list items */
+.list-group-item, .trampoline-item {
+    padding: 20px; /* Padding inside the item */
+    margin-bottom: 10px; /* Margin between items */
+    border: 1px solid #ddd; /* Border */
+    border-radius: 8px; /* Rounded corners */
+    background-color: #f8f9fa; /* Light background */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Shadow for depth */
 }
 
-/* Make the title stand out more */
-.list-group-item .fw-bold {
-    font-size: 1.2rem;
+/* Make the title stand out */
+.list-group-item .fw-bold, .trampoline-item .fw-bold {
+    font-size: 1.2rem; /* Larger font size for bold title */
 }
 
-/* Adjust the badge styling */
-.badge.text-bg-primary {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-}
-
-/* Style the remove button */
-.btn-outline-danger {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border: 1px solid #dc3545;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/* Adjust the SVG icon size */
-.bi-trash3 {
-    width: 16px;
-    height: 16px;
-}
-/* Ensure the list items have consistent padding and margins */
-.trampoline-item {
-    padding: 20px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Make the title stand out more */
-.trampoline-item .fw-bold {
-    font-size: 1.2rem;
-}
-
-/* Adjust the badge styling */
+/* Adjust badge styling */
 .price-badge {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    margin-left: 1rem;
+    font-size: 1rem; /* Normal font size */
+    padding: 0.5rem 1rem; /* Padding around badge */
+    margin-left: 1rem; /* Margin from the left */
 }
 
 /* Style the remove button */
 .btn-outline-danger {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border: 1px solid #dc3545;
+    display: flex; /* Flex display for alignment */
+    align-items: center; /* Center align items */
+    padding: 0.25rem 0.5rem; /* Padding inside button */
+    font-size: 0.875rem; /* Font size */
+    border: 1px solid #dc3545; /* Red border */
 }
 
 .btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
+    background-color: #dc3545; /* Red background on hover */
+    color: #fff; /* White text on hover */
 }
 
-/* Adjust the SVG icon size */
+/* Adjust SVG icon size */
 .bi-trash3 {
-    width: 16px;
-    height: 16px;
+    width: 16px; /* Icon width */
+    height: 16px; /* Icon height */
 }
 
+/* Style disabled state of the order button */
 #sendToOrderButton:disabled {
     background-color: #cccccc; /* Light gray background */
-    cursor: not-allowed; /* Change cursor to indicate disabled state */
-    opacity: 0.6; /* Slightly transparent */
+    cursor: not-allowed; /* Not-allowed cursor */
+    opacity: 0.6; /* Reduced opacity */
 }
 
-.modal-image {
-    height: 400px; /* Adjust the height as needed */
+/* Additional styling for the selected trampolines section */
+#SelectedTrampolines {
+    background-color: #ffffff; /* White background */
+    border: 1px solid #ced4da; /* Light gray border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 20px; /* Padding inside the div */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow for depth */
 }
 
-/* Ensure the list items have consistent padding and margins */
-.list-group-item {
-    padding: 15px 20px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-}
-
-/* Make the title stand out more */
-.list-group-item .fw-bold {
-    font-size: 1.2rem;
-}
-
-/* Adjust the badge styling */
-.badge.text-bg-primary {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-}
-
-/* Style the remove button */
-.btn-outline-danger {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border: 1px solid #dc3545;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/* Adjust the SVG icon size */
-.bi-trash3 {
-    width: 16px;
-    height: 16px;
-}
-/* Ensure the list items have consistent padding and margins */
-.trampoline-item {
-    padding: 20px;
-    margin-bottom: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #f8f9fa;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Make the title stand out more */
-.trampoline-item .fw-bold {
-    font-size: 1.2rem;
-}
-
-/* Adjust the badge styling */
-.price-badge {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    margin-left: 1rem;
-}
-
-/* Style the remove button */
-.btn-outline-danger {
-    display: flex;
-    align-items: center;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-    border: 1px solid #dc3545;
-}
-
-.btn-outline-danger:hover {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-/* Adjust the SVG icon size */
-.bi-trash3 {
-    width: 16px;
-    height: 16px;
-}
-
-#sendToOrderButton:disabled {
-    background-color: #cccccc; /* Light gray background */
-    cursor: not-allowed; /* Change cursor to indicate disabled state */
-    opacity: 0.6; /* Slightly transparent */
+#SelectedTrampolines .no-trampolines-message {
+    padding: 10px; /* Padding inside the message */
+    font-weight: bold; /* Bold text for emphasis */
+    color: #6c757d; /* Gray text color */
+    background-color: #f8f9fa; /* Light gray background */
+    border-radius: 8px; /* Rounded corners */
+    text-align: center; /* Center align text */
+    margin-bottom: 10px; /* Margin at the bottom of the message */
 }
 
 
+#sendToOrderButton {
+    margin-top: 20px; /* Margin from the top */
+}
+
+#SelectedTrampolines h3 {
+    font-size: 1.5rem; /* Larger font size */
+    font-weight: bold; /* Bold font weight */
+    margin-bottom: 20px; /* Space at the bottom */
+    color: #343a40; /* Dark text color */
+}
 

@@ -21,6 +21,7 @@ class Trampoline extends Model
     }
 
     public array $FieldRelationsToColumns = [
+        2 => 'parameters.activity',
         4 => 'parameters.height',
         5 => 'parameters.width',
         6 => 'parameters.length',

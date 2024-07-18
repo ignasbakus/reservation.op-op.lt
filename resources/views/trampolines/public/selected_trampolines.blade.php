@@ -2,7 +2,7 @@
     <li class="list-group-item d-flex justify-content-between align-items-center trampoline-item">
         <div class="me-auto">
             <div class="fw-bold h5">{{$Trampoline->title}}</div>
-            <p class="mb-1">{{$Trampoline->description}}</p>
+{{--            <p class="mb-1">{{$Trampoline->description}}</p>--}}
         </div>
         <div class="d-flex align-items-center">
             <div class="price-badge">

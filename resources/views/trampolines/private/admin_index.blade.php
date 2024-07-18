@@ -6,21 +6,22 @@
     <div class="container flex-grow-1">
         <div class="row mb-5">
             <div class="col-4">
-                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createTrampolineModal">Pridėti
-                    naują batutą
-                </button>
-                <button id="refreshTable" class="btn btn-secondary">
-                    Atnaujinti lentelė
-                </button>
-            </div>
-            <div class="col-2">
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Aktyvus batutai</label>
-                </div>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
-                    <label class="form-check-label" for="flexSwitchCheckDefault">Neaktyvvus batutai</label>
+                <div class="button-container">
+                    <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#createTrampolineModal">
+                        Pridėti
+                        naują batutą
+                    </button>
+                    <button id="refreshTable" class="btn btn-secondary">
+                        Atnaujinti lentelė
+                    </button>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="activeTrampolines">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Aktyvus batutai</label>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="inactiveTrampolines">
+                        <label class="form-check-label" for="flexSwitchCheckDefault">Neaktyvvus batutai</label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -263,11 +264,13 @@
                 </div>
             </div>
         </div>
-        <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert" style="display: none;">
+        <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert"
+             style="display: none;">
             <span id="failedAlertMessage"></span>
             <button type="button" class="btn-close" aria-label="Close" onclick="$('#failedAlert').hide()"></button>
         </div>
-        <div class="alert alert-success alert-dismissible fade show custom-alert" id="successAlert" role="alert" style="display: none;">
+        <div class="alert alert-success alert-dismissible fade show custom-alert" id="successAlert" role="alert"
+             style="display: none;">
             <span id="successAlertMessage"></span>
             <button type="button" class="btn-close" aria-label="Close" onclick="$('#successAlert').hide()"></button>
         </div>
