@@ -245,7 +245,7 @@ class MontonioPaymentsService
         }
         return response()->json([
             'status' => 'unchanged',
-            'message' => 'Nebuvo atlikta jokių pakeitimų',
+            'message' => 'Nebuvo atlikta jokių pakeitimų, užsakymo būsena teisinga',
         ]);
     }
 

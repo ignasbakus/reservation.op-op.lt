@@ -62,14 +62,16 @@ class TrampolineOrder implements Order
             return $this;
         }
 
-
-        $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
-
-        if (!$isTrampolineActive) {
-            $this->status = false;
-            $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
-            return $this;
+        foreach ($trampolineOrderData->Trampolines as $trampoline) {
+            $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampoline['id']);
+            if (!$isTrampolineActive) {
+                $this->status = false;
+                $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
+                return $this;
+            }
         }
+//        $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
+
 
         $Client = (new Client())->updateOrCreate(
             [
@@ -505,6 +507,10 @@ class TrampolineOrder implements Order
                     'message' => 'Order activity updated successfully.'
                 ];
         }
+        return [
+            'status' => false,
+            'message' => 'Invalid status.'
+        ];
     }
 
     public function getOrderStatus($orderId): array
