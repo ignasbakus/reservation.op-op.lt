@@ -30,6 +30,7 @@ let showCalendar = {
         } else {
             $('#calendar').css('display', 'none');
             $('#orderDates').css('display', 'block');
+            flatPickerCalendar.Modal.init();
             mobileCalendar = true;
             PcCalendar = false;
         }
@@ -54,7 +55,7 @@ let Variables = {
         return Trampolines;
     },
 };
-let CalendarFunctions = {           // Calendar functions
+let CalendarFunctions = {
     Calendar: {
         initialize: function () {
             this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
@@ -340,19 +341,12 @@ let flatPickerCalendar = {
                     }
 
                     if (!isValidRange) {
-                        console.log('Invalid date range. Clearing selection and updating events.');
-                        // flatPicker.changeMonth(instance.currentMonth, false)
-                        // instance.destroy()
-                        instance.clear();
-                        console.log('current month', instance.currentMonth)
-                        instance.changeMonth(flatPickerCalendar.monthChangeTo, true);
-                        // flatPicker.close()
-                        // CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                        console.log('Updated events after clearing selection.');
-                        console.log('First month day:', firstMonthDay);
-                        alert('The selected range includes disabled dates. Please select a valid range.');
+                        flatPickerCalendar.Modal.element.show()
+                        $('#disabledDatesModal').on('hidden.bs.modal', function () {
+                            instance.clear();
+                            instance.changeMonth(flatPickerCalendar.monthChangeTo, true);
+                        });
                     } else {
-                        console.log('Valid date range selected:', selectedDates);
                         Trampolines.forEach(function (Trampoline) {
                             Trampoline.rental_start = formattedStartDate;
                             Trampoline.rental_end = formattedEndDate;
@@ -393,18 +387,12 @@ let flatPickerCalendar = {
         return false;
     },
     logVisibleDays: function () {
-        // Assuming flatPicker is your Flatpickr instance
-        // Get the days container element
         const daysContainer = flatPicker.calendarContainer.querySelector('.flatpickr-days');
-
-        // Find all visible day elements
         const allDayElements = daysContainer.querySelectorAll('.flatpickr-day');
 
-        // Initialize variables to hold first and last visible day elements
         let firstVisibleDayElement = null;
         let lastVisibleDayElement = null;
 
-        // Loop through all day elements to find first and last visible ones
         allDayElements.forEach(dayElement => {
             // Check if the element is visible (not previous or next month)
             if (dayElement.classList.contains('prevMonthDay') && dayElement.classList.contains('nextMonthDay')) {
@@ -417,19 +405,15 @@ let flatPickerCalendar = {
             }
         });
 
-        // If there are no previous month days, use the first day of the current month
         if (!firstVisibleDayElement) {
             firstVisibleDayElement = daysContainer.querySelector('.flatpickr-day:not(.nextMonthDay)');
         }
 
-        // If there are no next month days, use the last day of the current month
         if (!lastVisibleDayElement) {
             const allDayElementsArray = Array.from(allDayElements);
             lastVisibleDayElement = allDayElementsArray[allDayElementsArray.length - 1];
         }
 
-        // Function to format date to yyyy-mm-dd HH:MM:ss
-        // Function to format date to yyyy-mm-dd HH:MM:ss and add one day to the last visible day only
         const formatDate = (dateLabel, isLastVisibleDay) => {
             const date = new Date(dateLabel);
             // Add 3 hours to adjust for Lithuanian GMT+3
@@ -455,6 +439,19 @@ let flatPickerCalendar = {
     updateDisabledDates: function (newDisabledDates) {
         flatPickerCalendar.disabledDaysArray = newDisabledDates;
         flatPicker.set('disable', newDisabledDates);
+    },
+    Modal: {
+        init: function () {
+            this.Events.init();
+        },
+        element: new bootstrap.Modal('#disabledDatesModal'),
+        Events: {
+            init: function (){
+                $('#disabledDatesModal .closeModal').on('click', function (event) {
+                    flatPickerCalendar.Modal.element.hide()
+                })
+            }
+        }
     }
 }
 
@@ -629,7 +626,7 @@ let TrampolineOrder = {
         dismissAlertsAfterTimeout: function (alertId, timeout) {
             setTimeout(function () {
                 $(alertId).fadeOut('slow', function () {
-                    $(this).alert('close');
+                    $(this).css('display', 'none')
                 });
             }, timeout);
         }
@@ -641,9 +638,7 @@ $(document).ready(function () {
     console.log("/js/trampolines/public/order_public.js -> ready!");
     showCalendar.showCalendar()
     TrampolineOrder.init();
-    // CalendarFunctions.Calendar.initialize();
     flatPickerTime.initialize();
-    // $(window).resize(showCalendar.showCalendar())
     console.log('Trampolines ->', Trampolines);
     // new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
     //     allowInputToggle: false,

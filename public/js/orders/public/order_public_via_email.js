@@ -31,6 +31,7 @@ let showCalendar = {
             $('#changeOrderDeliveryTimePc').css('display', 'none');
             $('#changeOrderDatesMobile').css('display', 'block');
             $('#dateCalendarForMobile').css('display', 'block');
+            flatPickerFunctions.flatPickerCalendar.Modal.init();
             mobileCalendar = true;
             PcCalendar = false;
         }
@@ -75,35 +76,19 @@ let flatPickerFunctions = {
                 disable: flatPickerFunctions.flatPickerCalendar.disabledDaysArray,
                 defaultDate: [flatPickerFunctions.flatPickerCalendar.initialRentalStart, flatPickerFunctions.flatPickerCalendar.initialRentalEnd],
                 onChange: function (selectedDates, dateStr, instance) {
-                    // Ensure range selection does not include disabled dates
-                    console.log('disabled days: ', flatPickerFunctions.flatPickerCalendar.disabledDaysArray)
-                    console.log('patekom i on change')
                     if (selectedDates.length === 2) {
-                        console.log('Selected dates:', selectedDates);
-
                         let startDate = selectedDates[0];
                         let endDate = selectedDates[1];
                         let isValidRange = true;
 
-                        console.log('Start date:', startDate);
-                        console.log('End date:', endDate);
-
-                        // Create new Date objects for manipulation
                         let startDateToAjax = new Date(startDate);
                         let endDateToAjax = new Date(endDate);
-
                         startDateToAjax.setHours(startDateToAjax.getHours() + 3);
-
                         endDateToAjax.setHours(endDateToAjax.getHours() + 3);
                         endDateToAjax.setDate(endDateToAjax.getDate() + 1);
 
                         let formattedStartDate = startDateToAjax.toISOString().substring(0, 10);
-
                         let formattedEndDate = endDateToAjax.toISOString().substring(0, 10);
-
-                        console.log('Formatted Start Date:', formattedStartDate);
-                        console.log('Formatted End Date:', formattedEndDate);
-
                         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                             console.log('Checking date in range:', d);
 
@@ -113,16 +98,14 @@ let flatPickerFunctions = {
                                 break;
                             }
                         }
-
                         if (!isValidRange) {
-                            console.log('Invalid date range. Clearing selection and updating events.');
-                            instance.clear();
-                            instance.setDate([flatPickerFunctions.flatPickerCalendar.initialRentalStart, flatPickerFunctions.flatPickerCalendar.initialRentalEnd]);
-                            console.log('current month', instance.currentMonth)
-                            instance.changeMonth(flatPickerFunctions.flatPickerCalendar.monthChangeTo, true);
-                            console.log('Updated events after clearing selection.');
-                            console.log('First month day:', firstMonthDay);
-                            alert('The selected range includes disabled dates. Please select a valid range.');
+                            // TrampolineOrder.ChangeOrderDatesModal.element.hide();
+                            flatPickerFunctions.flatPickerCalendar.Modal.element.show();
+                            $('#disabledDatesModal').on('hidden.bs.modal', function () {
+                                instance.clear();
+                                instance.setDate([flatPickerFunctions.flatPickerCalendar.initialRentalStart, flatPickerFunctions.flatPickerCalendar.initialRentalEnd]);
+                                instance.changeMonth(flatPickerFunctions.flatPickerCalendar.monthChangeTo, true);
+                            })
                         } else {
                             console.log('Valid date range selected:', selectedDates);
                             Trampolines.forEach(function (Trampoline) {
@@ -231,6 +214,19 @@ let flatPickerFunctions = {
         updateDisabledDates: function (newDisabledDates) {
             flatPickerFunctions.flatPickerCalendar.disabledDaysArray = newDisabledDates;
             flatPicker.set('disable', newDisabledDates);
+        },
+        Modal: {
+            init: function () {
+                this.Events.init();
+            },
+            element: new bootstrap.Modal('#disabledDatesModal'),
+            Events: {
+                init: function (){
+                    $('#disabledDatesModal .closeModal').on('click', function (event) {
+                        flatPickerFunctions.flatPickerCalendar.Modal.element.hide();
+                    })
+                }
+            }
         }
     },
     flatPickerTime: {
@@ -762,7 +758,7 @@ let TrampolineOrder = {
         dismissAlertsAfterTimeout: function (alertId, timeout){
             setTimeout(function() {
                 $(alertId).fadeOut('slow', function() {
-                    $(this).alert('close');
+                    $(this).css('display', 'none');
                 });
             }, timeout);
         }

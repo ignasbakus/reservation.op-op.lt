@@ -2,18 +2,14 @@
 
 use App\Http\Controllers\ClientsController;
 use App\Http\Controllers\OrderController;
-use App\Http\Controllers\WebhookController;
+use App\Http\Controllers\PaymentsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrampolinesController;
 
-Route::controller(WebhookController::class)->group(function () {
+Route::controller(PaymentsController::class)->group(function () {
+    Route::get('/status', 'checkPaymentStatus');
     Route::post('/webhook/montonio', 'paymentResponse');
-//    Route::post('/webhook/montonio/pending', 'paymentPending');
 });
-
-//Route::controller(ClientsController::class)->group(function () {
-//    Route::get('/clients', 'index')->name('clients');
-//});
 
 Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For admin usage (authenticated user)*/
@@ -43,8 +39,8 @@ Route::controller(OrderController::class)->prefix('orders')->group(function () {
             Route::get('test', 'test');
             Route::get('getCalendarInitial', 'initializeOrderUpdateCalendar');
             Route::get('getOrderUpdateData', 'prepareOrderUpdateModalInfo');
-            Route::get('waiting_confirmation/view/{order_number}', 'orderWaitingConfirmation');
-            Route::get('check_payment_status/view/{order_number}', 'checkPaymentStatus');
+            Route::get('waiting_confirmation/view/{order_number}', 'orderWaitingConfirmationView');
+            Route::get('check_payment_status/view/{order_number}', 'waitingForWebhook');
             Route::post('generate_url', 'generatePaymentUrl');
             Route::post('private_calendar/get', 'privateUpdateCalendar');
             Route::post('public_calendar/get', 'publicUpdateCalendar');

@@ -215,7 +215,7 @@ class DataTablesProcessing
                     }
 
                     $ROW = [
-                        $CollectionItem->id,
+                        $CollectionItem->order_number,
                         $CollectionItem->order_date,
                         $TrampolineNames,
                         $RentalStart . '<br>' . $RentalEnd,
@@ -229,10 +229,9 @@ class DataTablesProcessing
                         $CollectionItem->advance_sum . ' ' . config('trampolines.currency', '€'),
                         $CollectionItem->order_status,
                         '
-                  <button data-orderid="' . $CollectionItem->id . '" class="btn orderShow">
-                    <svg width="20" height="20" fill="currentColor" class="bi bi-image" viewBox="0 0 16 16">
-                        <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0"></path>
-                        <path d= "M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v6.5l-3.777-1.947a.5.5 0 0 0-.577.093l-3.71 3.71-2.66-1.772a.5.5 0 0 0-.63.062L1.002 12V3a1 1 0 0 1 1-1z"></path>
+                  <button data-orderid="' . $CollectionItem->id . '" class="btn checkOrderStatus">
+                    <svg width="20" height="20" fill="green" class="bi bi-check-lg" viewBox="0 0 16 16">
+                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425z"></path>
                     </svg>
                   </button>
                   <button data-orderid="' . $CollectionItem->id . '" class="btn orderUpdate">

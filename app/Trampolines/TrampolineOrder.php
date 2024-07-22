@@ -34,6 +34,7 @@ class TrampolineOrder implements Order
     public \App\Models\Order $Order;
     public array $OrderTrampolines;
     public MessageBag $failedInputs;
+
     public function __construct()
     {
         $this->failedInputs = new MessageBag();
@@ -42,10 +43,11 @@ class TrampolineOrder implements Order
         $this->Messages = [];
         $this->Order = new \App\Models\Order();
     }
+
     public function create(TrampolineOrderData $trampolineOrderData): static
     {
 //        dd($trampolineOrderData);
-        $checkResult = self::canRegisterOrder($trampolineOrderData);
+        $checkResult = self::canRegisterOrder(null, $trampolineOrderData);
 //        dd($isTrampolineActive);
         if (!$checkResult['status']) {
             $this->status = false;
@@ -63,7 +65,7 @@ class TrampolineOrder implements Order
 
         $isTrampolineActive = (new BaseTrampoline())->isTrampolineActive($trampolineOrderData->Trampolines[0]['id']);
 
-        if(!$isTrampolineActive){
+        if (!$isTrampolineActive) {
             $this->status = false;
             $this->failedInputs->add('error', 'Batutas neaktyvus, prašome pasirinkti kitą');
             return $this;
@@ -168,9 +170,9 @@ class TrampolineOrder implements Order
 
         $order = \App\Models\Order::find($trampolineOrderData->orderID);
 //        dd($order);
-        if (!$order || $order->order_status === 'Atšauktas') {
+        if (!$order) {
             $this->status = false;
-            $this->failedInputs->add('error', 'Nepavyko atnaujinti. Užsakymas nerastas/atšauktas.');
+            $this->failedInputs->add('error', 'Nepavyko atnaujinti. Užsakymas nerastas.');
             return $this;
         }
         $datesChanged = false;
@@ -201,7 +203,7 @@ class TrampolineOrder implements Order
         }
 
         if ($datesChanged) {
-            $checkResult = self::canRegisterOrder($trampolineOrderData);
+            $checkResult = self::canRegisterOrder(null, $trampolineOrderData);
             if (!$checkResult['status']) {
                 $this->status = false;
                 $this->failedInputs->add('error', $checkResult['message']);
@@ -274,21 +276,22 @@ class TrampolineOrder implements Order
 //        dd($this);
         $this->status = true;
         $this->Messages[] = 'Užsakymas atnaujintas sėkmingai !';
-        if (config('mail.send_email') === true){
+        if (config('mail.send_email') === true) {
             Mail::to($Order->client->email)->send(new orderUpdated($this->Order));
             Mail::to(config('mail.admin_email'))->send(new adminOrderUpdated($this->Order));
         }
         return $this;
     }
+
     public function delete($orderID): static
     {
         try {
 
             $order = \App\Models\Order::find($orderID);
 
-            if (config('mail.send_email') === true){
+            if (config('mail.send_email') === true) {
                 if ($order->trampolines->first()->is_active)
-                Mail::to($order->client->email)->send(new OrderDeleted($order));
+                    Mail::to($order->client->email)->send(new OrderDeleted($order));
             }
             $order->trampolines()->delete();
             $order->client()->delete();
@@ -303,63 +306,74 @@ class TrampolineOrder implements Order
         }
         return $this;
     }
+
     public function read($orderID): Model|Collection|Builder|array|null
     {
         return \App\Models\Order::with('trampolines', 'client', 'address')->find($orderID);
     }
-    public static function canRegisterOrder(TrampolineOrderData $trampolineOrderData): array
+
+    public static function canRegisterOrder(\App\Models\Order $order = null, TrampolineOrderData $trampolineOrderData = null): array
     {
-        foreach ($trampolineOrderData->Trampolines as $trampoline) {
-//            dd($trampoline);
-            $trampolineId = $trampoline['id'];
-            $rentalStart = Carbon::parse($trampoline['rental_start'])->format('Y-m-d');
-            $rentalEnd = Carbon::parse($trampoline['rental_end'])->format('Y-m-d');
-            $orderId = $trampolineOrderData->orderID ?? null; // check if orderID exists
+        if ($trampolineOrderData) {
+            foreach ($trampolineOrderData->Trampolines as $trampoline) {
+                $trampolineId = $trampoline['id'];
+                $rentalStart = Carbon::parse($trampoline['rental_start'])->format('Y-m-d');
+                $rentalEnd = Carbon::parse($trampoline['rental_end'])->format('Y-m-d');
+                $orderId = $trampolineOrderData->orderID ?? null; // check if orderID exists
+            }
+        }
+        if ($order) {
+            $trampolineId = $order->trampolines->first()->trampolines_id;
+            $rentalStart = Carbon::parse($order->trampolines()->first()->rental_start)->format('Y-m-d');
+            $rentalEnd = Carbon::parse($order->trampolines()->first()->rental_end)->format('Y-m-d');
+            $orderId = $order->id;
+        }
 
-            $overlappingRentals = DB::table('orders_trampolines')
-                ->where('trampolines_id', $trampolineId)
-                ->where('is_active', 1) // Only consider active orders
-                ->when($orderId, function ($query, $orderId) {
-                    // exclude the current order from the check if orderID exists
-                    return $query->where('orders_id', '!=', $orderId);
-                })
-                ->where(function ($query) use ($rentalStart, $rentalEnd) {
-                    $query->where(function ($query) use ($rentalStart) {
-                        // rental_start is between existing rental_start and rental_end
-                        $query->where('rental_start', '<=', $rentalStart)
-                            ->where('rental_end', '>', $rentalStart)
-                            ->where('rental_end', '!=', DB::raw("DATE_ADD('$rentalStart', INTERVAL 0 SECOND)"));
-                    })->orWhere(function ($query) use ($rentalEnd) {
-                        // rental_end is between existing rental_start and rental_end
-                        $query->where('rental_start', '<', $rentalEnd)
-                            ->where('rental_end', '>=', $rentalEnd)
-                            ->where('rental_start', '!=', DB::raw("DATE_ADD('$rentalEnd', INTERVAL 0 SECOND)"));
-                    })->orWhere(function ($query) use ($rentalStart, $rentalEnd) {
-                        // existing rental period is entirely within the new rental period
-                        $query->where('rental_start', '>=', $rentalStart)
-                            ->where('rental_end', '<=', $rentalEnd);
-                    });
-                })
-                ->exists();
+        $overlappingRentals = DB::table('orders_trampolines')
+            ->where('trampolines_id', $trampolineId)
+            ->where('is_active', 1) // Only consider active orders
+            ->when($orderId, function ($query, $orderId) {
+                // exclude the current order from the check if orderID exists
+                return $query->where('orders_id', '!=', $orderId);
+            })
+            ->where(function ($query) use ($rentalStart, $rentalEnd) {
+                $query->where(function ($query) use ($rentalStart) {
+                    // rental_start is between existing rental_start and rental_end
+                    $query->where('rental_start', '<=', $rentalStart)
+                        ->where('rental_end', '>', $rentalStart)
+                        ->where('rental_end', '!=', DB::raw("DATE_ADD('$rentalStart', INTERVAL 0 SECOND)"));
+                })->orWhere(function ($query) use ($rentalEnd) {
+                    // rental_end is between existing rental_start and rental_end
+                    $query->where('rental_start', '<', $rentalEnd)
+                        ->where('rental_end', '>=', $rentalEnd)
+                        ->where('rental_start', '!=', DB::raw("DATE_ADD('$rentalEnd', INTERVAL 0 SECOND)"));
+                })->orWhere(function ($query) use ($rentalStart, $rentalEnd) {
+                    // existing rental period is entirely within the new rental period
+                    $query->where('rental_start', '>=', $rentalStart)
+                        ->where('rental_end', '<=', $rentalEnd);
+                });
+            })
+            ->exists();
 
-            // Debug output to check the result of the query
+        // Debug output to check the result of the query
 //            dd($overlappingRentals);
 
-            if ($overlappingRentals) {
-                return [
-                    'status' => false,
-                    'message' => 'Dienos, kurias pasirinkote jau yra rezervuotos. Atsiprašome už nesklandumus.'
-                ];
-            }
+        if ($overlappingRentals) {
+            return [
+                'status' => false,
+                'message' => 'Dienos, kurias pasirinkote jau yra rezervuotos. Atsiprašome už nesklandumus.'
+            ];
         }
         return ['status' => true];
     }
+
     public static function calculateAdvanceSum($totalSum): float
     {
         $advancePercentage = config('trampolines.advance_percentage');
         $advancePayment = $totalSum * $advancePercentage;
         return round($advancePayment, -1);
     }
+
     public function deleteUnpaidOrders(): static
     {
         $now = Carbon::now();
@@ -376,6 +390,7 @@ class TrampolineOrder implements Order
         }
         return $this;
     }
+
     public function cancelOrder($orderID, $isFromWebhook = false): static
     {
         $order = \App\Models\Order::find($orderID);
@@ -400,13 +415,13 @@ class TrampolineOrder implements Order
 
         if (!$isFromWebhook) {
             $order->update(['order_status' => 'Atšauktas kliento']);
-            if (config('mail.send_email') === true){
+            if (config('mail.send_email') === true) {
                 Mail::to($order->client->email)->send(new OrderDeleted($order));
                 Mail::to(config('mail.admin_email'))->send(new adminOrderCancelled($this->Order));
             }
         } else {
             $order->update(['order_status' => 'Atšauktas, nes neapmokėtas']);
-            if (config('mail.send_email') === true){
+            if (config('mail.send_email') === true) {
                 Mail::to($order->client->email)->send(new OrderNotPaid($order));
             }
         }
@@ -420,7 +435,7 @@ class TrampolineOrder implements Order
         return $this;
     }
 
-    public function updateOrderStatus($orderId): array
+    public function updateOrderStatus($orderId, $status): array
     {
         $order = \App\Models\Order::find($orderId);
         if (!$order) {
@@ -430,17 +445,83 @@ class TrampolineOrder implements Order
             ];
         }
 
+        switch ($status) {
+            case 'PAID':
+                $order->update(['order_status' => 'Apmokėtas']);
+                if (config('mail.send_email') === true) {
+                    Mail::to($order->client->email)->send(new OrderPaid($order));
+                    Mail::to(config('mail.admin_email'))->send(new AdminPaidOrder($order));
+                }
+                break;
+            case 'ABANDONED':
+                $order->update(['order_status' => 'Atšauktas, nes neapmokėtas']);
+                if (config('mail.send_email') === true) {
+                    Mail::to($order->client->email)->send(new OrderNotPaid($order));
+                    Mail::to(config('mail.admin_email'))->send(new adminOrderCancelled($order));
+                }
+                break;
+        }
 
-        $order->update(['order_status' => 'Apmokėtas']);
-        if (config('mail.send_email') === true){
-            Mail::to($order->client->email)->send(new OrderPaid($order));
-            Mail::to(config('mail.admin_email'))->send(new AdminPaidOrder($order));
+        return [
+            'status' => true,
+            'message' => 'Order status updated.'
+        ];
+    }
+
+    public function updateOrderActivity($orderId, $status): array
+    {
+        $order = \App\Models\Order::find($orderId);
+        if ($status === 'PAID') {
+            $isPossible = self::canRegisterOrder($order);
+            if (!$isPossible['status']) {
+                return [
+                    'status' => false,
+                    'message' => $isPossible['message']
+                ];
+            }
+        }
+        if (!$order) {
+            return [
+                'status' => false,
+                'message' => 'Order not found.'
+            ];
+        }
+        $orderTrampolines = OrdersTrampoline::where('orders_id', $orderId)->get();
+        switch ($status) {
+            case 'ABANDONED':
+                foreach ($orderTrampolines as $orderTrampoline) {
+                    $orderTrampoline->update(['is_active' => 0]);
+                }
+                return [
+                    'status' => true,
+                    'message' => 'Order activity updated successfully.'
+                ];
+            case 'PAID':
+                foreach ($orderTrampolines as $orderTrampoline) {
+                    $orderTrampoline->update(['is_active' => 1]);
+                }
+                return [
+                    'status' => true,
+                    'message' => 'Order activity updated successfully.'
+                ];
+        }
+    }
+
+    public function getOrderStatus($orderId): array
+    {
+        $order = \App\Models\Order::find($orderId);
+        if (!$order) {
+            return [
+                'status' => false,
+                'message' => 'Order not found.'
+            ];
         }
         return [
             'status' => true,
-            'message' => 'Order status updated to Apmokėta successfully.'
+            'orderStatus' => $order->order_status
         ];
     }
+
     public function updateDeliveryTime($Request): array
     {
         $orderID = $Request->input('orderID');
@@ -449,11 +530,11 @@ class TrampolineOrder implements Order
 
 
         $affectedRows = OrdersTrampoline::where('orders_id', $orderID)->update(['delivery_time' => $customerDeliveryTime]);
-        if($affectedRows > 0 && config('mail.send_email') === true){
+        if ($affectedRows > 0 && config('mail.send_email') === true) {
             Mail::to($order->client->email)->send(new orderUpdated($order));
             Mail::to(config('mail.admin_email'))->send(new adminOrderUpdated($order));
         }
-        if($affectedRows > 0){
+        if ($affectedRows > 0) {
             return [
                 'status' => true,
                 'message' => 'Delivery time updated successfully.',

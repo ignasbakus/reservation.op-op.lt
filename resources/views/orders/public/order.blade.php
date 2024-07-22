@@ -153,6 +153,24 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="disabledDatesModal" tabindex="-1" role="dialog" aria-labelledby="reservationModalLabel"
+             aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h4 class="modal-title" id="reservationModalLabel">Negalimos dienos</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6>Informuojame, jog pasirinkote laikotarpį, kuriame yra užimtos dienos. Prašome pasirinkti
+                        kitas dienas</h6>
+                    </div>
+                    <div id="disabledDatesModalButtons" class="modal-footer justify-content-between">
+                        <button type="button" class="btn btn-secondary closeModal">Rinktis kitas dienas</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 @endsection
 

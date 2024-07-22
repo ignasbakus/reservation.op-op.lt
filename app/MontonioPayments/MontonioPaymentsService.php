@@ -2,14 +2,20 @@
 
 namespace App\MontonioPayments;
 
+use App\Mail\admin\adminOrderUpdated;
+use App\Mail\user\orderUpdated;
 use App\Models\MontonioPaymentCreationLog;
+use App\Models\MontonioPaymentWebhooksLog;
 use App\Models\Order;
 use App\Models\OrdersTrampoline;
 use App\Models\Trampoline;
 use App\Trampolines\TrampolineOrder;
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 use GuzzleHttp\Client;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class MontonioPaymentsService
 {
@@ -86,10 +92,10 @@ class MontonioPaymentsService
             'grandTotal' => (float)$grandTotal,
             'locale' => 'lt',
             'expiresIn' => 5,
-            'billingAddress'    => [
-                'firstName'    => $client->name,
-                'lastName'     => $client->surname,
-                'email'        => $client->email,
+            'billingAddress' => [
+                'firstName' => $client->name,
+                'lastName' => $client->surname,
+                'email' => $client->email,
                 'phoneNumber' => $client->phone,
             ],
             'lineItems' => [
@@ -165,18 +171,115 @@ class MontonioPaymentsService
         return null;
     }
 
-    public function retrieveUuidAndOrderId($id)
+    private function retrieveUuidAndOrderId($id)
     {
         return MontonioPaymentCreationLog::where('uuid', $id)->select('uuid', 'order_id')->first();
     }
 
-    public function orderPaid($orderId): void
+    private function orderPaid($orderId, $paymentStatus): void
     {
-        (new TrampolineOrder())->updateOrderStatus($orderId);
+        (new TrampolineOrder())->updateOrderStatus($orderId, $paymentStatus);
     }
 
-    public function orderAbandoned($orderId): void
+    private function orderAbandoned($orderId): void
     {
         (new TrampolineOrder())->cancelOrder($orderId, true);
+    }
+
+    public function checkOrderStatus($orderId): JsonResponse
+    {
+        $uuid = MontonioPaymentCreationLog::where('order_id', $orderId)->first()->uuid;
+        $apiUrl = config('montonio.api_url') . 'orders/' . $uuid;
+        $accessKey = config('montonio.access_key');
+
+        $payload = [
+            'accessKey' => $accessKey,
+            'exp' => time() + (60 * 60)
+        ];
+
+        $Token = JWT::encode(
+            $payload,
+            config('montonio.secret_key'),
+            'HS256'
+        );
+
+        $client = new Client();
+        $response = $client->get($apiUrl, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+                'Authorization' => 'Bearer ' . $Token,
+            ],
+            'json' => [],
+        ]);
+        $paymentStatus = json_decode($response->getBody(), true)['paymentStatus'] ?? 'UNKNOWN';
+
+        switch ($paymentStatus) {
+            case 'PAID':
+                if ((new TrampolineOrder())->getOrderStatus($orderId)['orderStatus'] != 'Apmokėtas') {
+                    $activity = ((new TrampolineOrder())->updateOrderActivity($orderId, $paymentStatus));
+                    if (!$activity['status']){
+                        return response()->json([
+                            'status' => false,
+                            'message' => 'Užsakymo būsena negali būti pakeista į apmokėta, nes datos jau užimtos kito kliento.
+                            Pakeiskite datas!',
+                        ]);
+                    }
+                    (new TrampolineOrder())->updateOrderStatus($orderId, $paymentStatus);
+                    return response()->json([
+                        'status' => 'changed',
+                        'message' => 'Užsakymas buvo pakeistas į apmokėtą',
+                    ]);
+                }
+                break;
+            case 'ABANDONED':
+                if ((new TrampolineOrder())->getOrderStatus($orderId)['orderStatus'] != 'Atšauktas, nes neapmokėtas') {
+                    ((new TrampolineOrder())->updateOrderActivity($orderId, $paymentStatus));
+                    (new TrampolineOrder())->updateOrderStatus($orderId, $paymentStatus);
+                    return response()->json([
+                        'status' => 'changed',
+                        'message' => 'Užsakymas buvo pakeistas į atšauktą, nes neapmokėtas',
+                    ]);
+                }
+                break;
+        }
+        return response()->json([
+            'status' => 'unchanged',
+            'message' => 'Nebuvo atlikta jokių pakeitimų',
+        ]);
+    }
+
+    public function handlePaymentResponse(): JsonResponse
+    {
+        Log::info('patekom i handle payment response');
+        JWT::$leeway = 60 * 5;
+        $decoded = JWT::decode(
+            json_decode(\request()->getContent(), true)['orderToken'],
+            new Key(config('montonio.secret_key'), 'HS256'),
+        );
+
+        $retrieveUuidAndOrderId = self::retrieveUuidAndOrderId($decoded->uuid);
+        MontonioPaymentWebhooksLog::create([
+            'order_id' => $retrieveUuidAndOrderId->order_id,
+            'callback_response' => json_encode($decoded),
+        ]);
+
+        if (
+            $decoded->uuid === $retrieveUuidAndOrderId->uuid &&
+            $decoded->accessKey === config('montonio.access_key')
+        )
+            switch ($decoded->paymentStatus) {
+                case 'PAID':
+                    self::orderPaid($retrieveUuidAndOrderId->order_id, $decoded->paymentStatus);
+                    break;
+                case 'ABANDONED':
+                    self::orderAbandoned($retrieveUuidAndOrderId->order_id);
+                    break;
+                default:
+                    break;
+            }
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Received webhook : ' . $decoded->paymentStatus,
+        ], 200);
     }
 }

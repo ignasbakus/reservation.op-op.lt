@@ -24,7 +24,6 @@ use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
-
     public function adminGetDatatable(): JsonResponse
     {
 //        dd(\request()->get('length'));
@@ -66,12 +65,10 @@ class OrderController extends Controller
             'recordsFiltered' => $Orders->recordsFiltered ?? 0,
         ]);
     }
-
     public function adminGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
         return view('orders.private.admin_order_table');
     }
-
     public function publicGetIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
 
@@ -85,7 +82,6 @@ class OrderController extends Controller
             'AdvancePercentage' => config('trampolines.advance_percentage'),
         ]);
     }
-
     public function publicGetIndexViaEmail($order_number): \Illuminate\Contracts\Foundation\Application|Factory|View|Application
     {
         $order = Order::where('order_number', $order_number)->first();
@@ -125,16 +121,13 @@ class OrderController extends Controller
             ]
         ]);
     }
-
-    public function orderWaitingConfirmation($order_number): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+    public function orderWaitingConfirmationView($order_number): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
     {
-//        $order = Order::where('order_number', $order_number)->firstOrFail();
         return \view('orders.public.order_waiting_confirmation', [
             'order_number' => $order_number
         ]);
     }
-
-    public function checkPaymentStatus($order_number): JsonResponse
+    public function waitingForWebhook($order_number): JsonResponse
     {
         $order = Order::where('order_number', $order_number)->firstOrFail();
         if ($order->order_status === 'Apmokėtas') {
@@ -154,7 +147,6 @@ class OrderController extends Controller
 
         return response()->json(['status' => false]);
     }
-
     public function publicUpdateCalendar(): JsonResponse
     {
         $trampolineIds = \request()->get('trampoline_id', []);
@@ -237,7 +229,6 @@ class OrderController extends Controller
             'Trampolines' => $Trampolines
         ]);
     }
-
     public function privateUpdateCalendar(): JsonResponse
     {
 
@@ -296,7 +287,6 @@ class OrderController extends Controller
             ], 400);
         }
     }
-
     public function orderGet(): JsonResponse
     {
         return \response()->json([
@@ -304,7 +294,6 @@ class OrderController extends Controller
             'order' => (new TrampolineOrder())->read(request()->get('order_id'))
         ]);
     }
-
     public function orderInsert(): JsonResponse
     {
 
@@ -389,7 +378,6 @@ class OrderController extends Controller
             'homeLink' => config('app.link_to_homepage')
         ]);
     }
-
     public function orderUpdate(): JsonResponse
     {
 //        dd(\request()->get('trampolines[0][rental_start]'));
@@ -466,6 +454,26 @@ class OrderController extends Controller
             ])->render()
         ]);
     }
+    public function orderDelete(): JsonResponse
+    {
+        return response()->json((new TrampolineOrder())->delete(\request()->input('orderID')));
+    }
+    public function orderCancel(): JsonResponse
+    {
+        $cancelledOrder = (new TrampolineOrder())->cancelOrder(\request()->input('order_id'));
+        if ($cancelledOrder->status) {
+            return response()->json([
+                'status' => true,
+                'message' => 'Order cancelled successfully',
+                'view' => view('orders.public.successful_cancellation')->render()
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'failed_inputs' => $cancelledOrder->failedInputs
+            ]);
+        }
+    }
     public function updateDeliveryTime(): JsonResponse
     {
         $deliveryTime = (new TrampolineOrder())->updateDeliveryTime(\request());
@@ -483,28 +491,6 @@ class OrderController extends Controller
             ]);
         }
     }
-    public function orderDelete(): JsonResponse
-    {
-        return response()->json((new TrampolineOrder())->delete(\request()->input('orderID')));
-    }
-
-    public function orderCancel(): JsonResponse
-    {
-        $cancelledOrder = (new TrampolineOrder())->cancelOrder(\request()->input('order_id'));
-        if ($cancelledOrder->status) {
-            return response()->json([
-                'status' => true,
-                'message' => 'Order cancelled successfully',
-                'view' => view('orders.public.successful_cancellation')->render()
-            ]);
-        } else {
-            return response()->json([
-                'status' => false,
-                'failed_inputs' => $cancelledOrder->failedInputs
-            ]);
-        }
-    }
-
     public function initializeOrderUpdateCalendar(): JsonResponse
     {
         $orderID = \request()->get('order_id');
@@ -518,7 +504,6 @@ class OrderController extends Controller
             ]
         ]);
     }
-
     public function prepareOrderUpdateModalInfo(): JsonResponse
     {
         try {
@@ -596,7 +581,6 @@ class OrderController extends Controller
             ], 400);
         }
     }
-
     public function checkForUnpaidOrders(): JsonResponse
     {
         $unpaidOrders = (new TrampolineOrder())->deleteUnpaidOrders();
@@ -606,7 +590,6 @@ class OrderController extends Controller
 //            'unpaidOrders' => $unpaidOrders
 //        ]);
     }
-
     public function generatePaymentUrl($orderId): string
     {
         (new MontonioPaymentsService())->createOrder($orderId);
@@ -621,9 +604,4 @@ class OrderController extends Controller
     {
         return view('orders.public.contacts');
     }
-
-//    public function test(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
-//    {
-//        return \view('test.test');
-//    }
 }

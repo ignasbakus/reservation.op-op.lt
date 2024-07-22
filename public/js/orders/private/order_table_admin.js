@@ -250,7 +250,7 @@ let Orders = {
                 createdRow: function (row, data, index) {
                 },
                 columns: [
-                    {title: "Užsakymo<br>Numeris", orderable: false},
+                    {title: "Užsakymo<br>Numeris", orderable: false, width: "13%"},
                     {title: "Užsakymo data", orderable: false},
                     {title: "Užsakytas batutas", orderable: false},
                     {title: "Užsakyta <br> nuo-iki"},
@@ -262,8 +262,8 @@ let Orders = {
                     {title: "Nuomos<br>trukmė", orderable: false},
                     {title: "Bendra<br>suma", orderable: false},
                     {title: "Avanso<br>suma", orderable: false},
-                    {title: "Užsakymo<br>būsena", orderable: false},
-                    {title: "Valdymas", orderable: false, width: "15%"}
+                    {title: "Užsakymo<br>būsena", orderable: false, width: "6%"},
+                    {title: "Valdymas", orderable: false, width: "10%"}
                 ],
                 bAutoWidth: false,
                 fixedColumns: true,
@@ -281,6 +281,10 @@ let Orders = {
             $('#orderTable .orderUpdate').on('click', (event) => {
                 event.stopPropagation()
                 this.Events.updateOrder($(event.currentTarget).data('orderid'))
+            })
+            $('#orderTable .checkOrderStatus').on('click', (event) => {
+              event.stopPropagation()
+                this.Events.checkOrderStatus($(event.currentTarget).data('orderid'))
             })
         },
         Events: {
@@ -327,6 +331,38 @@ let Orders = {
             },
             updateOrder: function (OrderID) {
                 Orders.Modals.updateOrder.prepareModal(OrderID)
+            },
+            checkOrderStatus: function (OrderID){
+                $('#overlay').css('display', 'flex')
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    method: "GET",
+                    url: "/status",
+                    data: {
+                        OrderId: OrderID
+                    }
+                }).done((response) => {
+                    $('#overlay').hide();
+                    console.log('AJAX Response:', response);
+
+                    if (response.status === 'changed' || response.status === 'unchanged') {
+                        $('#successAlertMessage').text(response.message);
+                        $('#successAlert').show().css('display', 'flex');
+                        Orders.Events.dismissAlertsAfterTimeout('#successAlert', 5000);
+
+                        // If the table needs to be updated
+                        if (response.status === 'changed') {
+                            Orders.Table.Table.draw();
+                        }
+                    }
+                    if (!response.status){
+                        $('#failedAlertMessage').text(response.message);
+                        $('#failedAlert').show().css('display', 'flex');
+                        Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
+                    }
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                })
             }
         }
     },
@@ -641,7 +677,7 @@ let Orders = {
         dismissAlertsAfterTimeout: function (alertId, timeout){
             setTimeout(function() {
                 $(alertId).fadeOut('slow', function() {
-                    $(this).alert('close');
+                    $(this).css('display', 'none')
                 });
             }, timeout);
         }

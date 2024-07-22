@@ -432,7 +432,7 @@ let Trampolines = {
         dismissAlertsAfterTimeout: function (alertId, timeout){
             setTimeout(function() {
                 $(alertId).fadeOut('slow', function() {
-                    $(this).alert('close');
+                    $(this).css('display', 'none');
                 });
             }, timeout);
         }
