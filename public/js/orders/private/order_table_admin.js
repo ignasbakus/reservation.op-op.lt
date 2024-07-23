@@ -19,17 +19,22 @@ let isWeeklyFilterActive = false;
 let Variables = {
     orderFormInput: [
         'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity',
-        'customerDeliveryPostCode', 'customerDeliveryAddress', 'customerDeliveryTime'
+        'customerDeliveryPostCode', 'customerDeliveryAddress', 'customerDeliveryTime', 'emailType'
     ],
     getOrderFormInputs: function (ModalID) {
         let values = {}
         this.orderFormInput.forEach(function (inputName) {
-            values[inputName] = $('#' + ModalID + ' input[name=' + inputName + ']').val()
+            if (inputName === 'emailType') {
+                values[inputName] = $('#' + ModalID + ' select[name=' + inputName + ']').val(); // Correctly get the selected value from the dropdown
+            } else {
+                values[inputName] = $('#' + ModalID + ' input[name=' + inputName + ']').val(); // Get the value from the input fields
+            }
         })
-        values.trampolines = trampolines
-        return values
+        values.trampolines = trampolines;
+        return values;
     }
 }
+
 let FormatDays = {
     formCorrectFirstVisibleDay: function (firstVisibleDay) {
         firstVisibleDay.setUTCHours(firstVisibleDay.getUTCHours() + 3)
@@ -187,6 +192,7 @@ let Orders = {
     init: function () {
         this.Modals.deleteOrder.init()
         this.Modals.updateOrder.init()
+        this.Modals.sendEmailModal.init()
         this.Table.init()
     },
     Table: {
@@ -221,7 +227,7 @@ let Orders = {
                 filter: true,
                 responsive: true,
                 language: {search: "_INPUT_", searchPlaceholder: "Ieškoti"},
-                searchDelay     : 1000,
+                searchDelay: 1000,
                 order: [],
                 serverSide: true,
                 ajax: {
@@ -263,7 +269,7 @@ let Orders = {
                     {title: "Bendra<br>suma", orderable: false},
                     {title: "Avanso<br>suma", orderable: false},
                     {title: "Užsakymo<br>būsena", orderable: false, width: "6%"},
-                    {title: "Valdymas", orderable: false, width: "10%"}
+                    {title: "Valdymas", orderable: false, width: "7%"}
                 ],
                 bAutoWidth: false,
                 fixedColumns: true,
@@ -283,8 +289,12 @@ let Orders = {
                 this.Events.updateOrder($(event.currentTarget).data('orderid'))
             })
             $('#orderTable .checkOrderStatus').on('click', (event) => {
-              event.stopPropagation()
+                event.stopPropagation()
                 this.Events.checkOrderStatus($(event.currentTarget).data('orderid'))
+            })
+            $('#orderTable .sendMail').on('click', (event) => {
+                event.stopPropagation()
+                this.Events.sendEmail($(event.currentTarget).data('orderid'))
             })
         },
         Events: {
@@ -332,7 +342,7 @@ let Orders = {
             updateOrder: function (OrderID) {
                 Orders.Modals.updateOrder.prepareModal(OrderID)
             },
-            checkOrderStatus: function (OrderID){
+            checkOrderStatus: function (OrderID) {
                 $('#overlay').css('display', 'flex')
                 $.ajax({
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
@@ -355,7 +365,7 @@ let Orders = {
                             Orders.Table.Table.draw();
                         }
                     }
-                    if (!response.status){
+                    if (!response.status) {
                         $('#failedAlertMessage').text(response.message);
                         $('#failedAlert').show().css('display', 'flex');
                         Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
@@ -363,6 +373,9 @@ let Orders = {
                 }).fail((jqXHR) => {
                     $('#overlay').hide();
                 })
+            },
+            sendEmail: function (OrderID) {
+                Orders.Modals.sendEmailModal.prepareModal(OrderID)
             }
         }
     },
@@ -504,8 +517,12 @@ let Orders = {
                     $('#overlay').hide();
                     if (response.status) {
                         CalendarFunctions.Calendar.initializeCalendar(response.Dates.CalendarInitial)
-                    } else {
-                        console.error("Failed to fetch data: ", response.message);
+                    }
+                    if (!response.status) {
+                        this.element.hide()
+                        $('#failedAlertMessage').text(response.message);
+                        $('#failedAlert').show().css('display', 'flex');
+                        Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
                     }
                 }).fail((jqXHR) => {
                     $('#overlay').hide();
@@ -671,12 +688,117 @@ let Orders = {
                     }
                 }
             }
+        },
+        sendEmailModal: {
+            EmailOrderId: 0,
+            dataForm: {
+              customerEmail: {
+                  set: function (Value) {
+                      $('#sendEmailModal input[name=customerEmail]').val(Value)
+                  }
+              }
+            },
+            fillDataForm: function (BackendResponse){
+                this.dataForm.customerEmail.set(BackendResponse.client.email)
+            },
+            getDataForModal: function (){
+                $('#overlay').css('display', 'flex')
+                $.ajax({
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    dataType: 'json',
+                    method: "GET",
+                    url: "/orders/admin/order/getOrderUpdateData",
+                    data: {
+                        order_id: Orders.Modals.sendEmailModal.EmailOrderId,
+                        target_start_date: firstVisibleDayOnCalendar,
+                        target_end_date: lastVisibleDayOnCalendar
+                    }
+                }).done((response) => {
+                    $('#overlay').hide();
+                    if (response.status) {
+                        this.fillDataForm(response.order)
+                    } else {
+                        console.error("Failed to fetch data: ", response.message);
+                    }
+                }).fail((jqXHR) => {
+                    $('#overlay').hide();
+                    Orders.Modals.updateOrder.element.hide()
+                    let errorMessage = 'An error occurred';
+                    if (jqXHR.responseJSON) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseJSON.message;
+                    } else if (jqXHR.responseText) {
+                        errorMessage = 'Nepavyko užkrauti užsakymo: ' + jqXHR.responseText;
+                    }
+                    $('#failedAlertMessage').text(errorMessage);
+                    $('#failedAlert').show().css('display', 'flex');
+                    Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
+                })
+            },
+            init: function () {
+                this.Events.init()
+            },
+            element: new bootstrap.Modal('#sendEmailModal'),
+            prepareModal: function (orderID) {
+                this.EmailOrderId = orderID
+                this.element.show()
+            },
+            Events: {
+                init: function () {
+                    $('#sendEmailModal').on('shown.bs.modal', function () {
+                        Orders.Modals.sendEmailModal.getDataForModal()
+                    })
+                    $('#sendEmailModal .modalClose').on('click', (event) => {
+                        event.stopPropagation();
+                        $('#sendEmailModal input[name=customerEmail]').val('');
+                    })
+                    $('#sendEmailModal .sendEmail').on('click', (event) => {
+                        event.stopPropagation();
+                        this.sendEmail()
+                    })
+                },
+                sendEmail: function (){
+                    $('#overlay').css('display', 'flex')
+                    let form_data = Variables.getOrderFormInputs('sendEmailModal')
+                    form_data.orderID = Orders.Modals.sendEmailModal.EmailOrderId
+                    $.ajax({
+                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                        method: "POST",
+                        url: "/orders/admin/order/sendEmail",
+                        data: form_data,
+                    }).done((response) => {
+                        $('#overlay').hide();
+                        if (response.status === false) {
+                            $('#failedAlertMessage').text(response.message);
+                            $('#failedAlert').show().css('display', 'flex');
+                            Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
+                        }
+                        if (response.status) {
+                            $('#successAlertMessage').text(response.message)
+                            $('#successAlert').show().css('display', 'flex')
+                            Orders.Events.dismissAlertsAfterTimeout('#successAlert', 5000)
+                        }
+                        Orders.Modals.sendEmailModal.element.hide()
+                    }).fail((jqXHR) => {
+                        $('#overlay').hide();
+                        Orders.Modals.updateOrder.element.hide()
+                        let errorMessage = 'An error occurred';
+                        if (jqXHR.responseJSON) {
+                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseJSON.message;
+                        } else if (jqXHR.responseText) {
+                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseText;
+                        }
+                        $('#failedAlertMessage').text(errorMessage);
+                        $('#failedAlert').show().css('display', 'flex');
+                        Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
+                    })
+                }
+            }
         }
     },
     Events: {
-        dismissAlertsAfterTimeout: function (alertId, timeout){
-            setTimeout(function() {
-                $(alertId).fadeOut('slow', function() {
+        dismissAlertsAfterTimeout: function (alertId, timeout) {
+            setTimeout(function () {
+                $(alertId).fadeOut('slow', function () {
                     $(this).css('display', 'none')
                 });
             }, timeout);

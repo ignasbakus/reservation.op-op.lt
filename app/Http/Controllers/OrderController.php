@@ -454,6 +454,24 @@ class OrderController extends Controller
             ])->render()
         ]);
     }
+    public function updateDeliveryTime(): JsonResponse
+    {
+        $deliveryTime = (new TrampolineOrder())->updateDeliveryTime(\request());
+//        dd($deliveryTime['view']);
+        if ($deliveryTime['status']) {
+            return response()->json([
+                'status' => true,
+                'deliveryTime' => $deliveryTime['deliveryTime'],
+                'view' => $deliveryTime['view'],
+                'message' => 'Delivery time updated successfully',
+            ]);
+        } else {
+            return response()->json([
+                'status' => false,
+                'failed_inputs' => $deliveryTime['failedInputs'] ?? []
+            ]);
+        }
+    }
     public function orderDelete(): JsonResponse
     {
         return response()->json((new TrampolineOrder())->delete(\request()->input('orderID')));
@@ -474,35 +492,23 @@ class OrderController extends Controller
             ]);
         }
     }
-    public function updateDeliveryTime(): JsonResponse
+    public function initializeOrderUpdateCalendar(): JsonResponse
     {
-        $deliveryTime = (new TrampolineOrder())->updateDeliveryTime(\request());
-//        dd($deliveryTime);
-        if ($deliveryTime['status']) {
+        $order = (new TrampolineOrder())->initializeUpdateCalendar(\request()->get('order_id'));
+//        dd($order);
+        if (!$order['status']){
             return response()->json([
-                'status' => true,
-                'deliveryTime' => $deliveryTime['deliveryTime'],
-                'message' => 'Delivery time updated successfully',
+                'status' => $order['status'],
+                'message' => $order['message']
             ]);
         } else {
             return response()->json([
-                'status' => false,
-                'failed_inputs' => $deliveryTime['failedInputs'] ?? []
+                'status' => $order['status'],
+                'Dates' => (object)[
+                    'CalendarInitial' => Carbon::parse($order['rentalStart'])->format('Y-m-d')
+                ]
             ]);
         }
-    }
-    public function initializeOrderUpdateCalendar(): JsonResponse
-    {
-        $orderID = \request()->get('order_id');
-        $order = (new TrampolineOrder())->read($orderID);
-        $rentalStart = $order->trampolines()->pluck('rental_start')->first();
-
-        return response()->json([
-            'status' => true,
-            'Dates' => (object)[
-                'CalendarInitial' => Carbon::parse($rentalStart)
-            ]
-        ]);
     }
     public function prepareOrderUpdateModalInfo(): JsonResponse
     {
@@ -600,8 +606,15 @@ class OrderController extends Controller
     {
         return view('orders.public.delivery_prices');
     }
-    public function contactsIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+
+    public function sendAdditionalEmail(): array
     {
-        return view('orders.public.contacts');
+        return (new TrampolineOrder())->sendAdditionalEmail(\request());
     }
+
+//    public function contactsIndex(): Factory|Application|View|\Illuminate\Contracts\Foundation\Application
+//    {
+//        return view('orders.public.contacts');
+//    }
+
 }

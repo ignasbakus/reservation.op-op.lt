@@ -14,6 +14,7 @@ use App\Mail\user\orderUpdated;
 use App\Models\Client;
 use App\Models\ClientAddress;
 use App\Models\OrdersTrampoline;
+use App\MontonioPayments\MontonioPaymentsService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -178,6 +179,8 @@ class TrampolineOrder implements Order
             $this->failedInputs->add('error', 'Nepavyko atnaujinti. Užsakymas nerastas.');
             return $this;
         }
+
+
         $datesChanged = false;
 
         $rentalStartDb = Carbon::parse($order->trampolines()->first()->rental_start)->format('Y-m-d');
@@ -297,8 +300,8 @@ class TrampolineOrder implements Order
                     Mail::to($order->client->email)->send(new OrderDeleted($order));
             }
             $order->trampolines()->delete();
-            $order->client()->delete();
-            $order->address()->delete();
+//            $order->client()->delete();
+//            $order->address()->delete();
             $order->paymentCreationLog()->delete();
             $order->paymentWebhooksLog()->delete();
             $this->status = $order->delete();
@@ -387,8 +390,8 @@ class TrampolineOrder implements Order
             $orderDate = Carbon::parse($order->order_date);
             if (abs($now->diffInHours($orderDate, false)) > 48) {
                 $order->trampolines()->delete();
-                $order->client()->delete();
-                $order->address()->delete();
+//                $order->client()->delete();
+//                $order->address()->delete();
                 $this->status = $order->delete();
                 $this->Messages[] = 'Neapmokėti užsakymai ištrinti sėkmingai !';
             }
@@ -547,7 +550,11 @@ class TrampolineOrder implements Order
             return [
                 'status' => true,
                 'message' => 'Delivery time updated successfully.',
-                'deliveryTime' => $customerDeliveryTime
+                'deliveryTime' => $customerDeliveryTime,
+                'view' => \view('orders.public.order_info', [
+                    'Order' => (new \App\Models\Order())->newQuery()->with('trampolines')->with('client')
+                        ->with('address')->find($order->id),
+                ])->render()
             ];
         } else {
             return [
@@ -556,5 +563,52 @@ class TrampolineOrder implements Order
             ];
         }
 
+    }
+
+    public function initializeUpdateCalendar($orderID): array
+    {
+        $order = \App\Models\Order::find($orderID);
+        $orderActive = $order->trampolines()->where('is_active', 1)->exists();
+        if (!$orderActive) {
+            return [
+                'status' => false,
+                'message' => 'Užsakymas neaktyvus, redaguoti negalima.'
+            ];
+        }
+        $rentalStart = $order->trampolines()->pluck('rental_start')->first();
+        return [
+            'status' => true,
+            'rentalStart' => $rentalStart
+        ];
+    }
+
+    public function sendAdditionalEmail($Request): array
+    {
+        if ((config('mail.send_email') === false)) {
+            return [
+                'status' => false,
+                'message' => 'El. pašto siuntimas išjungtas.'
+            ];
+        }
+        $order = \App\Models\Order::find($Request->input('orderID'));
+        $email = $Request->input('customerEmail');
+        switch ($Request->input('emailType')) {
+            case 'OrderPaid':
+                Mail::to($email)->send(new OrderPaid($order));
+                break;
+            case 'OrderPlaced':
+                Mail::to($email)->send(new OrderPlaced(
+                    $order,
+                    (new MontonioPaymentsService())->retrievePaymentLink($Request->input('orderID'))
+                ));
+                break;
+            case 'OrderNotPaid':
+                Mail::to($email)->send(new OrderNotPaid($order));
+                break;
+        }
+        return [
+            'status' => true,
+            'message' => 'El. laiškas išsiųstas.'
+        ];
     }
 }

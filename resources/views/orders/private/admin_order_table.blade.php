@@ -62,7 +62,7 @@
             </div>
         </div>
         <div class="modal fade" id="updateOrderModal" data-bs-backdrop="static" tabindex="-1"
-             aria-labelledby="updateOrderModal" aria-hidden="true">
+                   aria-labelledby="updateOrderModal" aria-hidden="true">
             <div class="modal-dialog modal-fullscreen">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -173,6 +173,41 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="sendEmailModal" data-bs-backdrop="static" tabindex="-1"
+             aria-labelledby="updateOrderModal" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-sm">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="exampleModalLabel">El. laiško  pakartotinis siuntimas</h1>
+                        <button type="button" class="btn-close modalClose" data-bs-dismiss="modal"
+                                aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col">
+                                <label for="recipientEmail" class="form-label">Gavėjo el. paštas</label>
+                                <input type="email" id="recipientEmail" name="customerEmail" class="form-control" value="">
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col">
+                                <label for="randomValues" class="form-label">El. laiško tipas</label>
+                                <select name="emailType" class="form-select">
+                                    <option value="OrderPaid">Gautas apmokėjimas</option>
+                                    <option value="OrderPlaced">Gautas užsakymas</option>
+                                    <option value="OrderNotPaid">Užsakymas neapmokėtas</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary modalClose" data-bs-dismiss="modal">Uždaryti</button>
+                        <button type="submit" class="btn btn-primary sendEmail">Siųsti</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="alert alert-warning alert-dismissible fade show custom-alert" id="failedAlert" role="alert"
              style="display: none;">
             <span id="failedAlertMessage"></span>

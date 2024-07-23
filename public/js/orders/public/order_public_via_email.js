@@ -426,7 +426,8 @@ let CalendarFunctions = {
             TrampolineOrder.UpdateOrder.getDataForModal();
         },
         goToInitialDates: function () {
-            this.calendar.gotoDate(eventDay);
+            console.log('event day', eventDay)
+            CalendarFunctions.Calendar.calendar.gotoDate(eventDay);
         },
     },
     addEvent: function (EventsToAdd) {
@@ -627,13 +628,13 @@ let TrampolineOrder = {
                         }
                     }
                     if (!response.status) {
-
                         $('#failedAlertMessage').text(response.failed_input.error[0]);
                         $('#failedAlert').show().css('display', 'flex');
                         TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
                         if (PcCalendar) {
+                            // console.log('paetkom')
                             CalendarFunctions.Calendar.calendar.removeAllEvents();
-                            CalendarFunctions.Calendar.goToInitialDates();
+                            TrampolineOrder.UpdateOrder.getDataForModal()
                             $('#confirmationContainer').css('display', 'none');
                         }
                         if (mobileCalendar) {
@@ -661,7 +662,6 @@ let TrampolineOrder = {
                         $('#thankYouDiv').html(response.view);
                         flatPickerFunctions.flatPickerTime.defaultTime = response.deliveryTime
                         TrampolineOrder.ChangeOrderDatesModal.element.hide()
-
                     }
                     if (!response.status) {
                         $('#failedAlertMessage').text(response.failed_input.error[0]);

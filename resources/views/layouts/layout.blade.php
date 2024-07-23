@@ -37,9 +37,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('contactsIndex') }}">Kontaktai</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('deliveryPricesIndex') }}">Pristatymo kainos</a>
-                    </li>
+{{--                    <li class="nav-item">--}}
+{{--                        <a class="nav-link" href="{{ route('deliveryPricesIndex') }}">Pristatymo kainos</a>--}}
+{{--                    </li>--}}
                 </ul>
             </div>
         </div>
