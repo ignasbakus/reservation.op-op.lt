@@ -656,6 +656,7 @@ let Orders = {
                     form_data.orderID = Orders.Modals.updateOrder.orderIdToUpdate
                     form_data.firstVisibleDay = firstVisibleDayOnCalendar
                     form_data.lastVisibleDay = lastVisibleDayOnCalendar
+                    console.log('form_data => ', form_data)
                     $.ajax({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         method: "PUT",
