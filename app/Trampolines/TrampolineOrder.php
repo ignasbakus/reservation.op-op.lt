@@ -290,7 +290,7 @@ class TrampolineOrder implements Order
             Mail::to($updatedOrder ->client->email)->send(new orderUpdated($updatedOrder ));
             Mail::to(config('mail.admin_email'))->send(new adminOrderUpdated($updatedOrder));
         }
-        dd($this);
+        dd($this->Order->address);
     }
 
     public function delete($request): static
