@@ -242,7 +242,7 @@ class TrampolineOrder implements Order
                 'address_postcode' => $trampolineOrderData->PostCode
             ]
         );
-        dd($this->Order->address);
+        dd($this->Order->client);
         $OrderTotalSum = 0;
         $OrderRentalDuration = 0;
         try {
