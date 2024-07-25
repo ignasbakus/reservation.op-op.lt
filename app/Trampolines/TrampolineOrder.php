@@ -218,12 +218,12 @@ class TrampolineOrder implements Order
                 return $this;
             }
         }
-        $Order = \App\Models\Order::find($trampolineOrderData->orderID);
-        $this->Order = $Order;
-//        dd($this->Order . ' ' . $trampolineOrderData->PostCode);
+
+        $this->Order = \App\Models\Order::find($trampolineOrderData->orderID);
+//        dd($this->Order . ' ' . $trampolineOrderData->orderID);
         Client::updateOrCreate(
             [
-                'id' => $Order->client_id
+                'id' => $this->Order->client_id
             ],
             [
                 'name' => $trampolineOrderData->CustomerName,
@@ -232,17 +232,31 @@ class TrampolineOrder implements Order
                 'phone' => $trampolineOrderData->CustomerPhone
             ]
         );
-        ClientAddress::updateOrCreate(
-            [
-                'clients_id' => $Order->delivery_address_id,
-            ],
-            [
-                'address_street' => $trampolineOrderData->Address,
-                'address_town' => $trampolineOrderData->City,
-                'address_postcode' => $trampolineOrderData->PostCode
-            ]
-        );
-        dd($this->Order->client);
+        try {
+            Log::info('Attempting to update or create client address.', [
+                'clients_id' => $this->Order->delivery_address_id,
+                'data' => [
+                    'address_street' => $trampolineOrderData->Address,
+                    'address_town' => $trampolineOrderData->City,
+                    'address_postcode' => $trampolineOrderData->PostCode
+                ]
+            ]);
+
+            $clientAddress = ClientAddress::updateOrCreate(
+                ['clients_id' => $this->Order->delivery_address_id],
+                [
+                    'address_street' => $trampolineOrderData->Address,
+                    'address_town' => $trampolineOrderData->City,
+                    'address_postcode' => $trampolineOrderData->PostCode
+                ]
+            );
+
+            Log::info('Client address updated or created successfully.', ['client_address' => $clientAddress]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating or creating client address: ' . $e->getMessage());
+        }
+//        dd($this->Order->address);
         $OrderTotalSum = 0;
         $OrderRentalDuration = 0;
         try {
@@ -253,7 +267,7 @@ class TrampolineOrder implements Order
                 $Trampoline = \App\Models\Trampoline::with('Parameter')->find($trampoline['id']);
                 $this->OrderTrampolines[] = OrdersTrampoline::updateOrCreate(
                     [
-                        'orders_id' => $Order->id,
+                        'orders_id' => $this->Order->id,
                         'trampolines_id' => $Trampoline->id,
                     ],
                     [
@@ -287,8 +301,8 @@ class TrampolineOrder implements Order
         $this->status = true;
         $this->Messages[] = 'Užsakymas atnaujintas sėkmingai !';
         if (config('mail.send_email') === true) {
-            $updatedOrder = \App\Models\Order::find($Order->id); // Ensure we have the latest order info
-            Mail::to($updatedOrder->client->email)->send(new orderUpdated($updatedOrder ));
+            $updatedOrder = \App\Models\Order::find($this->Order->id); // Ensure we have the latest order info
+            Mail::to($updatedOrder ->client->email)->send(new orderUpdated($updatedOrder ));
             Mail::to(config('mail.admin_email'))->send(new adminOrderUpdated($updatedOrder));
         }
         return $this;
