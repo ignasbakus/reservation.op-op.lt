@@ -218,12 +218,12 @@ class TrampolineOrder implements Order
                 return $this;
             }
         }
-
-        $this->Order = \App\Models\Order::find($trampolineOrderData->orderID);
-        dd($this->Order . ' ' . $trampolineOrderData->PostCode);
+        $Order = \App\Models\Order::find($trampolineOrderData->orderID);
+        $this->Order = $Order;
+//        dd($this->Order . ' ' . $trampolineOrderData->PostCode);
         Client::updateOrCreate(
             [
-                'id' => $this->Order->client_id
+                'id' => $Order->client_id
             ],
             [
                 'name' => $trampolineOrderData->CustomerName,
@@ -234,7 +234,7 @@ class TrampolineOrder implements Order
         );
         ClientAddress::updateOrCreate(
             [
-                'clients_id' => $this->Order->delivery_address_id,
+                'clients_id' => $Order->delivery_address_id,
             ],
             [
                 'address_street' => $trampolineOrderData->Address,
@@ -253,7 +253,7 @@ class TrampolineOrder implements Order
                 $Trampoline = \App\Models\Trampoline::with('Parameter')->find($trampoline['id']);
                 $this->OrderTrampolines[] = OrdersTrampoline::updateOrCreate(
                     [
-                        'orders_id' => $this->Order->id,
+                        'orders_id' => $Order->id,
                         'trampolines_id' => $Trampoline->id,
                     ],
                     [
@@ -287,8 +287,8 @@ class TrampolineOrder implements Order
         $this->status = true;
         $this->Messages[] = 'Užsakymas atnaujintas sėkmingai !';
         if (config('mail.send_email') === true) {
-            $updatedOrder = \App\Models\Order::find($this->Order->id); // Ensure we have the latest order info
-            Mail::to($updatedOrder ->client->email)->send(new orderUpdated($updatedOrder ));
+            $updatedOrder = \App\Models\Order::find($Order->id); // Ensure we have the latest order info
+            Mail::to($updatedOrder->client->email)->send(new orderUpdated($updatedOrder ));
             Mail::to(config('mail.admin_email'))->send(new adminOrderUpdated($updatedOrder));
         }
         return $this;
