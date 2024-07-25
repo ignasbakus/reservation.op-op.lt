@@ -12,7 +12,7 @@
 {{--            </div>--}}
 {{--        </div>--}}
         <div class="row mt-5">
-            <div class="col-12 col-lg-6 mt-5 mb-3">
+            <div class="col-12 col-lg-6 mb-3 mt-lg-5">
                 <div id="trampolinesCarousel" class="carousel slide" data-bs-theme="dark">
                     <div class="carousel-inner">
                         @foreach($Trampolines as $Trampoline)
