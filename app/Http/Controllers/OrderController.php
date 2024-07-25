@@ -383,7 +383,7 @@ class OrderController extends Controller
     {
 //        dd(\request()->get('trampolines[0][rental_start]'));
         $Order = (new TrampolineOrder())->update(new TrampolineOrderData(\request()));
-        dd($Order->Order->address);
+//        dd($Order->Order->address);
         if (!isset($Order->Order)) {
             return response()->json([
                 'status' => false,

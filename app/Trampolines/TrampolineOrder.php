@@ -167,6 +167,7 @@ class TrampolineOrder implements Order
 
     public function update(TrampolineOrderData $trampolineOrderData): static
     {
+        dd($trampolineOrderData);
         if (!$trampolineOrderData->ValidationStatus) {
             $this->failedInputs = $trampolineOrderData->failedInputs;
             $this->status = false;
