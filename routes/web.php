@@ -14,8 +14,8 @@ Route::controller(PaymentsController::class)->group(function () {
 
 Route::controller(OrderController::class)->prefix('orders')->group(function () {
     /*For admin usage (authenticated user)*/
-    Route::prefix('admin')->group(function () {
-        Route::get('/', 'adminGetIndex')->name("orderTableIndex"); //http://locahost:8000/orders/admin
+    Route::middleware('auth')->prefix('admin')->group(function () {
+        Route::get('/', 'adminGetIndex')->name("orderTableIndex");
         /* Route for admin managing of orders */
         Route::prefix('order')->group(function () {
             Route::get('getOrderUpdateData', 'prepareOrderUpdateModalInfo');
@@ -67,7 +67,7 @@ Route::controller(TrampolinesController::class)->group(function () {
     Route::prefix('trampolines')->group(function () {
         Route::post('public/render_selected_view', 'publicRenderSelectedTrampolines')->name('trampolinesPublicSectionA');
         //http://localhost:8000/trampolines/admin/
-        Route::prefix('admin')->group(function () {
+        Route::middleware('auth')->prefix('admin')->group(function () {
             Route::get('/', 'privateIndex')->name('adminIndex');
             /*http://locahost:8000/trampolines/admin/trampoline [GET/POST/PUT/DELETE]*/
             Route::prefix('trampoline')->group(function () {
@@ -87,4 +87,4 @@ Route::controller(TrampolinesController::class)->group(function () {
 
 Auth::routes();
 
-#Route::get('/home', [TrampolinesController::class, 'publicIndex']);
+Route::get('/home', [TrampolinesController::class, 'publicIndex']);
