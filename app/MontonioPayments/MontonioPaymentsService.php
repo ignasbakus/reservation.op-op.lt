@@ -81,6 +81,8 @@ class MontonioPaymentsService
         $notificationUrl = config('montonio.webhook_url');
         $order = Order::find($orderId);
         $client = \App\Models\Client::find($order->client_id);
+//        dd(config('montonio.payment_duration'));
+        $exp = (int) config('montonio.payment_duration');
 
         $grandTotal = number_format((float)$order->advance_sum, 2, '.', '');
         $payload = [
@@ -91,7 +93,7 @@ class MontonioPaymentsService
             'currency' => 'EUR',
             'grandTotal' => (float)$grandTotal,
             'locale' => 'lt',
-            'expiresIn' => config('montonio.payment_duration'),
+            'expiresIn' => $exp,
             'billingAddress' => [
                 'firstName' => $client->name,
                 'lastName' => $client->surname,
@@ -115,7 +117,7 @@ class MontonioPaymentsService
             "methodOptions" => [
                 "preferredCountry" => "LT",
                 "preferredLocale" => "lt",
-                "paymentDescription" => "Avansas už užsakymą " . $orderId
+                "paymentDescription" => "Avansas už užsakymą Nr. " . $order->order_number,
             ],
         ];
 

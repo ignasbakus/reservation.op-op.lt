@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -109,7 +110,7 @@ class TrampolineOrder implements Order
 
         try {
             $this->Order = \App\Models\Order::create([
-                'order_number' => Str::uuid(),
+                'order_number' => Str::random(7),
                 'order_date' => Carbon::now()->format('Y-m-d H:i:s'),
                 'rental_duration' => 0,
                 'delivery_address_id' => $ClientAddress->id,
@@ -184,13 +185,17 @@ class TrampolineOrder implements Order
 
 
         $datesChanged = false;
-        $days = (int) config('trampolines.amount_of_days');
-        $rentalStartDb = Carbon::parse($order->trampolines()->first()->rental_start)->format('Y-m-d');
-        if (Carbon::now()->startOfDay()->addDays($days) > $rentalStartDb) {
-            $this->status = false;
-            $this->failedInputs->add('error', 'Užsakymo atnaujinti negalima, nes liko mažiau nei ' . $days .  ' dienos iki pirmosios rezervacijos dienos');
-            return $this;
+
+        if (!Auth::check()) {
+            $days = (int) config('trampolines.amount_of_days');
+            $rentalStartDb = Carbon::parse($order->trampolines()->first()->rental_start)->format('Y-m-d');
+            if (Carbon::now()->startOfDay()->addDays($days) > $rentalStartDb) {
+                $this->status = false;
+                $this->failedInputs->add('error', 'Užsakymo atnaujinti negalima, nes liko mažiau nei ' . $days .  ' dienos iki pirmosios rezervacijos dienos');
+                return $this;
+            }
         }
+
         foreach ($trampolineOrderData->Trampolines as $trampoline) {
             $existingTrampoline = $order->trampolines()->where('trampolines_id', $trampoline['id'])->first();
 
