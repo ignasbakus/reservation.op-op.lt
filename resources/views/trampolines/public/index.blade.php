@@ -5,6 +5,9 @@
 @endsection
 
 @section('content')
+{{--    <div>--}}
+{{--        <img alt="" src="images/coverPhoto/cover_photo.jpg" style="width: 100%; height: 700px;">--}}
+{{--    </div>--}}
     <div class="container">
         {{--        <div class="row">--}}
         {{--            <div class="col text-center mb-3">--}}

@@ -1,4 +1,5 @@
 @php use App\MontonioPayments\MontonioPaymentsService;
+ $exp = (int) config('montonio.payment_duration');
  @endphp
     <!DOCTYPE html>
 <html>
@@ -65,7 +66,7 @@
         <h2>Avansą apmokėti galite čia: <a
                 href="{{ $paymentLink }}">Spauskite čia</a></h2>
         <br>
-        <h4>Jei neapmokėsite avanso per {{config('montonio.payment_duration')}} min., jūsų užsakymas bus atšauktas</h4>
+        <h4>Jei neapmokėsite avanso per {{$exp}} min., jūsų užsakymas bus atšauktas</h4>
     </div>
     <div class="order-details">
         <h2>Užsakymo detalės</h2>

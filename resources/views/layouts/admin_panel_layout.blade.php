@@ -105,12 +105,21 @@
                             </svg>
                         </a>
                         <ul class="dropdown-menu text-small shadow">
-                            <li><a class="dropdown-item" href="#">Keisti slaptažodį</a></li>
-                            <li><a class="dropdown-item" href="#">Sukurti paskyrą</a></li>
-                            <li>
-                                <hr class="dropdown-divider">
+                            <li class="px-3 py-2">
+                                <strong>{{ Auth::user()->name }}</strong>
                             </li>
-                            <li><a class="dropdown-item" href="#">Atsijungti</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <!-- Change Password Link -->
+                            <!-- Logout Link -->
+                            <li>
+                                <a class="dropdown-item" href="{{ route('logout') }}"
+                                   onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                    Atsijungti
+                                </a>
+                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                    @csrf
+                                </form>
+                            </li>
                         </ul>
                     </div>
                 </div>

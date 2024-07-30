@@ -18,61 +18,61 @@
                 <form id="orderForm" class="needs-validation" novalidate>
                     <div class="row">
                         <div class="form-group col-6">
-                            <label for="customerName">Vardas</label>
+                            <label for="customerName">Vardas <span class="required-asterisk">*</span></label>
                             <input name="customerName" type="text" class="form-control" id="customerName"
                                    placeholder="Įveskite vardą" required>
                             <div class="invalid-feedback customerNameInValidFeedback"></div>
                         </div>
                         <div class="form-group col-6">
-                            <label for="customerSurname">Pavardė</label>
+                            <label for="customerSurname">Pavardė <span class="required-asterisk">*</span></label>
                             <input name="customerSurname" type="text" class="form-control" id="customerSurname"
                                    placeholder="Įveskite pavardę" required>
                             <div class="invalid-feedback customerSurnameInValidFeedback"></div>
                         </div>
                     </div>
                     <div class="form-group mt-3">
-                        <label for="customerPhoneNumber">Telefono Numeris</label>
+                        <label for="customerPhoneNumber">Telefono Numeris <span class="required-asterisk">*</span></label>
                         <input name="customerPhoneNumber" type="tel" class="form-control" id="customerPhoneNumber"
                                placeholder="Įveskite telefono numerį">
                         <div class="invalid-feedback customerPhoneNumberInValidFeedback"></div>
                     </div>
                     <div class="form-group mt-3">
-                        <label for="customerEmail">El. Paštas</label>
+                        <label for="customerEmail">El. Paštas <span class="required-asterisk">*</span></label>
                         <input name="customerEmail" type="email" class="form-control" id="customerEmail"
                                placeholder="Įveskite el. paštą" required>
                         <div class="invalid-feedback customerEmailInValidFeedback"></div>
                     </div>
                     <div class="row mt-3">
                         <div class="form-group col-6">
-                            <label for="customerDeliveryCity">Pristatymo Miestas</label>
+                            <label for="customerDeliveryCity">Pristatymo Miestas <span class="required-asterisk">*</span></label>
                             <input name="customerDeliveryCity" type="text" class="form-control"
                                    id="customerDeliveryCity"
                                    placeholder="Įveskite pristatymo miestą" required>
                             <div class="invalid-feedback customerDeliveryCityInValidFeedback"></div>
                         </div>
                         <div class="form-group col-6">
-                            <label for="customerDeliveryPostCode">Pašto Kodas</label>
+                            <label for="customerDeliveryPostCode">Pašto Kodas <span class="required-asterisk">*</span></label>
                             <input name="customerDeliveryPostCode" type="text" class="form-control"
                                    id="customerDeliveryPostCode" placeholder="Įveskite pašto kodą" required>
                             <div class="invalid-feedback customerDeliveryPostCodeInValidFeedback"></div>
                         </div>
                     </div>
                     <div class="form-group mt-3">
-                        <label for="customerDeliveryAddress">Pristatymo Adresas</label>
+                        <label for="customerDeliveryAddress">Pristatymo Adresas <span class="required-asterisk">*</span></label>
                         <input name="customerDeliveryAddress" class="form-control" id="customerDeliveryAddress"
                                placeholder="Įveskite pristatymo adresą" required>
                         <div class="invalid-feedback customerDeliveryAddressNameInValidFeedback"></div>
                     </div>
                     <div class="row mt-3" id="orderDates">
                         <div class="form-group col">
-                            <label for="flatPickerCalendar">Užsakymo datos</label>
+                            <label for="flatPickerCalendar">Užsakymo datos <span class="required-asterisk">*</span></label>
                             <input name="flatPickerCalendar" class="form-control" type="text" id="flatPickerCalendar"
                                    placeholder="Pasirinkite datas" required>
                         </div>
                     </div>
                     <div class="row mt-3">
                         <div class="form-group col">
-                            <label for="customerDeliveryTime">Pristatymo laikas</label>
+                            <label for="customerDeliveryTime">Pristatymo laikas <span class="required-asterisk">*</span></label>
                             <input name="customerDeliveryTime" class="form-control" type="time"
                                    id="customerDeliveryTime" placeholder="Pasirinkite pristatymo laiką" required>
                         </div>
@@ -89,7 +89,7 @@
                 </form>
             </div>
             <div class="col-lg-7 col-md-6 col-sm-12">
-                <div id="calendar"></div>
+                <div data-bs-toggle="tooltip" id="calendar"></div>
             </div>
             <div class="alert alert-warning alert-dismissible fade show custom-alert col-12 mt-3" id="failedAlert"
                  role="alert"
