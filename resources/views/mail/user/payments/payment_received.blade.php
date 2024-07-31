@@ -10,7 +10,7 @@
 <body>
 <div style="max-width: 600px; margin: 0 auto;">
     <div style="display: flex; justify-content: center; align-items: center; height: 100px; background-color: #B6D2F7; max-width: 650px; margin: 0 auto;">
-        <img src="/images/companyLogo/logo.png" style="width: 70px; display: block;" alt="logo">
+        <img src="https://op-op.lt/images/companyLogo/logo.png" width="70" height="70" style="display: block;" alt="logo" title="logo">
     </div>
     <div style="max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 50px;">
