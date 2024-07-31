@@ -111,27 +111,38 @@
         </div>
     </div>
 
-    <div
-        style="display: flex; flex-direction: column; align-items: center; justify-content: center; font-size: 12px; color: black; background-color: #B6D2F7; max-width: 650px; min-height: 150px; margin: 0 auto; padding: 20px; text-align: center;">
-        <!-- Facebook Icon -->
-        <a href="ADDLINKTOFACEBOOK" style="margin-bottom: 10px; text-decoration: none; color: black; font-family: 'Open Sans', sans-serif;" target="_blank">
-            <!-- Fallback text -->
-            <svg style="margin-bottom: 10px;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"></path>
-            </svg>
-            <span style="display: none;">Facebook</span>
-        </a>
+    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse;">
+        <tbody>
+        <tr>
+            <td style="text-align: center; font-size: 12px; color: black; vertical-align: middle;">
+                <!-- Facebook Icon -->
+                <a href="ADDLINKTOFACEBOOK" style="display: block; text-decoration: none; color: black; font-family: 'Open Sans', sans-serif;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"></path>
+                    </svg>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 16px; color: black; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="{{config('app.link_to_homepage')}}" style="text-decoration: none; color: black;" target="_blank">
+                    op-op.lt
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 18px; color: black; font-weight: 500; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="{{config('contactInfo.phone')}}" style="text-decoration: none; color: black;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
+                    </svg>
+                    {{config('contactInfo.phone')}}
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 
-        <a href="{{config('app.link_to_homepage')}}" style="font-size: 16px;">op-op.lt</a>
-        <a href="{{config('contactInfo.phone')}}"
-           style="font-size: 18px; font-weight: 500; text-decoration: none; color: black;">
-            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path
-                    d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
-            </svg>
-            {{config('contactInfo.phone')}}
-        </a>
-    </div>
 </div>
 </body>
 </html>
