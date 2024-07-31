@@ -74,7 +74,7 @@
         </div>
 
         <div style="font-weight: 500; font-size: 1.5rem;">
-            <p style="font-size: 15px; margin-bottom: 40px;"><span style="color: red">* </span>Prie likusios mokėti
+            <p style="font-size: 13px; margin-bottom: 40px;"><span style="color: red">* </span>Prie likusios mokėti
                 sumos prisidės papildomos išlaidos už pristatymą.</p>
         </div>
 
@@ -111,7 +111,7 @@
         </div>
     </div>
 
-    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse;">
+    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 150px">
         <tbody>
         <tr>
             <td style="text-align: center; font-size: 12px; color: black; vertical-align: middle;">
