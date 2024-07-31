@@ -15,7 +15,7 @@
     <div style="max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 50px;">
             <p style="font-weight: 500; font-size: 27px;">Jūsų užsakymas apmokėtas!</p>
-            <p>Užsakymo nr. <span style="font-weight: 600;">{{-- $order->order_number --}}</span></p>
+            <p>Užsakymo nr. <span style="font-weight: 600;">{{ $order->order_number }}</span></p>
         </div>
 
         <p>Gerb. kliente,</p>
@@ -24,7 +24,7 @@
 
         <div style="background-color: #F5F7F7; padding: 30px; border-radius: 5px; margin-bottom: 40px; color: #124E78; text-align: center;">
             <!-- Use an anchor tag styled as a button -->
-            <a href="#{{-- url('/orders/public/order/view/' . $order->order_number) --}}" style="background-color: #B6D2F7; color: black; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: 500;">Redaguoti užsakymą</a>
+            <a href="{{ url('/orders/public/order/view/' . $order->order_number) }}" style="background-color: #B6D2F7; color: black; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: 500;">Redaguoti užsakymą</a>
         </div>
 
         <p style="margin-bottom: 40px;"><span style="font-weight: 700;">Svarbi informacija!</span> Jeigu užsakymą atšauksite, avansas bus negrąžinamas.</p>
@@ -34,23 +34,27 @@
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td style="font-weight: 500; width: 50%; vertical-align: top;">Rezervuotos dienos:</td>
-                    <td style="text-align: right;">{{-- \Carbon\Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d') }} - {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_end)->subDay()->format('Y-m-d') --}} Fake info</td>
+                    <td style="text-align: right;">{{ \Carbon\Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d') }} -
+                        {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_end)->subDay()->format('Y-m-d') }}</td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Pristatymo laikas:</td>
-                    <td style="text-align: right;">{{-- $order->trampolines->first()->delivery_time --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->trampolines->first()->delivery_time }}</td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Batutai:</td>
-                    <td style="text-align: right;">{{-- @foreach($order->trampolines as $orderTrampoline) {{$orderTrampoline->trampoline->title}}<br> @endforeach --}} Fake info</td>
+                    <td style="text-align: right;"> @foreach($order->trampolines as $orderTrampoline)
+                        {{$orderTrampoline->trampoline->title}}<br>
+                        @endforeach
+                    </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Avansas:</td>
-                    <td style="text-align: right;">{{-- number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') --}} Fake info</td>
+                    <td style="text-align: right;">{{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}</td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Likusi mokėti suma:<span style="color: red"> *</span></td>
-                    <td style="text-align: right;">{{-- number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') --}} Fake info</td>
+                    <td style="text-align: right;">{{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }} </td>
                 </tr>
             </table>
         </div>
@@ -64,30 +68,30 @@
             <table style="width: 100%; border-collapse: collapse;">
                 <tr>
                     <td style="font-weight: 500;">Vardas Pavardė:</td>
-                    <td style="text-align: right;">{{-- $order->client->name }} {{ $order->client->surname --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->client->name }} {{ $order->client->surname }} </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Telefonas:</td>
-                    <td style="text-align: right;">{{-- $order->client->phone --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->client->phone }} </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Miestas:</td>
-                    <td style="text-align: right;">{{-- $order->address->address_town --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->address->address_town }} </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Gatvė:</td>
-                    <td style="text-align: right;">{{-- $order->address->address_street --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->address->address_street }} </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500;">Pašto kodas:</td>
-                    <td style="text-align: right;">{{-- $order->address->address_postcode --}} Fake info</td>
+                    <td style="text-align: right;">{{ $order->address->address_postcode }} </td>
                 </tr>
             </table>
         </div>
 
         <div style="margin-top: 40px;">
             <p>Dėkojame, kad pasirinkote op-op batutų nuomą!</p>
-            <p>Jei kiltų klausimų - drąsiai susisiekite telefonu {{--config('contactInfo.phone')--}} ar el.paštu {{--config('contactInfo.email')--}} ir mes Jums mielai padėsime.</p>
+            <p>Jei kiltų klausimų - drąsiai susisiekite telefonu {{config('contactInfo.phone')}} ar el.paštu {{config('contactInfo.email')}} ir mes Jums mielai padėsime.</p>
         </div>
     </div>
 
@@ -98,11 +102,11 @@
             </svg>
         </a>
         <a href="configas" style="font-size: 16px;">op-op.lt</a>
-        <a href="{{--config('contactInfo.phone')--}}" style="font-size: 18px; font-weight: 500; text-decoration: none; color: black;">
+        <a href="{{config('contactInfo.phone')}}" style="font-size: 18px; font-weight: 500; text-decoration: none; color: black;">
             <svg width="20" height="20" fill="currentColor" class="bi bi-telephone" viewBox="0 0 16 16">
                 <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
             </svg>
-            {{--config('contactInfo.phone')--}}</a>
+            {{config('contactInfo.phone')}}</a>
     </div>
 </div>
 </body>
