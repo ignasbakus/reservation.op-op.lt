@@ -1,148 +1,159 @@
 <!DOCTYPE html>
-<html>
+<html lang="lt">
 <head>
-    <title>Gautas naujas užsakymas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .order-details, .customer-info, .price-info {
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-        }
-
-        h2 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batuto Nuomos Patvirtinimas</title>
+    <link href="/frameworks/bootstrap-5.3.3/css/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="/frameworks/bootstrap-icons-1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container">
-    <h1 class="text-center">Gautas naujas užsakymas</h1>
-
-    <!-- Order Information -->
-    <h2 class="mt-4">Užsakymo detalės</h2>
-    <table class="table table-bordered">
-        <tr>
-            <th>Užsakymo data</th>
-            <th>Užsakymo numeris</th>
-            <th>Batutas</th>
-            <th>Nuomos pradžia</th>
-            <th>Nuomos pabaiga</th>
-            <th>Pristatymo laikas</th>
-        </tr>
-        @foreach($order->trampolines as $orderTrampoline)
+<div style="max-width: 600px; margin: 0 auto;">
+    <div style="max-width: 650px; margin: 0 auto;">
+        <!-- Table-based centering for better compatibility -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%"
+               style="background-color: #B6D2F7; height: 100px; margin: 0 auto;">
             <tr>
-                <td>{{ $order->created_at->format('Y-m-d') }}</td>
-                <td>{{ $order->order_number }}</td>
-                <td>{{ $orderTrampoline->trampoline->title }}</td>
-                <td>{{ \Carbon\Carbon::parse($orderTrampoline->rental_start)->format('Y-m-d') }}</td>
-                <td>{{ \Carbon\Carbon::parse($orderTrampoline->rental_end)->subDay()->format('Y-m-d') }}</td>
-                <td> {{ $orderTrampoline->delivery_time }} </td>
+                <td align="center" style="vertical-align: middle;">
+                    <img src="{{config('app.link_to_homepage')}}/images/companyLogo/logo.png" width="70" height="70"
+                         style="display: block;" alt="Company Logo" title="Company Logo">
+                </td>
             </tr>
-        @endforeach
-    </table>
-
-    <!-- Customer Information -->
-    <h2 class="mt-4">Kliento informacija</h2>
-    <table class="table table-bordered">
-        <tbody>
-        <tr>
-            <th scope="row">Vardas:</th>
-            <td>{{ $order->client->name }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Pavardė:</th>
-            <td>{{ $order->client->surname }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Telefono numeris:</th>
-            <td>{{ $order->client->phone }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Elektroninis paštas:</th>
-            <td>{{ $order->client->email }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Miestas:</th>
-            <td>{{ $order->address->address_town }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Adresas:</th>
-            <td>{{ $order->address->address_street . '; ' . $order->address->address_postcode }}</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <h2 class="mt-4">Mokama suma</h2>
-    <table class="table table-bordered">
-        <tbody>
-        <tr>
-            <th scope="row">Bendra suma:</th>
-            <td>{{ number_format($order->total_sum, 2) }}{{config('trampolines.currency') }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Sumokėta avanso suma:</th>
-            <td>{{ number_format($order->advance_sum, 2) }}{{config('trampolines.currency') }}</td>
-        </tr>
-        <tr>
-            <th scope="row">Suma mokama vietoje:</th>
-            <td>{{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{config('trampolines.currency')}}</td>
-        </tr>
-        </tbody>
-    </table>
-
-    <div class="footer">
-        <p>Automatinis pranešimas</p>
+        </table>
     </div>
+    <div style="max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 10px;">
+        <div style="text-align: center; margin-bottom: 50px;">
+            <p style="font-weight: 500; font-size: 27px;">Gautas naujas užsakymas!</p>
+        </div>
+
+        <div
+            style="background-color: #F5F7F7; padding: 30px; border-radius: 5px; margin-bottom: 40px; color: #124E78; text-align: center;">
+            <!-- Use an anchor tag styled as a button -->
+            <a href="{{ url('/orders/admin') }}"
+               style="background-color: #B6D2F7; color: black; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: 500;">
+                Peržiūrėti užsakymą
+            </a>
+        </div>
+
+        <h4 style="font-weight: 500; font-size: 1.5rem; margin-bottom: 10px">Užsakymo informacija</h4>
+        <div style="background-color: #B6D2F7; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+            <table style="width: 100%; border-collapse: collapse;">
+                <tr>
+                    <td style="font-weight: 500; width: 50%; vertical-align: top; padding: 5px 0; border-bottom: 1px solid white;">Užsakymo Nr:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">{{ $order->order_number }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Rezervuotos dienos:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d') }}
+                        -
+                        {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_end)->subDay()->format('Y-m-d') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Pristatymo laikas:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">{{ $order->trampolines->first()->delivery_time }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Batutai:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        @foreach($order->trampolines as $orderTrampoline)
+                            {{$orderTrampoline->trampoline->title}}<br>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Avansas:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Bendra suma:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ number_format($order->total_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Likusi mokėti suma:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <h4 style="font-weight: 500; font-size: 1.5rem; margin-bottom: 10px">Kliento informacija</h4>
+        <div style="background-color: #B6D2F7; padding: 15px; border-radius: 5px; margin-bottom: 10px;">
+            <table style="width: 100%; border-collapse: collapse; margin: 0; padding: 0;">
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Užsakymo numeris:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">{{ $order->order_number }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Rezervuotos dienos:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_start)->format('Y-m-d') }}
+                        -
+                        {{ \Carbon\Carbon::parse($order->trampolines->first()->rental_end)->subDay()->format('Y-m-d') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Pristatymo laikas:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">{{ $order->trampolines->first()->delivery_time }}</td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Batutai:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        @foreach($order->trampolines as $orderTrampoline)
+                            {{$orderTrampoline->trampoline->title}}<br>
+                        @endforeach
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Avansas:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Bendra suma:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
+                        {{ number_format($order->total_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 500; width: 50%; padding: 5px 0; border-bottom: 1px solid white;">Likusi mokėti suma:</td>
+                    <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white">
+                        {{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 150px">
+        <tbody>
+        <tr>
+            <td style="text-align: center; font-size: 16px; color: black; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="{{config('app.link_to_homepage')}}" style="text-decoration: none; color: black;" target="_blank">
+                    op-op.lt
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 18px; color: black; font-weight: 500; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="tel:{{config('contactInfo.phone')}}" style="text-decoration: none; color: black;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
+                    </svg>
+                    {{config('contactInfo.phone')}}
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
 </div>
 </body>
 </html>

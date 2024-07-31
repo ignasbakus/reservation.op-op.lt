@@ -13,31 +13,19 @@
              style="width: 70px;">
     </div>
     <div style="padding: 20px; text-align: center;">
-        <h1 style="font-size: 24px; margin: 0 0 10px;">Užsakymas atšauktas</h1>
-        <p style="font-size: 16px; margin: 0 0 10px;">Informuojame, kad jūsų užsakymas buvo ištrintas.</p>
-        <p style="font-size: 16px; margin: 0 0 10px;">Jūsų užsakymo numeris buvo
-            <strong>{{$order->order_number}}</strong>.</p>
+        <h1 style="font-size: 24px; margin: 0 0 10px; font-weight: 500;">Užsakymas atšauktas</h1>
+        <p style="font-size: 16px; margin: 0 0 10px;">Informuojame, kad jūsų užsakymas Nr. <strong>{{$order->order_number}}</strong> buvo atšauktas.</p>
     </div>
-    {{--<?php if (!empty($additionalInfo)) : ?>
+    <?php if (!empty($additionalInfo)) : ?>
     <h3>Priežastis:</h3>
     <p><?php echo htmlspecialchars($additionalInfo); ?></p>
-    <?php endif; ?>--}}
+    <?php endif; ?>
     <div style="font-size: 12px; color: #999999; text-align: center; padding: 20px;">
         <p style="margin: 0;">Jei turite klausimų, nedvejodami susisiekite su mumis
             telefonu {{config('contactInfo.phone')}} arba el. paštu {{config('contactInfo.email')}}.</p>
     </div>
     <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 70px">
         <tbody>
-        <tr>
-            <td style="text-align: center; font-size: 12px; color: black; vertical-align: middle;">
-                <!-- Facebook Icon -->
-                <a href="ADDLINKTOFACEBOOK" style="display: block; text-decoration: none; color: black; font-family: 'Open Sans', sans-serif;" target="_blank">
-                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"></path>
-                    </svg>
-                </a>
-            </td>
-        </tr>
         <tr>
             <td style="text-align: center; font-size: 16px; color: black; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
                 <a href="{{config('app.link_to_homepage')}}" style="text-decoration: none; color: black;" target="_blank">

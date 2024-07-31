@@ -1,79 +1,51 @@
 <!DOCTYPE html>
-<html>
+<html lang="lt">
 <head>
-    <title>Užsakymo atnaujinimas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 600px;
-            margin: 20px auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .header {
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .content {
-            margin-bottom: 20px;
-        }
-
-        .content p {
-            font-size: 16px;
-            color: #333;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            color: #fff;
-            background-color: #007bff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-
-        .footer {
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Užsakymas Atnaujintas</title>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Jūsų užsakymas atnaujintas</h1>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+<div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <div style="background-color: #B6D2F7; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
+        <img src="{{config('app.link_to_homepage')}}/images/companyLogo/logo.png" alt="Įmonės logotipas" style="width: 70px;">
     </div>
-
-    <div class="content">
-        <p>Gerbiamas kliente,</p>
-        <p>Informuojame, kad Jūsų užsakymas buvo atnaujintas.</p>
-        <p>Norėdami peržiūrėti savo atnaujintą užsakymą, <a href="{{url('/orders/public/order/view/' . $order->order_number)}}">spauskite čia</a>:</p>
+    <div style="padding: 20px; text-align: center;">
+        <h1 style="font-size: 24px; font-weight: 500; margin: 0 0 10px;">Užsakymas atnaujintas</h1>
+        <p style="font-size: 15px; margin: 0 0 10px;">Jūsų užsakymas Nr. <strong>{{$order->order_number}}</strong> buvo atnaujintas!</p>
+        <p style="font-size: 15px; margin: 0 0 10px;">Patikrinti naujus užsakymo duomenis galite paspaudus žemiau esantį mygtuką.</p>
     </div>
-
-    <div class="footer">
-        <p>Jeigu turite klausimų, susisiekite su mumis el. paštu {{config('contactInfo.email')}} arba telefonu {{config('contactInfo.phone')}}.</p>
-        <p>Ačiū, kad rinkotės mus!</p>
+    <div
+        style="background-color: #F5F7F7; padding: 30px; border-radius: 5px; margin-bottom: 10px; color: #124E78; text-align: center;">
+        <!-- Use an anchor tag styled as a button -->
+        <a href="{{url('/orders/public/order/view/' . $order->order_number)}}"
+           style="background-color: #B6D2F7; color: black; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: 500;">
+            Jūsų užsakymas</a>
     </div>
+    <div style="font-size: 12px; color: #999999; text-align: center; padding: 20px; margin-bottom: 10px">
+        <p style="margin: 0;">Jei turite klausimų, nedvejodami susisiekite su mumis telefonu {{config('contactInfo.phone')}} arba el. paštu {{config('contactInfo.email')}}.</p>
+    </div>
+    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 70px">
+        <tbody>
+        <tr>
+            <td style="text-align: center; font-size: 16px; color: black; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="{{config('app.link_to_homepage')}}" style="text-decoration: none; color: black;" target="_blank">
+                    op-op.lt
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 18px; color: black; font-weight: 500; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="tel:{{config('contactInfo.phone')}}" style="text-decoration: none; color: black;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
+                    </svg>
+                    {{config('contactInfo.phone')}}
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
-
