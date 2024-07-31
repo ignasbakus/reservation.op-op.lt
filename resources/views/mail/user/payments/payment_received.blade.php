@@ -9,8 +9,15 @@
 </head>
 <body>
 <div style="max-width: 600px; margin: 0 auto;">
-    <div style="display: flex; justify-content: center; align-items: center; height: 100px; background-color: #B6D2F7; max-width: 650px; margin: 0 auto;">
-        <img src="https://op-op.lt/images/companyLogo/logo.png" width="70" height="70" style="display: block;" alt="logo" title="logo">
+    <div style="max-width: 650px; margin: 0 auto;">
+        <!-- Table-based centering for better compatibility -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #B6D2F7; height: 100px; margin: 0 auto;">
+            <tr>
+                <td align="center" style="vertical-align: middle;">
+                    <img src="/images/companyLogo/logo.png" width="70" height="70" style="display: block;" alt="Company Logo" title="Company Logo">
+                </td>
+            </tr>
+        </table>
     </div>
     <div style="max-width: 600px; margin: 0 auto; padding: 40px; border-radius: 10px;">
         <div style="text-align: center; margin-bottom: 50px;">
