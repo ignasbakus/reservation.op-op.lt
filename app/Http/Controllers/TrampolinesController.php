@@ -36,7 +36,7 @@ class TrampolinesController extends Controller
 //            //5 => '',
 //            //6 => '',
 //        ];return
-//        return \view('mail.user.payments.payment_received');
+//        return \view('mail.user.orders.order-placed');
         $Trampolines = (new Trampoline)->with('images')
             ->whereHas('Parameter', function($query) {
                 $query->where('activity', 1);

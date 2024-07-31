@@ -29,7 +29,7 @@
 
         <p>Gerb. kliente,</p>
 
-        <p style="margin-bottom: 40px;">Jūsų batuto nuomos užsakymas patvirtintas. Žemiau rasite užsakymo detales.</p>
+        <p style="margin-bottom: 40px;">Jūsų batuto nuomos užsakymas apmokėtas. Žemiau rasite užsakymo detales.</p>
 
         <div
             style="background-color: #F5F7F7; padding: 30px; border-radius: 5px; margin-bottom: 40px; color: #124E78; text-align: center;">

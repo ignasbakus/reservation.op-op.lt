@@ -1,165 +1,61 @@
-@php use App\MontonioPayments\MontonioPaymentsService;
- $exp = (int) config('montonio.payment_duration');
-@endphp
 <!DOCTYPE html>
-<html>
+<html lang="lt">
 <head>
-    <title>Užsakymas pateiktas</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            color: #333;
-        }
-
-        .order-details, .customer-info, .trampolines, .address-info .importantInfo {
-            margin-bottom: 20px;
-        }
-
-        .order-details table, .customer-info table, .trampolines table, .address-info table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .order-details th, .customer-info th, .trampolines th, .address-info th, .order-details td, .customer-info td, .trampolines td, .address-info td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .order-details th, .customer-info th, .trampolines th, .address-info th {
-            background-color: #f2f2f2;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-            color: #555;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Užsakymo Patvirtinimas</title>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h1>Jūsų užsakymas buvo gautas!</h1>
+<body style="font-family: Arial, sans-serif; margin: 0; padding: 0;">
+<div style="max-width: 650px; margin: 0 auto; background-color: #ffffff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
+    <div style="background-color: #B6D2F7; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;">
+        <img src="{{config('app.link_to_homepage')}}/images/companyLogo/logo.png" alt="Įmonės logotipas" style="width: 70px;">
     </div>
-    <div>
-        <h2>Avansą apmokėti galite čia: <a
-                href="{{ $paymentLink }}">Spauskite čia</a></h2>
-        <br>
-        <h4>Jei neapmokėsite avanso per {{$exp}} min., jūsų užsakymas bus atšauktas</h4>
+    <div style="padding: 20px; text-align: center;">
+        <h1 style="font-size: 24px; margin: 0 0 10px;">Užsakymas Patvirtintas</h1>
+        <p style="font-size: 16px; margin: 0 0 10px;">Ačiū, kad pateikėte užsakymą!</p>
+        <p style="font-size: 16px; margin: 0 0 10px;">Jūsų užsakymo numeris yra <strong>{{$order->order_number}}</strong>.</p>
     </div>
-    <div class="order-details">
-        <h2>Užsakymo detalės</h2>
-        <table>
-            <tr>
-                <th>Užsakymo numeris</th>
-                <td>{{ $order->order_number }}</td>
-            </tr>
-            <tr>
-                <th>Data</th>
-                <td>{{ $order->created_at->format('Y-m-d') }}</td>
-            </tr>
-            <tr>
-                <th>Avanso suma</th>
-                <td>{{ number_format($order->advance_sum, 2) }} €</td>
-            </tr>
-            <tr>
-                <th>Bendra suma</th>
-                <td>{{ number_format($order->total_sum, 2) }} €</td>
-            </tr>
-        </table>
+    <div
+        style="background-color: #F5F7F7; padding: 30px; border-radius: 5px; margin-bottom: 40px; color: #124E78; text-align: center;">
+        <!-- Use an anchor tag styled as a button -->
+        <a href="{{ $paymentLink }}"
+           style="background-color: #B6D2F7; color: black; padding: 10px 20px; text-decoration: none; display: inline-block; border-radius: 5px; font-weight: 500;">
+            Apmokėti avansą</a>
     </div>
-
-    <div class="customer-info">
-        <h2>Kliento informacija</h2>
-        <table>
-            <tr>
-                <th>Vardas</th>
-                <td>{{ $order->client->name }}</td>
-            </tr>
-            <tr>
-                <th>Pavardė</th>
-                <td>{{ $order->client->surname }}</td>
-            </tr>
-            <tr>
-                <th>El. paštas</th>
-                <td>{{ $order->client->email }}</td>
-            </tr>
-            <tr>
-                <th>Telefonas</th>
-                <td>{{ $order->client->phone }}</td>
-            </tr>
-        </table>
+    <div style="font-size: 12px; color: #999999; text-align: center; padding: 20px;">
+        <p style="margin: 0;">Jei turite klausimų, nedvejodami susisiekite su mumis telefonu {{config('contactInfo.phone')}} arba el. paštu {{config('contactInfo.email')}}.</p>
     </div>
-
-    <div class="address-info">
-        <h2>Pristatymo adresas</h2>
-        <table>
-            <tr>
-                <th>Miestas</th>
-                <td>{{ $order->address->address_town }}</td>
-            </tr>
-            <tr>
-                <th>Gatvė</th>
-                <td>{{ $order->address->address_street }}</td>
-            </tr>
-            <tr>
-                <th>Pašto kodas</th>
-                <td>{{ $order->address->address_postcode }}</td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="trampolines">
-        <h2>Pasirinkti batutai</h2>
-        <table>
-            <tr>
-                <th>Pavadinimas</th>
-                <th>Nuomos pradžia</th>
-                <th>Nuomos pabaiga</th>
-                <th>Pristatymo laikas</th>
-                <th>Kaina</th>
-            </tr>
-            @foreach ($order->trampolines as $orderTrampoline)
-                <tr>
-                    <td>{{ $orderTrampoline->trampoline->title }}</td>
-                    <td>{{ \Carbon\Carbon::parse($orderTrampoline->rental_start)->format('Y-m-d') }}</td>
-                    <td>{{ \Carbon\Carbon::parse($orderTrampoline->rental_end)->subDay()->format('Y-m-d') }}</td>
-                    <td> {{ $orderTrampoline->delivery_time }} </td>
-                    <td>{{ number_format($orderTrampoline->total_sum, 2) }} €</td>
-                </tr>
-            @endforeach
-        </table>
-    </div>
-    <div class="importantInfo">
-        <h4>Naudinga informacija</h4>
-        <p>Jeigu nuspręsite užsakymą atšaukti, pinigai už avansą negražinami</p>
-    </div>
-    <div class="footeris">
-        <p>Jeigu turite klausimų, susisiekite su mumis el. paštu {{config('contactInfo.email')}} arba telefonu {{config('contactInfo.phone')}}</p>
-        <p>Ačiū, kad rinkotės mus!</p>
-    </div>
+    <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 70px">
+        <tbody>
+        <tr>
+            <td style="text-align: center; font-size: 12px; color: black; vertical-align: middle;">
+                <!-- Facebook Icon -->
+                <a href="ADDLINKTOFACEBOOK" style="display: block; text-decoration: none; color: black; font-family: 'Open Sans', sans-serif;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M16 8.049c0-4.446-3.582-8.05-8-8.05C3.58 0-.002 3.603-.002 8.05c0 4.017 2.926 7.347 6.75 7.951v-5.625h-2.03V8.05H6.75V6.275c0-2.017 1.195-3.131 3.022-3.131.876 0 1.791.157 1.791.157v1.98h-1.009c-.993 0-1.303.621-1.303 1.258v1.51h2.218l-.354 2.326H9.25V16c3.824-.604 6.75-3.934 6.75-7.951"></path>
+                    </svg>
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 16px; color: black; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="{{config('app.link_to_homepage')}}" style="text-decoration: none; color: black;" target="_blank">
+                    op-op.lt
+                </a>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align: center; font-size: 18px; color: black; font-weight: 500; font-family: 'Open Sans', sans-serif; padding-top: 10px;">
+                <a href="tel:{{config('contactInfo.phone')}}" style="text-decoration: none; color: black;" target="_blank">
+                    <svg style="display: block; margin: 0 auto;" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M3.654 1.328a.678.678 0 0 0-1.015-.063L1.605 2.3c-.483.484-.661 1.169-.45 1.77a17.6 17.6 0 0 0 4.168 6.608 17.6 17.6 0 0 0 6.608 4.168c.601.211 1.286.033 1.77-.45l1.034-1.034a.678.678 0 0 0-.063-1.015l-2.307-1.794a.68.68 0 0 0-.58-.122l-2.19.547a1.75 1.75 0 0 1-1.657-.459L5.482 8.062a1.75 1.75 0 0 1-.46-1.657l.548-2.19a.68.68 0 0 0-.122-.58zM1.884.511a1.745 1.745 0 0 1 2.612.163L6.29 2.98c.329.423.445.974.315 1.494l-.547 2.19a.68.68 0 0 0 .178.643l2.457 2.457a.68.68 0 0 0 .644.178l2.189-.547a1.75 1.75 0 0 1 1.494.315l2.306 1.794c.829.645.905 1.87.163 2.611l-1.034 1.034c-.74.74-1.846 1.065-2.877.702a18.6 18.6 0 0 1-7.01-4.42 18.6 18.6 0 0 1-4.42-7.009c-.362-1.03-.037-2.137.703-2.877z"></path>
+                    </svg>
+                    {{config('contactInfo.phone')}}
+                </a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
 </div>
 </body>
 </html>
-
