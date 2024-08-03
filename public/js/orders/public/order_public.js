@@ -20,44 +20,28 @@ today.setHours(today.getHours() + 3);
 today = today.toISOString().split('T')[0];
 
 /* JS classes */
-let ToolTip = {
-    init: function () {
-        // Select the calendar element
-        const calendarEl = document.querySelector('#calendar');
-
-        // Initialize the Bootstrap Tooltip
-        const tooltip = new bootstrap.Tooltip(calendarEl, {
-            title: 'Norint pasirinkti dieną, paspauskite ir slinkite "Jūsų užsakymas" per kalendorių',
-            placement: 'top',
-            trigger: 'manual', // Manual trigger so we can control it programmatically
-            html: true // Allow HTML content
-        });
-
-        let tooltipTimeout;
-        let tooltipShown = false;
-
-        // Show tooltip and set timeout to hide it
-        calendarEl.addEventListener('mouseenter', function () {
-            if (!tooltipShown) {
-                tooltip.show();
-                clearTimeout(tooltipTimeout);
-
-                // Set a timeout to hide the tooltip after 10 seconds
-                tooltipTimeout = setTimeout(() => {
-                    tooltip.hide();
-                    tooltipShown = true; // Ensure tooltip is not shown again
-                }, 10000); // 10 seconds
-            }
-        });
-
-        // Hide tooltip if mouse leaves before the timeout
-        calendarEl.addEventListener('mouseleave', function () {
-            clearTimeout(tooltipTimeout);
-            tooltip.hide();
-            tooltipShown = true; // Ensure tooltip is not shown again
-        });
-    }
-};
+// let ToolTip = {
+//     calendarTooltip: function (info){
+//         if (info.dayEl._tippy) {
+//             info.dayEl._tippy.setContent(`Date: ${info.dateStr}`);
+//             info.dayEl._tippy.show();
+//             return;
+//         }
+//
+//         // Initialize the tooltip with plain text content
+//         tippy(info.dayEl, {
+//             content: `Date: ${info.dateStr}`,
+//             placement: 'top',
+//             trigger: 'click',
+//             hideOnClick: true
+//         });
+//
+//         // Retrieve the tooltip instance and show it
+//         let tippyInstance = tippy(info.dayEl)[0];
+//         console.log('Tippy Instance:', tippyInstance);
+//         tippyInstance.show();
+//     }
+// };
 
 let showCalendar = {
     showCalendar: function () {
@@ -111,8 +95,10 @@ let Variables = {
 };
 let CalendarFunctions = {
     Calendar: {
-        tooltipShown: false,
-        tooltipTimeout: null,
+        hasEventBeenDragged: false,
+        hasEventBeenResized: false,
+        cellTooltip: null,
+        eventTooltip: null,
         initialize: function () {
             this.calendar = new FullCalendar.Calendar(document.getElementById('calendar'), {
                 initialDate: Dates.CalendarInitial,
@@ -137,43 +123,67 @@ let CalendarFunctions = {
                     }
                     isEventDrop = false;
                 },
-                eventMouseEnter: function (info) {
-                    const event = info.event;
-                    if (event.extendedProps.type_custom === 'trampolineEvent') {
-                        if (!CalendarFunctions.Calendar.tooltipShown) {
-                            const tooltip = new bootstrap.Tooltip(info.el, {
-                                title: 'Paspausk ant dešinio krašto ir trauk į šoną',
+                events: [],
+                eventDidMount: function (info) {
+                    if (!CalendarFunctions.Calendar.hasEventBeenResized) {
+                        if (info.event.extendedProps.type_custom === "trampolineEvent") {
+                            info.el._tippy = tippy(info.el, {
+                                content: 'Jei norite pasirinkti daugiau dienų, paspauskite ir vilkite dešinę "Jūsų užsakymas" pusę per kalendorių',
                                 placement: 'top',
-                                trigger: 'manual',
-                                html: true
+                                arrow: true,
+                                theme: 'light'
                             });
-                            tooltip.show();
-
-                            CalendarFunctions.Calendar.tooltipTimeout = setTimeout(() => {
-                                tooltip.hide();
-                                CalendarFunctions.Calendar.tooltipShown = true;
-                            }, 10000);
-                            const hideTooltip = () => {
-                                clearTimeout(CalendarFunctions.Calendar.tooltipTimeout);
-                                tooltip.hide();
-                                CalendarFunctions.Calendar.tooltipShown = true;
-                                info.el.removeEventListener('mouseleave', hideTooltip);
-                            };
-
-                            info.el.addEventListener('mouseleave', hideTooltip);
                         }
                     }
                 },
-                eventMouseLeave: function (info) {
-
-                    const event = info.event;
-                    if (event.extendedProps.type_custom === 'trampolineEvent') {
-                        clearTimeout(CalendarFunctions.Calendar.tooltipTimeout);
-                        CalendarFunctions.Calendar.tooltipShown = true;
+                eventDragStart: function (info) {
+                    CalendarFunctions.Calendar.hasEventBeenDragged = true;
+                    // Destroy tooltips on cells, not on the event being dragged
+                    document.querySelectorAll('.fc-daygrid-day').forEach(cell => {
+                        if (cell._tippy) {
+                            cell._tippy.destroy();
+                            delete cell._tippy;
+                        }
+                    });
+                },
+                eventResizeStart: function (info) {
+                    // Only destroy the tooltip when resizing the event
+                    CalendarFunctions.Calendar.hasEventBeenResized = true
+                    if (info.el._tippy) {
+                        info.el._tippy.destroy();
+                        delete info.el._tippy;
                     }
                 },
-                // dayMaxEvents: true,
-                events: [],
+                eventDragStop: function (info) {
+                    // Update tooltip content after drag
+                    if (!CalendarFunctions.Calendar.hasEventBeenResized) {
+                        if (info.el._tippy) {
+                            info.el._tippy.setContent('Jei norite pasirinkti daugiau dienų, paspauskite ir vilkite dešinę "Jūsų užsakymas" pusę per kalendorių');
+                        }
+                    }
+                },
+                dateClick: function (info) {
+                    // Only show tooltip if no event has been dragged since page load
+                    if (!CalendarFunctions.Calendar.hasEventBeenDragged) {
+                        if (info.dayEl._tippy) {
+                            info.dayEl._tippy.destroy();
+                            delete info.dayEl._tippy;
+                        }
+
+                        info.dayEl._tippy = tippy(info.dayEl, {
+                            content: 'Jei norite pasirinkti užsakymo dieną, spauskite ir vilkite mėlyna ' +
+                                'eilutę pavadinimu "Jūsų užsakymas" per kalendorių',
+                            showOnCreate: true,
+                            trigger: 'manual',
+                            placement: 'top',
+                            arrow: true,
+                            onHidden(instance) {
+                                instance.destroy();
+                                delete info.dayEl._tippy;
+                            }
+                        });
+                    }
+                },
                 datesSet: function (info) {
                     let CalendarView = info.view;
                     console.log('CalendarView:', CalendarView)
@@ -463,9 +473,9 @@ let flatPickerCalendar = {
                     }
                 }, 100);
             },
-                onValueUpdate: function (selectedDates, dateStr, instance) {
-                    flatPickerCalendar.updateInputText(); // Update input text when value changes
-                }
+            onValueUpdate: function (selectedDates, dateStr, instance) {
+                flatPickerCalendar.updateInputText(); // Update input text when value changes
+            }
         });
     },
     updateInputText: function () {
@@ -615,7 +625,7 @@ let TrampolineOrder = {
                 });
                 $('#orderForm .viewOrderButton').on('click', function (event) {
                     event.preventDefault();
-                    if (Variables.areInputsFilled()){
+                    if (Variables.areInputsFilled()) {
                         // console.log('visi uzpildyti')
                         TrampolineOrder.ViewOrderModal.element.show();
                     }
@@ -651,7 +661,7 @@ let TrampolineOrder = {
                             $('#failedAlert').show().css('display', 'flex');
                             TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
                             CalendarFunctions.updateEventsPublic(firstVisibleDayOnCalendar, lastVisibleDayOnCalendar, firstMonthDay);
-                        } else{
+                        } else {
                             $('#failedAlertMessage').text(response.failed_input.error[0]);
                             $('#failedAlert').show().css('display', 'flex');
                             TrampolineOrder.Events.dismissAlertsAfterTimeout('#failedAlert', 5000);
@@ -765,7 +775,7 @@ $(document).ready(function () {
     console.log("/js/trampolines/public/order_public.js -> ready!");
     showCalendar.showCalendar()
     TrampolineOrder.init();
-    ToolTip.init()
+    // ToolTip.init()
     console.log('Trampolines ->', Trampolines);
     // new tempusDominus.TempusDominus(document.getElementById('datetimepicker'), {
     //     allowInputToggle: false,
