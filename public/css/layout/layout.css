@@ -17,11 +17,32 @@
     color: white;
 }
 
-.navbar-lightblue {
+.navbar-lightblue  {
     background-color: #4E91FD; /* Blue color */
 }
 
 .navbar-lightblue .navbar-brand,
 .navbar-lightblue .nav-link {
     color: white; /* White text color for contrast */
+}
+
+#offcanvasNavbar {
+    width: 200px; /* Adjust this to your preferred width */
+}
+
+.custom-offcanvas {
+    background-color: #4E91FD; /* Example color: dark gray */
+    color: #ffffff; /* Text color */
+}
+
+.custom-offcanvas .nav-link {
+    color: #ffffff; /* Ensure nav links are visible */
+}
+
+.custom-offcanvas .btn-close {
+    filter: invert(1); /* Optional: to make close button visible on dark background */
+}
+
+#pcNavbar .nav-item {
+    font-size: 18px;
 }

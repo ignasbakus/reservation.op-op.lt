@@ -142,3 +142,11 @@
 #formRow {
     margin-top: 2.5rem;
 }
+
+.confirmation-container {
+    max-width: 500px;
+}
+
+.form-check-input {
+    margin-top: 0.3rem;
+}

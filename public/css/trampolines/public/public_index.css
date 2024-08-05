@@ -7,6 +7,10 @@
     .mt-lg-5 {
         margin-top: 3rem; /* This is equivalent to mt-5 in Bootstrap */
     }
+    .modal-custom {
+        max-width: 100%; /* Adjust as needed */
+        width: 700px;   /* Custom width */
+    }
 }
 
 @media (max-width: 767px) {
@@ -98,8 +102,98 @@
     color: #343a40; /* Dark text color */
 }
 
-.modal-custom {
-    max-width: 100%; /* Adjust as needed */
-    width: 700px;   /* Custom width */
+
+
+
+
+.trampoline-name {
+    text-align: center;
+    margin: 0 auto 10px; /* Center horizontally and add margin below */
+    width: 50%; /* Adjust the width as needed */
+    max-width: 600px; /* Optional: Set a maximum width for larger screens */
 }
+
+.trampoline-name h3 {
+    font-size: 1.5rem;
+    color: black; /* White text color for visibility */
+    background-color: #DDC8C4; /* Optional: dark background for readability */
+    padding: 10px;
+    border-radius: 15px;
+    margin: 0; /* Remove default margin */
+}
+
+.trampoline-sizes {
+    text-align: center;
+    /*margin-top: 10px; !* Adjust spacing as needed *!*/
+}
+
+.trampoline-sizes p {
+    font-size: 1rem;
+    color: black; /* White text color for visibility */
+    /*background-color: rgba(0, 0, 0, 0.3); !* Optional: dark background for readability *!*/
+    padding: 10px;
+    /*border-radius: 5px;*/
+}
+
+.carousel-caption h5 {
+    font-size: 1rem;
+    background-color: rgba(0, 0, 0, 0.5 ); /* Optional: dark background for readability */
+    color: #ffffff; /* White text color */
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Base styles for the container */
+.containerModal {
+    max-width: 800px; /* Maximum width of the container */
+    margin: 20px auto; /* Center the container and add margins */
+    padding: 20px; /* Internal padding for spacing */
+    background-color: #f8f9fa; /* Light background color */
+    border-radius: 8px; /* Rounded corners */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+/* Heading styles */
+#showTrampolineModal h2 {
+    font-size: 1.8em; /* Larger font size for main heading */
+    color: #0a58ca; /* Primary color for heading */
+    margin-bottom: 15px; /* Space below the heading */
+}
+
+#showTrampolineModal h5 {
+    font-size: 1.2em; /* Font size for subheadings */
+    color: #333; /* Dark gray color for text */
+    margin: 5px 0; /* Vertical space between h5 elements */
+}
+
+/* Styling for the h6 element */
+#showTrampolineModal h6 {
+    background-color: #e9ecef; /* Light gray background for the paragraph */
+    border-radius: 5px; /* Rounded corners */
+    padding: 15px; /* Padding around the text */
+    border: 1px solid #0a58ca; /* Border color to match the theme */
+    color: #555; /* Slightly lighter text color for contrast */
+    line-height: 1.5; /* Improved readability with line height */
+    margin-top: 20px; /* Space above the h6 element */
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .containerModal {
+        padding: 15px; /* Less padding on smaller screens */
+    }
+
+    #showTrampolineModal h2 {
+        font-size: 1.5em; /* Smaller heading on mobile */
+    }
+
+    #showTrampolineModal h5 {
+        font-size: 1em; /* Smaller subheading on mobile */
+    }
+
+    #showTrampolineModal h6 {
+        font-size: 0.9em; /* Smaller text for the paragraph on mobile */
+    }
+}
+
 

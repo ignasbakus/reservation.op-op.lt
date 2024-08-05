@@ -45,7 +45,7 @@
                     </div>
                     <div class="row mt-3">
                         <div class="form-group col-6">
-                            <label for="customerDeliveryCity">Pristatymo Miestas <span
+                            <label for="customerDeliveryCity">Miestas <span
                                     class="required-asterisk">*</span></label>
                             <input name="customerDeliveryCity" type="text" class="form-control"
                                    id="customerDeliveryCity"

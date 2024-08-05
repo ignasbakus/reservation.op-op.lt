@@ -10,12 +10,19 @@ let Actions = {
     }
 }
 let ToolTip = {
+    tooltipInstance: null,
     init: function () {
         if (window.innerWidth > 768) {
-            let tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl);
+            this.tooltipInstance = tippy('.carousel-item', {
+                content: 'Paspauskite ant batuto, kad pamatytumėte daugiau nuotraukų ir informacijos',
+                placement: 'left',
             });
+        }
+    },
+    destroy: function () {
+        if (this.tooltipInstance) {
+            this.tooltipInstance.forEach(instance => instance.destroy());
+            this.tooltipInstance = null;
         }
     }
 }
@@ -34,17 +41,18 @@ let Carousels = {
             $('#selectTrampoline').on('click', () => {
                 Trampolines.addToSelected(this.ChosenTrampoline);
             })
+
         },
     },
     imageModal: {
-        init: function (){
+        init: function () {
             this.Events.init();
         },
         element: $('#modalCarouselInner'),
         Events: {
             init: function () {
-                $('#trampolinesCarousel .openModal').on('click', function(event) {
-                    console.log('trmpolines from db', trampolinesFromDb)
+                $('#trampolinesCarousel .openModal').on('click', function (event) {
+                    ToolTip.destroy();
                     event.preventDefault(); // Prevent the default link behavior
 
                     const trampolineId = $(this).closest('.carousel-item').data('trampolineid');
@@ -101,8 +109,18 @@ let Trampolines = {
                     let trampoline = trampolinesFromDb.find(t => t.id === trampolineId);
                     console.log('trampoline:', trampoline)
                     let modalDescription = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description h6');
+                    let modalSizes = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .sizes');
+                    // let modalWidth = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .width');
+                    // let modalHeight = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .height');
+
                     console.log('trampoline description:', trampoline.description)
                     modalDescription.textContent = trampoline.description;
+                    modalSizes.innerHTML = 'Ilgis: <span style="font-weight: bold;">' + trampoline.parameter.length + unitOfMeasure +
+                        '</span>, Plotis: <span style="font-weight: bold;">' + trampoline.parameter.width + unitOfMeasure +
+                        '</span>, Aukštis: <span style="font-weight: bold;">' + trampoline.parameter.height + unitOfMeasure + '</span>';
+
+                    // modalWidth.textContent = 'Plotis: ' + trampoline.parameter.width + unitOfMeasure;
+                    // modalHeight.textContent = 'Aukštis: ' + trampoline.parameter.height + unitOfMeasure;
                     console.log('modalDescription:', modalDescription)
                 }
             }

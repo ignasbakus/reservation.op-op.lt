@@ -13,7 +13,7 @@
 }
 
 .thankYouDiv {
-    background-color: #fff;
+    /*background-color: #fff;*/
     border-color: #fff;
 }
 
@@ -125,11 +125,11 @@ hr.new1 {
 }
 
 .btn-thankYou {
-    background-color: #6c5ce7; /* Similar to the purple button */
+    background-color: #4E91FD; /* Similar to the purple button */
     color: #ffffff;
     border: none;
     border-radius: 30px; /* Rounded corners */
-    padding: 10px 20px; /* Padding */
+    padding: 5px 10px; /* Padding */
     font-size: 16px; /* Font size */
     cursor: pointer; /* Cursor style */
     transition: background-color 0.3s ease; /* Smooth transition */
@@ -137,7 +137,7 @@ hr.new1 {
 }
 
 .btn-thankYou:hover {
-    background-color: #5a47c7; /* Darker purple on hover */
+    background-color: #2175FD; /* Darker purple on hover */
 }
 
 .btn-cancel-order {
@@ -145,7 +145,7 @@ hr.new1 {
     color: #6c757d; /* Grey text */
     border: 2px solid #ced4da; /* Grey border */
     border-radius: 30px; /* Rounded corners */
-    padding: 10px 20px; /* Padding */
+    padding: 5px 10px; /* Padding */
     font-size: 16px; /* Font size */
     cursor: pointer; /* Cursor style */
     transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease; /* Smooth transition */

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Auth\ConfirmPasswordController;
 use App\Models\Parameter;
 use App\Models\Trampoline;
 use App\Trampolines\BaseTrampoline;
@@ -37,7 +38,7 @@ class TrampolinesController extends Controller
 //            //6 => '',
 //        ];return
 //        return \view('mail.user.orders.order-placed');
-        $Trampolines = (new Trampoline)->with('images')
+        $Trampolines = (new Trampoline)->with('images', 'Parameter')
             ->whereHas('Parameter', function($query) {
                 $query->where('activity', 1);
             })
@@ -62,7 +63,7 @@ class TrampolinesController extends Controller
             $trampoline->image_urls = $trampoline->images->pluck('image');
         }
 //        dd($Trampolines);
-
+//        dd($Trampolines->Parameter);
 //        foreach ($Trampolines as $Index => $trampoline) {
 //            if ($Index == 0) {
 //                $trampoline->active = 1;
@@ -75,7 +76,8 @@ class TrampolinesController extends Controller
 //        }
         return view('trampolines.public.index', [
             'Trampolines' => $Trampolines,
-            'firstTrampolineId' => $Trampolines->isEmpty() ? null : $Trampolines->first()->id
+            'firstTrampolineId' => $Trampolines->isEmpty() ? null : $Trampolines->first()->id,
+            'Unit_of_measure' => config('trampolines.unit_of_measure')
         ]);
     }
 

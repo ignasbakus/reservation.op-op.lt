@@ -23,13 +23,69 @@
     </div>
 </div>
 <div id="page-container">
-    <nav class="navbar navbar-expand-lg navbar-lightblue mb-3">
+    <!-- Offcanvas Navbar on the Right (Visible only on mobile) -->
+    <div class="offcanvas offcanvas-end custom-offcanvas" tabindex="-1" id="offcanvasNavbar" aria-labelledby="offcanvasNavbarLabel">
+        <div class="offcanvas-header">
+            <a href="{{ route('trampolinesPublic') }}" ><img height="40px" alt="Logo" src="/images/companyLogo/logo.png"></a>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('trampolinesPublic') }}">Batutai</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ route('contactsIndex') }}">Kontaktai</a>
+                </li>
+                {{-- <li class="nav-item">
+                    <a class="nav-link" href="{{ route('deliveryPricesIndex') }}">Pristatymo kainos</a>
+                </li> --}}
+
+                @guest
+                    @if (Route::has('login'))
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('login') }}">{{ __('Prisijungti') }}</a>
+                        </li>
+                    @endif
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('orderTableIndex') }}">Admin panelė</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                            {{ Auth::user()->name }}
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="{{ route('logout') }}"
+                               onclick="event.preventDefault();
+                                             document.getElementById('logout-form').submit();">
+                                {{ __('Atsijungti') }}
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </div>
+                    </li>
+                @endguest
+            </ul>
+        </div>
+    </div>
+
+    <nav class="navbar navbar-expand-lg navbar-lightblue mb-3 d-lg-none">
         <div class="container-fluid">
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo01"
-                    aria-controls="navbarTogglerDemo01" aria-expanded="false" aria-label="Toggle navigation">
+            <a href="{{ route('trampolinesPublic') }}"><img height="40px" alt="Logo" src="/images/companyLogo/logo.png"></a>
+{{--            <a class="navbar-brand" href="{{ route('trampolinesPublic') }}">op-op</a>--}}
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasNavbar" aria-controls="offcanvasNavbar" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <a class="navbar-brand" href="{{route('trampolinesPublic')}}">op-op</a>
+        </div>
+    </nav>
+
+    <!-- Standard Navbar for Larger Screens -->
+    <nav class="navbar navbar-expand-lg navbar-lightblue mb-3 d-none d-lg-block" id="pcNavbar">
+        <div class="container-fluid">
+            <a href="{{ route('trampolinesPublic') }}" ><img height="53px" alt="Logo" src="/images/companyLogo/logo.png"></a>
+{{--            <a class="navbar-brand" href="{{ route('trampolinesPublic') }}">op-op</a>--}}
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
                     <li class="nav-item">
@@ -38,9 +94,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('contactsIndex') }}">Kontaktai</a>
                     </li>
-{{--                    <li class="nav-item">--}}
-{{--                        <a class="nav-link" href="{{ route('deliveryPricesIndex') }}">Pristatymo kainos</a>--}}
-{{--                    </li>--}}
+                    {{-- <li class="nav-item">
+                        <a class="nav-link" href="{{ route('deliveryPricesIndex') }}">Pristatymo kainos</a>
+                    </li> --}}
 
                     @guest
                         @if (Route::has('login'))
@@ -59,7 +115,7 @@
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ route('logout') }}"
                                    onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                                 document.getElementById('logout-form').submit();">
                                     {{ __('Atsijungti') }}
                                 </a>
                                 <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
@@ -91,5 +147,7 @@
     <script src="/js/layouts/public.layout.js"></script>
     @yield('custom_js')
 </div>
+
+
 </body>
 </html>

@@ -163,26 +163,41 @@
                                     </div>
                                 </form>
                                 <div class="mt-5">
-                                    <div id="confirmationContainer" class="confirmation-container ms-lg-5 mt-3"
-                                         style="display: none">
-                                        <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>
-                                        <div class="d-flex justify-content-between align-items-start">
-                                            <button type="button" class="btn btn-secondary confirmationClose">Atšaukti
-                                            </button>
-                                            <div class="checkbox-container d-flex flex-column align-items-end">
-                                                <label for="confirmChange1" class="d-flex align-items-center">
-                                                    <input type="checkbox" id="confirmChange1"
-                                                           class="mr-2 form-check-input confirmChanges" required>
+{{--                                    <div id="confirmationContainer" class="confirmation-container ms-lg-5 mt-3"--}}
+{{--                                         style="display: none">--}}
+{{--                                        <h4 class="confirmation-title">Ar tikrai norite pakeisti užsakymo datas?</h4>--}}
+{{--                                        <div class="d-flex justify-content-between align-items-start">--}}
+{{--                                            <button type="button" class="btn btn-secondary confirmationClose">Atšaukti--}}
+{{--                                            </button>--}}
+{{--                                            <div class="checkbox-container d-flex flex-column align-items-end">--}}
+{{--                                                <label for="confirmChange1" class="d-flex align-items-center">--}}
+{{--                                                    <input type="checkbox" id="confirmChange1"--}}
+{{--                                                           class="mr-2 form-check-input confirmChanges" required>--}}
+{{--                                                    Patvirtinti pakeitimą--}}
+{{--                                                    <div class="invalid-feedback">Pažymėkite, jog patvirtinate datų--}}
+{{--                                                        pakeitimą--}}
+{{--                                                    </div>--}}
+{{--                                                </label>--}}
+{{--                                                <label for="confirmChange2" class="d-flex align-items-center mt-2">--}}
+{{--                                                    <input type="checkbox" id="confirmChange2"--}}
+{{--                                                           class="mr-2 form-check-input informClient" checked>--}}
+{{--                                                    Informuoti klientą--}}
+{{--                                                </label>--}}
+{{--                                            </div>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
+                                    <div id="confirmationContainer" class="confirmation-container p-3 bg-light border rounded shadow-sm" style="display: none">
+                                        <h4 class="confirmation-title mb-3">Ar tikrai norite pakeisti užsakymo datas?</h4>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <button type="button" class="btn btn-secondary confirmationClose">Atšaukti</button>
+                                            <div class="form-check">
+                                                <input type="checkbox" id="confirmChange1" class="form-check-input confirmChanges" required>
+                                                <label for="confirmChange1" class="form-check-label">
                                                     Patvirtinti pakeitimą
-                                                    <div class="invalid-feedback">Pažymėkite, jog patvirtinate datų
-                                                        pakeitimą
-                                                    </div>
                                                 </label>
-                                                <label for="confirmChange2" class="d-flex align-items-center mt-2">
-                                                    <input type="checkbox" id="confirmChange2"
-                                                           class="mr-2 form-check-input informClient" checked>
-                                                    Informuoti klientą
-                                                </label>
+                                                <div class="invalid-feedback">
+                                                    Pažymėkite, jog patvirtinate datų pakeitimą
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

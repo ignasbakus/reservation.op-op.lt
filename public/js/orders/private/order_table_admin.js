@@ -718,6 +718,11 @@ let Orders = {
             },
             Events: {
                 init: function () {
+                    $('#confirmationContainer .confirmChanges').on('change', (event) => {
+                        if ($(event.currentTarget).is(':checked')) {
+                            $(event.currentTarget).removeClass('is-invalid');
+                        }
+                    })
                     $('#updateOrderModal .updateOrder').on('click', (event) => {
                         event.stopPropagation();
                         if ($('#confirmationContainer').css('display') === 'none') {
@@ -735,6 +740,7 @@ let Orders = {
                     $('#updateOrderModal .modalClose').on('click', (event) => {
                         event.stopPropagation()
                         $('#updateOrderModal form input').removeClass('is-invalid');
+                        $('#confirmationContainer .confirmChanges').removeClass('is-invalid').prop('checked', false);
                         this.DisplayConfirmationElement('none')
                         CalendarFunctions.Calendar.calendar.destroy()
                         $('#updateOrderForm input').val('')
@@ -754,61 +760,65 @@ let Orders = {
                         Orders.Modals.updateOrder.getInitialDatesCalendar()
                     })
                 },
-                updateOrder: function () {
-                    $('#overlay').css('display', 'flex')
-                    let form_data = Variables.getOrderFormInputs('updateOrderModal')
-                    form_data.orderID = Orders.Modals.updateOrder.orderIdToUpdate
-                    form_data.firstVisibleDay = firstVisibleDayOnCalendar
-                    form_data.lastVisibleDay = lastVisibleDayOnCalendar
-                    console.log('form_data => ', form_data)
-                    $.ajax({
-                        headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                        method: "PUT",
-                        url: "/orders/admin/order",
-                        data: form_data,
-                    }).done((response) => {
-                        $('#overlay').hide();
-                        if (response.status === false) {
-                            $('#updateOrderModal form input').removeClass('is-invalid');
-                            Object.keys(response.failed_input).forEach(function (FailedInput) {
-                                $('#updateOrderModal form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
-                                $('#updateOrderModal form input[name=' + FailedInput + ']').addClass('is-invalid');
-                                if (response.failed_input.error) {
-                                    $('#failedAlertMessage').text(response.failed_input.error[0]);
-                                    $('#failedAlert').show().css('display', 'flex');
-                                    Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
-                                    CalendarFunctions.Calendar.calendar.removeAllEvents()
-                                    Orders.Modals.updateOrder.Events.DisplayConfirmationElement('none')
-                                    Orders.Modals.updateOrder.getDataForModal()
-                                }
-                            })
-                        }
-                        if (response.status) {
-                            $('#successAlertMessage').text('Užsakymas atnaujintas sėkmingai!')
-                            $('#successAlert').show().css('display', 'flex')
-                            Orders.Events.dismissAlertsAfterTimeout('#successAlert', 5000)
-                            eventDay = response.Event[0].start
-                            $('#updateOrderModal form input').removeClass('is-invalid');
-                            this.DisplayConfirmationElement('none')
-                            CalendarFunctions.Calendar.calendar.removeAllEvents()
-                            CalendarFunctions.addEvent(response.Occupied)
-                            CalendarFunctions.addEvent(response.Event)
-                            Orders.Modals.updateOrder.OccupiedWhenCancelled = response.Occupied
-                            Orders.Modals.updateOrder.EventWhenCancelled = response.Event
-                        }
-                    }).fail((jqXHR) => {
-                        $('#overlay').hide();
-                        Orders.Modals.updateOrder.element.hide()
-                        let errorMessage = 'An error occurred';
-                        if (jqXHR.responseJSON) {
-                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseJSON.message;
-                        } else if (jqXHR.responseText) {
-                            errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseText;
-                        }
-                        $('#failedAlertMessage').text(errorMessage);
-                        $('#failedAlert').show().css('display', 'flex');
-                    })
-                },
+                updateOrder:
+
+                    function () {
+                        $('#overlay').css('display', 'flex')
+                        let form_data = Variables.getOrderFormInputs('updateOrderModal')
+                        form_data.orderID = Orders.Modals.updateOrder.orderIdToUpdate
+                        form_data.firstVisibleDay = firstVisibleDayOnCalendar
+                        form_data.lastVisibleDay = lastVisibleDayOnCalendar
+                        console.log('form_data => ', form_data)
+                        $.ajax({
+                            headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                            method: "PUT",
+                            url: "/orders/admin/order",
+                            data: form_data,
+                        }).done((response) => {
+                            $('#overlay').hide();
+                            if (response.status === false) {
+                                $('#updateOrderModal form input').removeClass('is-invalid');
+                                Object.keys(response.failed_input).forEach(function (FailedInput) {
+                                    $('#updateOrderModal form .' + FailedInput + 'InValidFeedback').text(response.failed_input[FailedInput][0]);
+                                    $('#updateOrderModal form input[name=' + FailedInput + ']').addClass('is-invalid');
+                                    if (response.failed_input.error) {
+                                        $('#failedAlertMessage').text(response.failed_input.error[0]);
+                                        $('#failedAlert').show().css('display', 'flex');
+                                        Orders.Events.dismissAlertsAfterTimeout('#failedAlert', 5000)
+                                        CalendarFunctions.Calendar.calendar.removeAllEvents()
+                                        Orders.Modals.updateOrder.Events.DisplayConfirmationElement('none')
+                                        Orders.Modals.updateOrder.getDataForModal()
+                                    }
+                                })
+                            }
+                            if (response.status) {
+                                $('#successAlertMessage').text('Užsakymas atnaujintas sėkmingai!')
+                                $('#successAlert').show().css('display', 'flex')
+                                Orders.Events.dismissAlertsAfterTimeout('#successAlert', 5000)
+                                eventDay = response.Event[0].start
+                                $('#updateOrderModal form input').removeClass('is-invalid');
+                                this.DisplayConfirmationElement('none')
+                                CalendarFunctions.Calendar.calendar.removeAllEvents()
+                                CalendarFunctions.addEvent(response.Occupied)
+                                CalendarFunctions.addEvent(response.Event)
+                                Orders.Modals.updateOrder.OccupiedWhenCancelled = response.Occupied
+                                Orders.Modals.updateOrder.EventWhenCancelled = response.Event
+                            }
+                        }).fail((jqXHR) => {
+                            $('#overlay').hide();
+                            Orders.Modals.updateOrder.element.hide()
+                            let errorMessage = 'An error occurred';
+                            if (jqXHR.responseJSON) {
+                                errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseJSON.message;
+                            } else if (jqXHR.responseText) {
+                                errorMessage = 'Nepavyko atnaujinti užsakymo: ' + jqXHR.responseText;
+                            }
+                            $('#failedAlertMessage').text(errorMessage);
+                            $('#failedAlert').show().css('display', 'flex');
+                        })
+                    }
+
+                ,
                 DisplayConfirmationElement: function (displayValue) {
                     switch (displayValue) {
                         case 'block':

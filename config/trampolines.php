@@ -16,4 +16,7 @@ return [
     /* Custom param, which declares when the user won't be able to edit an order. For example, if 3, if the rental start
     is less than 3 days from now, user wont be allowed to edit. */
     'amount_of_days' => env('ALLOWED_DAYS_TO_UPDATE', 3),
+
+    /* Custom param, units of measure */
+    'unit_of_measure' => env('TRAMPOLINE_UNIT_OF_MEASURE', 'm'),
 ];

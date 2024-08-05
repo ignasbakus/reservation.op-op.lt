@@ -63,7 +63,7 @@ let showCalendar = {
 let Variables = {
     orderFormInput: [
         'customerName', 'customerSurname', 'customerPhoneNumber', 'customerEmail', 'customerDeliveryCity',
-        'customerDeliveryPostCode', 'customerDeliveryAddress', 'customerDeliveryTime'
+        'customerDeliveryPostCode', 'customerDeliveryAddress', 'flatPickerCalendar', 'customerDeliveryTime'
     ],
     getOrderFormInputs: function () {
         let values = {};
@@ -79,11 +79,18 @@ let Variables = {
     },
     areInputsFilled: function () {
         let isFilled = true;
-        this.orderFormInput.forEach(function (inputName) {
+        let newOrderFormInput = [];
+        if (mobileCalendar) {
+            newOrderFormInput = Variables.orderFormInput;
+            console.log('newOrderFormInput:', newOrderFormInput)
+        } else {
+            newOrderFormInput = Variables.orderFormInput.filter(item => item !== 'flatPickerCalendar');
+            console.log('newOrderFormInput:', newOrderFormInput)
+        }
+        newOrderFormInput.forEach(function (inputName) {
             let value = $('#orderForm input[name="' + inputName + '"]').val().trim();
             if (value === '') {
                 isFilled = false;
-                // Optionally highlight the empty input
                 $('#orderForm input[name="' + inputName + '"]').addClass('is-invalid');
             } else {
                 // Remove highlight if filled
