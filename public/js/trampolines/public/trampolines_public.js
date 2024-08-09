@@ -20,7 +20,7 @@ let view = {
         } else {
             Trampolines.mobileCalendar = true;
             Trampolines.PcCalendar = false;
-            $('#carousel-row').removeClass('mt-5')
+            // $('#carousel-row').removeClass('mt-5')
 
         }
     }

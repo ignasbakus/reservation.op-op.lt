@@ -16,7 +16,7 @@
         <img id="pcBanner" width="100%" class="cover-photo pc-banner" alt="banner" src="/images/coverPhoto/pc_main.png">
     </div>
     <div class="container custom-container">
-        <div id="carousel-row" class="row mt-5 ">
+        <div id="carousel-row" class="row mt-5 mb-5">
             <div id="carouselColumn" class="col-12 col-lg-12">
                 <div id="carousel-wrap">
                     <div id="trampolinesCarousel" class="carousel slide" data-bs-theme="dark">
