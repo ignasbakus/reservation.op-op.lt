@@ -120,6 +120,11 @@ let Trampolines = {
                         event.stopPropagation();
                         Trampolines.addToSelected(Carousels.trampolinesCarousel.ChosenTrampoline);
                         Trampolines.Modals.showTrampoline.element.hide();
+                        $('#selectedTrampolinesSection').show();
+                        // Change the carousel column to col-lg-6
+                        $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
+                        // Disable the CSS rule for carousel wrap
+                        $('#carousel-wrap').removeAttr('style');
                     });
                 },
                 fetchDescription: function (event) {
