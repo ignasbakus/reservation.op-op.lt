@@ -1,6 +1,6 @@
 
 /*//for pc*/
-@media (min-width: 768px) {
+@media (min-width: 1025px) {
     .modal-image {
         height: 500px; /* Adjust the height as needed */
     }
@@ -20,16 +20,47 @@
     }
 
     #pcBanner {
-        display: block; /* Show PC banner */
+        display: none; /* Show PC banner */
     }
-    #content-wrap {
-        background-color: #F6F7F7;
+    /*#content-wrap {*/
+    /*    !*background-color: #F6F7F7;*!*/
+    /*    background-image: url("/images/coverPhoto/pc background.png");*/
+    /*    background-size: cover;*/
+    /*    background-position: center top;*/
+    /*}*/
+
+    body {
+        background:
+            url('/images/coverPhoto/pc-top.png') no-repeat,
+            url('/images/coverPhoto/pc-bottom.png') no-repeat bottom;
+
     }
 }
 
 @media (max-width: 767px) {
     .modal-image {
         height: 300px; /* Adjust the height as needed */
+    }
+    .mt-lg-5 {
+        margin-top: 0;
+    }
+    #mobileBannerTop {
+        display: block; /* Hide mobile banner for larger screens */
+    }
+
+    #mobileBannerBottom {
+        display: block; /* Hide mobile banner for larger screens */
+    }
+
+    #pcBanner {
+        display: none; /* Show PC banner */
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* Your CSS rules here */
+    .modal-image {
+        height: 500px; /* Adjust the height as needed */
     }
     .mt-lg-5 {
         margin-top: 0;

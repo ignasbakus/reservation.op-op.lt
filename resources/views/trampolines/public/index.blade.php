@@ -55,9 +55,9 @@
                 <ul id="SelectedTrampolines" class="list-group">
                 </ul>
                 <div class="row mt-3">
-                    <div class="col-12 col-md-8"></div>
-                    <div class="col-12 col-md-4 text-end">
-                        <button class="btn mt-3 w-100 sendToOrderButton mb-5" id="sendToOrderButton"
+                    <div class="col-12 col-md-12"></div>
+                    <div id="sendToOrderDiv" class="col-12 col-md-12 text-end">
+                        <button class="btn mt-3 w-100 sendToOrderButton" id="sendToOrderButton"
                                 style="display: none;">
                             <span id="buttonText">Užsakyti</span>
                         </button>

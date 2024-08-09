@@ -12,16 +12,23 @@ let Actions = {
 }
 let view = {
     findViewDevice: function () {
-        if ($(window).width() >= 768) {
-            Trampolines.PcCalendar = true;
-            Trampolines.mobileCalendar = false;
-            $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
+        //plansete
+        if ($(window).width() >= 768 && $(window).width() <= 1024) {
+            console.log('Tablet carousel');
+            Trampolines.tabletCarousel = true;
+            $('#carousel-wrap').attr('style', 'width: 80%; margin: 0 auto;');
             $('.trampoline-name').show()
-        } else {
-            Trampolines.mobileCalendar = true;
-            Trampolines.PcCalendar = false;
-            // $('#carousel-row').removeClass('mt-5')
 
+            //telefonas
+        } else if ($(window).width() < 768) {
+            Trampolines.mobileCarousel = true;
+
+            //kompiuteris
+        } else if ($(window).width() > 1024) {
+            Trampolines.PcCarousel = true;
+            $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
+            $('#sendToOrderDiv').addClass('mb-5')
+            $('.trampoline-name').show()
         }
     }
 }
@@ -59,9 +66,12 @@ let Carousels = {
                 Trampolines.addToSelected(this.ChosenTrampoline);
                 $('#selectedTrampolinesSection').show();
                 // Change the carousel column to col-lg-6
-                $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
-                // Disable the CSS rule for carousel wrap
-                $('#carousel-wrap').removeAttr('style');
+                if (Trampolines.PcCarousel){
+                    $('#selectedTrampolinesSection').attr('style', ' margin: 0 auto;');
+                    // $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
+                    // Disable the CSS rule for carousel wrap
+                    // $('#carousel-wrap').removeAttr('style');
+                }
             })
         },
     },
@@ -105,8 +115,9 @@ let Carousels = {
 }
 
 let Trampolines = {
-    PcCalendar: false,
-    mobileCalendar: false,
+    PcCarousel: false,
+    mobileCarousel: false,
+    tabletCarousel: false,
     init: function () {
     },
     chosen: [],
@@ -125,9 +136,11 @@ let Trampolines = {
                         Trampolines.Modals.showTrampoline.element.hide();
                         $('#selectedTrampolinesSection').show();
                         // Change the carousel column to col-lg-6
-                        $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
-                        // Disable the CSS rule for carousel wrap
-                        $('#carousel-wrap').removeAttr('style');
+                        if (Trampolines.PcCarousel) {
+                            $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
+                            // Disable the CSS rule for carousel wrap
+                            $('#carousel-wrap').removeAttr('style');
+                        }
                     });
                 },
                 fetchDescription: function (event) {
@@ -218,7 +231,7 @@ let Trampolines = {
                 event.stopPropagation();
                 if (Trampolines.chosen.length === 0) {
                     $('#selectedTrampolinesSection').hide();
-                    if (Trampolines.PcCalendar) {
+                    if (Trampolines.PcCarousel) {
                         $('#carouselColumn').removeClass('col-lg-6').addClass('col-lg-12');
                         $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
                     }
