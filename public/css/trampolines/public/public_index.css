@@ -35,7 +35,7 @@
         background: url('/images/coverPhoto/pc-top.png')  no-repeat ,
         url('/images/coverPhoto/pc-bottom.png') no-repeat bottom;
         /*background-size: cover;*/
-        /*background-size: 100% 50%, 100% 50%; !* Ensure each image covers half of the element *!*/
+        background-size: 100% 50%, 100% 50%; /* Ensure each image covers half of the element */
     }
 }
 
