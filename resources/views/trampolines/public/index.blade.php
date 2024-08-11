@@ -8,7 +8,7 @@
     <div id="banner-container" style="text-align: center; max-width: 100%">
         <!-- Mobile Banner -->
         <img id="mobileBannerTop" width="100%" class="cover-photo mobile-banner" alt="banner"
-             src="/images/coverPhoto/page top mobile.png">
+             src="/images/coverPhoto/main page top mobile.png">
         <!-- PC Banner -->
         <img id="pcBanner" width="100%" class="cover-photo pc-banner" alt="banner" src="/images/coverPhoto/pc_main.png">
     </div>
@@ -104,7 +104,7 @@
     <div id="banner-bottom" style="text-align: center; max-width: 100%">
         <!-- Mobile Banner -->
         <img id="mobileBannerBottom" width="100%" class="cover-photo mobile-banner" alt="banner"
-             src="/images/coverPhoto/page bottom mobile (3).png">
+             src="/images/coverPhoto/main page bottom mobile.png">
     </div>
 @endsection
 
