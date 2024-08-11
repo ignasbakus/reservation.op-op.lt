@@ -77,7 +77,9 @@ class TrampolinesController extends Controller
         return view('trampolines.public.index', [
             'Trampolines' => $Trampolines,
             'firstTrampolineId' => $Trampolines->isEmpty() ? null : $Trampolines->first()->id,
-            'Unit_of_measure' => config('trampolines.unit_of_measure')
+            'Unit_of_measure' => config('trampolines.unit_of_measure'),
+            'Currency' => config('trampolines.currency'),
+            'rentalDurationType' => config('trampolines.rental_duration_type'),
         ]);
     }
 

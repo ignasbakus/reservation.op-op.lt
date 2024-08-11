@@ -5,9 +5,6 @@
 @endsection
 
 @section('content')
-    {{--    <div id="banner-container" style="text-align: center; max-width: 100%">--}}
-    {{--        <img width="100%" class="cover-photo" alt="banner" src="/images/coverPhoto/pc_main.png">--}}
-    {{--    </div>--}}
     <div id="banner-container" style="text-align: center; max-width: 100%">
         <!-- Mobile Banner -->
         <img id="mobileBannerTop" width="100%" class="cover-photo mobile-banner" alt="banner"
@@ -90,6 +87,7 @@
                         <div class="container containerModal">
                             <h2>Info apie batutą:</h2>
                             <h5 class="sizes"></h5>
+                            <h5 class="price"></h5>
                             {{--                            <h5 class="width"></h5>--}}
                             {{--                            <h5 class="height"></h5>--}}
                             <h6></h6>
@@ -114,5 +112,7 @@
     <script> let firstTrampolineId = {{ Illuminate\Support\Js::from($firstTrampolineId) }};</script>
     <script> let trampolinesFromDb = {{ Illuminate\Support\Js::from($Trampolines) }};</script>
     <script> let unitOfMeasure = {{ Illuminate\Support\Js::from($Unit_of_measure) }};</script>
+    <script> let currency = {{ Illuminate\Support\Js::from($Currency) }};</script>
+    <script> let rentalType = {{ Illuminate\Support\Js::from($rentalDurationType) }};</script>
     <script src="/js/trampolines/public/trampolines_public.js"></script>
 @endsection

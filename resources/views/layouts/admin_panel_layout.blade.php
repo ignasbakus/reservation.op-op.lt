@@ -138,7 +138,6 @@
     </div>
     <footer id="footer" class="navbar navbar-lightblue">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Fixed bottom</a>
         </div>
     </footer>
 </div>

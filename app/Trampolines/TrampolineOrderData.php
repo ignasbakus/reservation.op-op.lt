@@ -34,7 +34,7 @@ class TrampolineOrderData
             $validator = Validator::make($request->all(), [
                 'customerName' => 'required|min:3|regex:/^[^\d]+$/',
                 'customerSurname' => 'required|min:3|regex:/^[^\d]+$/',
-                'customerPhoneNumber' => 'required|regex:/^\+?(\d{1,3})?\s?\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/',
+                'customerPhoneNumber' => 'required|regex:/^\+\d{1,3}\s?\(?\d{2,3}\)?[\s.-]?\d{3}[\s.-]?\d{4}$/',
                 'customerEmail' => 'email',
                 'customerDeliveryCity' => 'required|min:4|regex:/^[^\d]+$/',
                 'customerDeliveryPostCode' => 'required|digits:5|numeric',
@@ -48,7 +48,7 @@ class TrampolineOrderData
                 'customerSurname.min' => 'Pavardė per trumpa',
                 'customerSurname.regex' => 'Pavardė negali turėti skaičių',
                 'customerPhoneNumber.required' => 'Telefonas privalomas',
-                'customerPhoneNumber.regex' => 'Neteisingas telefono numerio formatas',
+                'customerPhoneNumber.regex' => 'Neteisingas telefono numerio formatas. Pavyzdys: +3701234567',
                 'customerEmail.email' => 'Neteisingas el. pašto formatas',
                 'customerDeliveryCity.required' => 'Miestas privalomas',
                 'customerDeliveryCity.min' => 'Miesto pavadinimas per trumpas',

@@ -1,16 +1,18 @@
-
 /*//for pc*/
 @media (min-width: 1025px) {
     .modal-image {
         height: 500px; /* Adjust the height as needed */
     }
+
     .mt-lg-5 {
         margin-top: 3rem; /* This is equivalent to mt-5 in Bootstrap */
     }
+
     .modal-custom {
         max-width: 100%; /* Adjust as needed */
-        width: 700px;   /* Custom width */
+        width: 700px; /* Custom width */
     }
+
     #mobileBannerTop {
         display: none; /* Hide mobile banner for larger screens */
     }
@@ -22,18 +24,18 @@
     #pcBanner {
         display: none; /* Show PC banner */
     }
+
     /*#content-wrap {*/
     /*    !*background-color: #F6F7F7;*!*/
     /*    background-image: url("/images/coverPhoto/pc background.png");*/
     /*    background-size: cover;*/
     /*    background-position: center top;*/
     /*}*/
-
     body {
-        background:
-            url('/images/coverPhoto/pc-top.png') no-repeat,
-            url('/images/coverPhoto/pc-bottom.png') no-repeat bottom;
-
+        background: url('/images/coverPhoto/pc-top.png')  no-repeat ,
+        url('/images/coverPhoto/pc-bottom.png') no-repeat bottom;
+        /*background-size: cover;*/
+        /*background-size: 100% 50%, 100% 50%; !* Ensure each image covers half of the element *!*/
     }
 }
 
@@ -41,9 +43,11 @@
     .modal-image {
         height: 300px; /* Adjust the height as needed */
     }
+
     .mt-lg-5 {
         margin-top: 0;
     }
+
     #mobileBannerTop {
         display: block; /* Hide mobile banner for larger screens */
     }
@@ -62,9 +66,11 @@
     .modal-image {
         height: 500px; /* Adjust the height as needed */
     }
+
     .mt-lg-5 {
         margin-top: 0;
     }
+
     #mobileBannerTop {
         display: block; /* Hide mobile banner for larger screens */
     }
@@ -189,7 +195,7 @@
 
 .carousel-caption h5 {
     font-size: 1rem;
-    background-color: rgba(0, 0, 0, 0.5 ); /* Optional: dark background for readability */
+    background-color: rgba(0, 0, 0, 0.5); /* Optional: dark background for readability */
     color: #ffffff; /* White text color */
     padding: 10px;
     border-radius: 5px;
@@ -254,14 +260,13 @@
 /*}*/
 
 
-
-
 #selectTrampoline {
     background-color: #4E91FD;
     color: white;
     font-weight: 500;
 }
-#sendToOrderButton{
+
+#sendToOrderButton {
     background-color: #F4AA90;
     font-weight: 500;
 }

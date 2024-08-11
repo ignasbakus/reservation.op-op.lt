@@ -94,6 +94,7 @@ let Trampolines = {
                 drawCallback: function (settings) {
                     Trampolines.Table.DrawCount = settings.iDraw
                     Trampolines.Table.initEventsAfterReload()
+                    toolTip.initTable()
                 },
                 rowCallback: function (row, data, index) {
                 },

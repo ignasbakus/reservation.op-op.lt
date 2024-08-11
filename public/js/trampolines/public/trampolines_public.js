@@ -3,7 +3,7 @@ let Actions = {
         ToolTip.init();
         view.findViewDevice();
         Carousels.trampolinesCarousel.init();
-        Carousels.imageModal.init();
+        // Carousels.imageModal.init();
         Carousels.trampolinesCarousel.ChosenTrampoline = firstTrampolineId
         Trampolines.init();
         Trampolines.SendOrder.Events.init();
@@ -73,45 +73,34 @@ let Carousels = {
                     // $('#carousel-wrap').removeAttr('style');
                 }
             })
+            $('#trampolinesCarousel .openModal').on('click', function (event) {
+                ToolTip.destroy();
+                event.preventDefault();
+
+                const trampolineId = $(this).closest('.carousel-item').data('trampolineid');
+                console.log('trampolineId:', trampolineId);
+
+                const trampoline = trampolinesFromDb.find(t => t.id === trampolineId);
+                console.log('trampoline: ', trampoline)
+
+                if (trampoline) {
+                    // Update the modal carousel with images
+                    const $modalInner = $('#carouselExample .carousel-inner');
+                    $modalInner.empty(); // Clear existing items
+
+                    // Populate carousel items
+                    trampoline.image_urls.forEach((url, index) => {
+                        const $item = $('<div class="carousel-item"></div>');
+                        if (index === 0) $item.addClass('active'); // Set the first item as active
+
+                        const $img = $(`<img src="${url}" class="d-block w-100 modal-image" alt="Trampoline Image">`);
+                        $item.append($img);
+                        $modalInner.append($item);
+                    });
+                }
+            })
         },
     },
-    imageModal: {
-        init: function () {
-            this.Events.init();
-        },
-        element: $('#modalCarouselInner'),
-        Events: {
-            init: function () {
-                $('#trampolinesCarousel .openModal').on('click', function (event) {
-                    ToolTip.destroy();
-                    event.preventDefault(); // Prevent the default link behavior
-
-                    const trampolineId = $(this).closest('.carousel-item').data('trampolineid');
-                    console.log('trampolineId:', trampolineId);
-
-                    const trampoline = trampolinesFromDb.find(t => t.id === trampolineId);
-                    console.log('trampoline: ', trampoline)
-
-                    if (trampoline) {
-                        // Update the modal carousel with images
-                        const $modalInner = $('#carouselExample .carousel-inner');
-                        $modalInner.empty(); // Clear existing items
-
-                        // Populate carousel items
-                        trampoline.image_urls.forEach((url, index) => {
-                            const $item = $('<div class="carousel-item"></div>');
-                            if (index === 0) $item.addClass('active'); // Set the first item as active
-
-                            const $img = $(`<img src="${url}" class="d-block w-100 modal-image" alt="Trampoline Image">`);
-                            $item.append($img);
-                            $modalInner.append($item);
-                        });
-                    }
-                })
-
-            }
-        }
-    }
 }
 
 let Trampolines = {
@@ -135,11 +124,11 @@ let Trampolines = {
                         Trampolines.addToSelected(Carousels.trampolinesCarousel.ChosenTrampoline);
                         Trampolines.Modals.showTrampoline.element.hide();
                         $('#selectedTrampolinesSection').show();
-                        // Change the carousel column to col-lg-6
-                        if (Trampolines.PcCarousel) {
-                            $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
+                        if (Trampolines.PcCarousel){
+                            $('#selectedTrampolinesSection').attr('style', ' margin: 0 auto;');
+                            // $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
                             // Disable the CSS rule for carousel wrap
-                            $('#carousel-wrap').removeAttr('style');
+                            // $('#carousel-wrap').removeAttr('style');
                         }
                     });
                 },
@@ -150,19 +139,15 @@ let Trampolines = {
                     console.log('trampoline:', trampoline)
                     let modalDescription = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description h6');
                     let modalSizes = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .sizes');
-                    // let modalWidth = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .width');
-                    // let modalHeight = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .height');
-
+                    let modalPrice = Trampolines.Modals.showTrampoline.element._element.querySelector('.modal-description .price');
                     console.log('trampoline description:', trampoline.description)
                     modalDescription.textContent = trampoline.description;
                     modalSizes.innerHTML = 'Ilgis: <span style="font-weight: bold;">' + trampoline.parameter.length + unitOfMeasure +
                         '</span>, Plotis: <span style="font-weight: bold;">' + trampoline.parameter.width + unitOfMeasure +
                         '</span>, Aukštis: <span style="font-weight: bold;">' + trampoline.parameter.height + unitOfMeasure + '</span>';
-
-                    // modalWidth.textContent = 'Plotis: ' + trampoline.parameter.width + unitOfMeasure;
-                    // modalHeight.textContent = 'Aukštis: ' + trampoline.parameter.height + unitOfMeasure;
-                    console.log('modalDescription:', modalDescription)
-                }
+                    modalPrice.innerHTML = 'Kaina: <span style="font-weight: bold;">' + trampoline.parameter.price +
+                        currency + '/' + rentalType + '</span>';
+                },
             }
         }
     },

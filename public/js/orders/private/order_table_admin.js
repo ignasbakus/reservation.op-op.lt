@@ -354,6 +354,7 @@ let Orders = {
                 drawCallback: function (settings) {
                     Orders.Table.DrawCount = settings.iDraw
                     Orders.Table.initEventsAfterReload()
+                    toolTip.initTable();
                 },
                 rowCallback: function (row, data, index) {
                 },
@@ -373,14 +374,15 @@ let Orders = {
                     {title: "Bendra<br>suma", orderable: false},
                     {title: "Avanso<br>suma", orderable: false},
                     {title: "Užsakymo<br>būsena", orderable: false, width: "6%"},
-                    {title: "Valdymas", orderable: false, width: "7%"}
+                    {title: "Valdymas", orderable: false, width: "10%"}
                 ],
                 bAutoWidth: false,
                 fixedColumns: true,
                 info: false,
                 initComplete: function () {
+                    console.log('tooltipi initialized')
                     toolTip.initTable();
-                }
+                },
             })
             this.Events.init()
         },
@@ -981,6 +983,10 @@ let toolTip = {
         });
         tippy('#orderDelete', {
             content: 'Ištrinti užsakymą',
+            placement: 'top',
+        });
+        tippy('#refundOrder', {
+            content: 'Funkcionalumas kuriamas (grąžinimas)',
             placement: 'top',
         });
     }
