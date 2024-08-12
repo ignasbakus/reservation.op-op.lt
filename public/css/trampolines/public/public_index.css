@@ -39,7 +39,7 @@
     }
 }
 
- for smaller pc screens
+ /*for smaller pc screens*/
 @media (min-width: 1025px) and (max-width: 1421px) {
 
     body {
@@ -51,6 +51,18 @@
 
     .modal-image {
         height: 350px; /* Adjust the height as needed */
+    }
+
+    #mobileBannerTop {
+        display: none; /* Hide mobile banner for larger screens */
+    }
+
+    #mobileBannerBottom {
+        display: none; /* Hide mobile banner for larger screens */
+    }
+
+    #pcBanner {
+        display: none; /* Show PC banner */
     }
 
 }

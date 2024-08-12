@@ -23,6 +23,7 @@ let view = {
         } else if ($(window).width() > 1024 && $(window).width() <= 1421) {
             Trampolines.PcCarousel = true;
             $('#carousel-wrap').attr('style', 'width: 35%; margin: 0 auto;');
+            $('.trampoline-name').show()
 
             //telefonas
         } else if ($(window).width() < 768) {
