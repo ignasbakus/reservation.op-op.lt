@@ -48,6 +48,18 @@ let ToolTip = {
                 placement: 'top',
             });
         }
+
+        if (window.innerWidth <= 768) {
+            console.log('Mobile tooltip');
+            this.tooltipInstance = tippy('.carousel-control-prev', {
+                content: 'Paspauskite ant batuto, kad pamatytumėte daugiau nuotraukų ir informacijos',
+                placement: 'top',
+            })
+            this.tooltipInstance = tippy('.carousel-control-next', {
+                content: 'Paspauskite ant batuto, kad pamatytumėte daugiau nuotraukų ir informacijos',
+                placement: 'top',
+            })
+        }
     },
     destroy: function () {
         if (this.tooltipInstance) {
