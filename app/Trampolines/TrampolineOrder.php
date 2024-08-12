@@ -428,10 +428,26 @@ class TrampolineOrder implements Order
         return round($advancePayment, -1);
     }
 
-    public function deleteAll(): static
+    public function deleteInactive(): static
     {
         try {
-            $orders = \App\Models\Order::all();
+            $statuses = ['Atšauktas, nes neapmokėtas', 'Atšauktas kliento'];
+            $now = Carbon::now();
+
+            $orders = \App\Models\Order::where(function ($query) use ($now) {
+                $query->whereHas('trampolines', function ($query) use ($now) {
+                    $query->where('rental_end', '<', $now);
+                });
+            })->orWhereIn('order_status', $statuses)
+                ->get();
+
+//            dd($orders);
+
+            if ($orders->isEmpty()) {
+                $this->status = true;
+                $this->Messages[] = ('Pasibaigusių/atšauktų užsakymų nerasta.');
+                return $this;
+            }
 
             foreach ($orders as $order) {
                 $order->trampolines()->delete();
@@ -441,7 +457,7 @@ class TrampolineOrder implements Order
             }
 
             $this->status = true;
-            $this->Messages[] = 'Visi užsakymai ištrinti !';
+            $this->Messages[] = 'Neaktyvūs užsakymai ištrinti !';
         } catch (\Exception $exception) {
             $this->Errors[] = 'Trinant užsakymą įvyko klaida : ' . $exception->getMessage();
             $this->status = false;

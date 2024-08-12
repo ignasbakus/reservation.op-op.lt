@@ -414,7 +414,7 @@ let Orders = {
                     $.ajax({
                         headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
                         method: "DELETE",
-                        url: "/orders/admin/order/deleteAllOrders",
+                        url: "/orders/admin/order/deleteInactiveOrders",
                     }).done((response) => {
                         $('#overlay').hide();
                         if (response.status) {
@@ -967,6 +967,11 @@ let toolTip = {
             content: 'Atšaukti "nuo - iki" datų filtravimą',
             placement: 'top',
         });
+        tippy('#deleteUnpaidOrders', {
+            content: 'Ištrinti atšauktus/pasibaigusius užsakymus',
+            placement: 'top',
+        });
+
     },
     initTable: function () {
         tippy('#checkOrderStatus', {

@@ -604,9 +604,9 @@ class OrderController extends Controller
             ], 400);
         }
     }
-    public function deleteAllOrders(): JsonResponse
+    public function deleteInactiveOrders(): JsonResponse
     {
-        $unpaidOrders = (new TrampolineOrder())->deleteAll();
+        $unpaidOrders = (new TrampolineOrder())->deleteInactive();
         return response()->json($unpaidOrders);
 //        return response()->json([
 //            'status' => true,

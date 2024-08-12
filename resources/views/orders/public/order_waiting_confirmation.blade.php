@@ -7,10 +7,12 @@
 
 @section('content')
     <div id="successPayment"  class="text-center" style="display:block;">
-        <div class="spinner-border text-primary" role="status"></div>
-        <h1 class="mt-3">Laukiame Jūsų Mokėjimo</h1>
-        <p class="mt-3">Šiame lange laukti nereikia. Jei užsakymą apmokėjote, patvirtinimą su papildoma informacija
-            atsiųsime į el. paštą.</p>
+        <div class="mt-5">
+            <div class="spinner-border text-primary" role="status"></div>
+            <h1 class="mt-3">Laukiame Jūsų Mokėjimo</h1>
+            <p class="mt-3">Šiame lange laukti nereikia. Jei užsakymą apmokėjote, patvirtinimą su papildoma informacija
+                atsiųsime į el. paštą.</p>
+        </div>
     </div>
     <div id="failedPayment" class="text-center" style="display: none;">
 {{--        <div class="spinner-border text-primary" role="status"></div>--}}
