@@ -37,6 +37,11 @@
         /*background-size: cover;*/
         background-size: 100%, 100%; /* Ensure each image covers half of the element */
     }
+
+    #carousel-wrap {
+        width: 50%;
+        margin: 0 auto;
+    }
 }
 
  /*for smaller pc screens*/
@@ -65,7 +70,10 @@
         display: none; /* Show PC banner */
     }
 
-
+    #carousel-wrap {
+        width: 40%;
+        margin: 0 auto;
+    }
 
 }
 
@@ -114,6 +122,12 @@
     #pcBanner {
         display: none; /* Show PC banner */
     }
+
+    #carousel-wrap {
+        width: 80%;
+        margin: 0 auto;
+    }
+
 }
 
 /* Ensure consistent styling for list items */

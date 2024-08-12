@@ -17,12 +17,12 @@ let view = {
         if ($(window).width() >= 768 && $(window).width() <= 1024) {
             console.log('Tablet carousel');
             Trampolines.tabletCarousel = true;
-            $('#carousel-wrap').attr('style', 'width: 80%; margin: 0 auto;');
+            // $('#carousel-wrap').attr('style', 'width: 80%; margin: 0 auto;');
 
 
         } else if ($(window).width() > 1024 && $(window).width() <= 1421) {
             Trampolines.PcCarousel = true;
-            $('#carousel-wrap').attr('style', 'width: 40%; margin: 0 auto;');
+            // $('#carousel-wrap').attr('style', 'width: 40%; margin: 0 auto;');
             // $('.trampoline-name').show()
 
             //telefonas
@@ -32,7 +32,7 @@ let view = {
             //kompiuteris
         } else if ($(window).width() > 1421) {
             Trampolines.PcCarousel = true;
-            $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
+            // $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
             $('#sendToOrderDiv').addClass('mb-5')
             $('.trampoline-name').show()
         }
