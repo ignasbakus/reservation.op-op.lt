@@ -35,7 +35,7 @@
         background: url('/images/coverPhoto/Lauryna test pc-top.png1.2.png')  no-repeat top,
         url('/images/coverPhoto/Lauryna test pc-bottom.png.1.2.png') no-repeat bottom;
         /*background-size: cover;*/
-        background-size: 100% 50%, 100% 50%; /* Ensure each image covers half of the element */
+        background-size: 100%, 100%; /* Ensure each image covers half of the element */
     }
 }
 

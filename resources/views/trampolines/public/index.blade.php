@@ -8,9 +8,7 @@
     <div id="banner-container" style="text-align: center; max-width: 100%">
         <!-- Mobile Banner -->
         <img id="mobileBannerTop" width="100%" class="cover-photo mobile-banner" alt="banner"
-             src="/images/coverPhoto/main page top mobile.png">
-        <!-- PC Banner -->
-        <img id="pcBanner" width="100%" class="cover-photo pc-banner" alt="banner" src="/images/coverPhoto/pc_main.png">
+             src="/images/coverPhoto/main page top mobile (1).png">
     </div>
     <div class="container custom-container">
         <div id="carousel-row" class="row mt-5 mb-5">

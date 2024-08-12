@@ -1,6 +1,7 @@
 let Actions = {
     InitActions: function () {
         ToolTip.init();
+        // view.init()
         view.findViewDevice();
         Carousels.trampolinesCarousel.init();
         // Carousels.imageModal.init();
@@ -30,7 +31,7 @@ let view = {
             $('#sendToOrderDiv').addClass('mb-5')
             $('.trampoline-name').show()
         }
-    }
+    },
 }
 
 let ToolTip = {
