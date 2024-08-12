@@ -65,19 +65,19 @@
                 <tr>
                     <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Avansas:</td>
                     <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
-                        {{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                        {{ $order->advance_sum }}{{ config('trampolines.currency') }}
                     </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Bendra suma:</td>
                     <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
-                        {{ number_format($order->total_sum, 2) }}{{ config('trampolines.currency') }}
+                        {{ $order->total_sum }}{{ config('trampolines.currency') }}
                     </td>
                 </tr>
                 <tr>
                     <td style="font-weight: 500; padding: 5px 0; border-bottom: 1px solid white;">Likusi mokėti suma:</td>
                     <td style="text-align: right; padding: 5px 0; border-bottom: 1px solid white;">
-                        {{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}
+                        {{ $order->total_sum - $order->advance_sum }}{{ config('trampolines.currency') }}
                     </td>
                 </tr>
             </table>

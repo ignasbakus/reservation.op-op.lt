@@ -1,3 +1,6 @@
+
+
+
 <!DOCTYPE html>
 <html lang="lt">
 <head>
@@ -64,15 +67,15 @@
                 </tr>
                 <tr style="border-bottom: 1px solid white;">
                     <td style="font-weight: 500;">Avansas:</td>
-                    <td style="text-align: right;">{{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}</td>
+                    <td style="text-align: right;">{{ $order->advance_sum }}{{ config('trampolines.currency') }}</td>
                 </tr>
                 <tr style="border-bottom: 1px solid white;">
                     <td style="font-weight: 500;">Bendra suma:<span style="color: red"></span></td>
-                    <td style="text-align: right;">{{ number_format($order->total_sum, 2) }}{{ config('trampolines.currency') }} </td>
+                    <td style="text-align: right;">{{ $order->total_sum }}{{ config('trampolines.currency') }} </td>
                 </tr>
                 <tr style="border-bottom: 1px solid white;">
                     <td style="font-weight: 500;">Likusi mokėti suma:<span style="color: red"></span></td>
-                    <td style="text-align: right;">{{ number_format($order->total_sum, 2) - number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }} </td>
+                    <td style="text-align: right;">{{ $order->total_sum - $order->advance_sum }}{{ config('trampolines.currency') }} </td>
                 </tr>
             </table>
         </div>
