@@ -84,7 +84,7 @@
     <!-- Standard Navbar for Larger Screens -->
     <nav class="navbar navbar-expand-lg navbar-lightblue d-none d-lg-block" id="pcNavbar">
         <div class="container-fluid">
-            <a href="{{ route('trampolinesPublic') }}" ><img height="53px" alt="Logo" src="/images/companyLogo/logo.png"></a>
+            <a href="{{ route('trampolinesPublic') }}" ><img id="logoNavbar" height="53px" alt="Logo" src="/images/companyLogo/logo.png"></a>
 {{--            <a class="navbar-brand" href="{{ route('trampolinesPublic') }}">op-op</a>--}}
             <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <ul class="navbar-nav ms-auto mb-2 mb-lg-0">

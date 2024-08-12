@@ -75,6 +75,13 @@
         margin: 0 auto;
     }
 
+    #logoNavbar {
+        height: 30px;
+    }
+
+    #footer {
+        height: 3rem;
+    }
 }
 
 /* for mobile */
