@@ -1,9 +1,9 @@
 #thankYouDiv {
-    background-color: #f8f9fa;
-    border: 2px solid #007bff;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa; /* Light gray background */
+    border: 2px solid #007bff; /* Blue border */
+    border-radius: 10px; /* Rounded corners */
+    padding: 20px; /* Inner padding */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
 }
 
 .container {
@@ -13,30 +13,31 @@
 }
 
 .thankYouDiv {
-    /*background-color: #fff;*/
-    border-color: #fff;
+    border-color: #fff; /* White border color */
 }
 
 .theme-color {
-    color: #004cb9;
+    color: #004cb9; /* Custom theme color */
 }
 
 hr.new1 {
-    border-top: 2px dashed #fff;
-    margin: 0.4rem 0;
+    border-top: 2px dashed #fff; /* Dashed white border */
+    margin: 0.4rem 0; /* Margin around the hr */
 }
 
 .confirmation-container {
+    display: none; /* Hidden by default, visible when needed */
     background-color: #ffffff; /* White background */
     border-radius: 10px; /* Rounded corners */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
     padding: 20px; /* Padding */
     margin: 0 auto; /* Center the container horizontally */
+    position: relative; /* Positioning context for the close button */
 }
 
 .confirmation-title {
     color: #007bff; /* Blue title color */
-    font-size: 20px; /* Larger font size */
+    font-size: 24px; /* Larger font size for better visibility */
     margin-bottom: 15px; /* Spacing below the title */
 }
 
@@ -67,18 +68,25 @@ hr.new1 {
     background-color: #0056b3; /* Darker blue on hover */
 }
 
+.confirmationClose {
+    background-color: #dc3545; /* Red button background for cancel */
+    color: #ffffff; /* White button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded button corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Cursor style */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin-right: 10px; /* Space between buttons */
+}
+
+.confirmationClose:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
 .invalid-feedback {
     color: #ff0000; /* Red color for invalid feedback */
     font-size: 14px; /* Font size */
-}
-
-.confirmation-container {
-    position: relative; /* Positioning context for absolute positioning */
-    background-color: #ffffff; /* White background */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
-    padding: 20px; /* Padding */
-    margin: 0 auto; /* Center the container horizontally */
 }
 
 .close-button {
@@ -105,29 +113,31 @@ hr.new1 {
     position: fixed;
     top: 20px;
     right: -350px; /* Start hidden off the right side */
-    width: 300px;
-    height: 100px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
+    width: 300px; /* Fixed width for alert */
+    height: 100px; /* Fixed height for alert */
+    display: flex; /* Flexbox for centering */
+    align-items: center; /* Center align items */
+    justify-content: center; /* Center justify content */
+    text-align: center; /* Center text */
     z-index: 1060; /* Higher than Bootstrap modal's z-index */
-    border-radius: 10px;
+    border-radius: 10px; /* Rounded corners */
     transition: right 0.5s ease; /* Smooth slide-in effect */
 }
+
 .custom-alert.show {
     right: 20px; /* Slide in to the right position */
 }
+
 .custom-alert .btn-close {
-    position: absolute;
-    top: 10px;
-    right: 10px;
+    position: absolute; /* Close button position */
+    top: 10px; /* Distance from top */
+    right: 10px; /* Distance from right */
 }
 
 .btn-thankYou {
     background-color: #4E91FD; /* Similar to the purple button */
-    color: #ffffff;
-    border: none;
+    color: #ffffff; /* White text color */
+    border: none; /* No border */
     border-radius: 30px; /* Rounded corners */
     padding: 5px 10px; /* Padding */
     font-size: 16px; /* Font size */
@@ -159,107 +169,162 @@ hr.new1 {
 }
 
 .modal-header.bg-primary {
-    background-color: #007bff;
-    color: white;
+    background-color: #007bff; /* Blue background for modal header */
+    color: white; /* White text color */
 }
 
 .modal-header .btn-close {
-    background-color: #ffffff;
+    background-color: #ffffff; /* White close button */
 }
 
 .order-summary {
-    margin-top: 1rem;
+    margin-top: 1rem; /* Space above order summary */
 }
 
 .order-summary .d-flex {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.5rem; /* Space between flex items */
 }
 
 .order-summary .trampoline-name {
-    text-transform: capitalize;
+    text-transform: capitalize; /* Capitalize text */
 }
 
 .modal-footer {
-    display: flex;
-    justify-content: space-between;
-    padding: 1rem;
+    display: flex; /* Flex layout for footer */
+    justify-content: space-between; /* Space between items */
+    padding: 1rem; /* Padding */
 }
 
 .modal-footer .btn-primary {
-    background-color: #007bff;
-    border-color: #007bff;
+    background-color: #007bff; /* Blue primary button */
+    border-color: #007bff; /* Border color */
 }
 
 .modal-footer .btn-secondary {
-    background-color: #6c757d;
-    border-color: #6c757d;
+    background-color: #6c757d; /* Grey secondary button */
+    border-color: #6c757d; /* Border color */
 }
 
 .order-summary h5 {
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #ddd; /* Bottom border */
+    padding-bottom: 0.5rem; /* Padding below */
 }
 
 .order-summary hr {
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #ddd; /* Top border */
 }
 
 .order-summary .d-flex.py-2 {
-    padding: 0.5rem 0;
+    padding: 0.5rem 0; /* Padding */
 }
 
 .text-center i {
-    color: #ff6f61;
+    color: #ff6f61; /* Icon color */
 }
 
 .reservation-dates-container {
-    background-color: #f8f9fa;
-    padding: 10px;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f8f9fa; /* Light gray background */
+    padding: 10px; /* Padding */
+    border-radius: 5px; /* Rounded corners */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Shadow */
 }
 
 .reservation-dates-title {
-    font-size: 1.25rem;
-    color: #333;
-    margin-bottom: 5px;
+    font-size: 1.25rem; /* Font size */
+    color: #333; /* Text color */
+    margin-bottom: 5px; /* Margin below */
 }
 
 .reservation-dates {
-    font-size: 1.1rem;
-    color: #555;
+    font-size: 1.1rem; /* Font size */
+    color: #555; /* Text color */
 }
 
 #viewOrderButton:disabled {
     background-color: #cccccc; /* Light gray background */
-    cursor: not-allowed; /* Change cursor to indicate disabled state */
+    cursor: not-allowed; /* Not-allowed cursor */
     opacity: 0.6; /* Slightly transparent */
 }
 
 #calendar, #changeOrderDatesMobile, #changeOrderDeliveryTimePc, #dateCalendarForMobile {
-    display: none;
+    display: none; /* Hide calendars */
 }
 
 /* Show PC calendar for larger screens */
 @media (min-width: 768px) {
     #calendar {
-        display: block;
+        display: block; /* Show PC calendar */
     }
     #changeOrderDeliveryTimePc {
-        display: block;
+        display: block; /* Show delivery time for PC */
     }
 }
 
 /* Show mobile calendar for smaller screens */
 @media (max-width: 767px) {
     #changeOrderDatesMobile {
-        display: block;
+        display: block; /* Show mobile calendar */
     }
     #dateCalendarForMobile {
-        display: block;
+        display: block; /* Show mobile date calendar */
     }
 }
 
-.flatpickr-calendar.open{
-    z-index: 99998;
+/* Styles for confirmationContainer */
+.confirmation-container {
+    display: none; /* Hidden by default */
+    background-color: #ffffff; /* White background */
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Box shadow for depth */
+    padding: 20px; /* Padding */
+    margin: 0 auto; /* Center the container horizontally */
+    position: relative; /* Positioning context for absolute positioning */
+}
+
+.confirmation-title {
+    color: #007bff; /* Blue title color */
+    font-size: 24px; /* Larger font size for better visibility */
+    margin-bottom: 15px; /* Spacing below the title */
+}
+
+.checkbox-container {
+    display: flex; /* Display children in a row */
+    align-items: center; /* Center align children vertically */
+    justify-content: flex-end; /* Align children to the right */
+    margin-top: 20px; /* Spacing above the container */
+}
+
+.confirmationClose {
+    background-color: #dc3545; /* Red button background for cancel */
+    color: #ffffff; /* White button text color */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded button corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Cursor style */
+    transition: background-color 0.3s ease; /* Smooth transition */
+    margin-right: 10px; /* Space between buttons */
+}
+
+.confirmationClose:hover {
+    background-color: #c82333; /* Darker red on hover */
+}
+
+.confirmChanges {
+    background-color: #4E91FD; /* Blue button background color */
+    color: #ffffff; /* White button text color */
+    border: none; /* No button border */
+    border-radius: 5px; /* Rounded button corners */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Cursor style */
+    transition: background-color 0.3s ease; /* Smooth transition */
+}
+
+.confirmChanges:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+.flatpickr-calendar.open {
+    z-index: 99998; /* Ensure calendar is above other content */
 }
