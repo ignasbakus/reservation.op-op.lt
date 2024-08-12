@@ -1,6 +1,6 @@
-/*//for pc*/
-@media (min-width: 1025px) {
-    .modal-image {
+/*//for bigger pc screens*/
+@media (min-width: 1422px) {
+        .modal-image {
         height: 500px; /* Adjust the height as needed */
     }
 
@@ -39,6 +39,23 @@
     }
 }
 
+ for smaller pc screens
+@media (min-width: 1025px) and (max-width: 1421px) {
+
+    body {
+        background: url('/images/coverPhoto/pc_top_smaller_screen.png')  no-repeat top,
+        url('/images/coverPhoto/pc_bottom_smaller_screen.png') no-repeat bottom;
+        /*background-size: cover;*/
+        background-size: 100%, 100%; /* Ensure each image covers half of the element */
+    }
+
+    .modal-image {
+        height: 350px; /* Adjust the height as needed */
+    }
+
+}
+
+/* for mobile */
 @media (max-width: 767px) {
     .modal-image {
         height: 300px; /* Adjust the height as needed */
@@ -61,6 +78,7 @@
     }
 }
 
+/* For tablets */
 @media (min-width: 768px) and (max-width: 1024px) {
     /* Your CSS rules here */
     .modal-image {

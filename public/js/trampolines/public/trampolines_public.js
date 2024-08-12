@@ -18,14 +18,18 @@ let view = {
             console.log('Tablet carousel');
             Trampolines.tabletCarousel = true;
             $('#carousel-wrap').attr('style', 'width: 80%; margin: 0 auto;');
-            $('.trampoline-name').show()
+
+
+        } else if ($(window).width() > 1024 && $(window).width() <= 1421) {
+            Trampolines.PcCarousel = true;
+            $('#carousel-wrap').attr('style', 'width: 35%; margin: 0 auto;');
 
             //telefonas
         } else if ($(window).width() < 768) {
             Trampolines.mobileCarousel = true;
 
             //kompiuteris
-        } else if ($(window).width() > 1024) {
+        } else if ($(window).width() > 1421) {
             Trampolines.PcCarousel = true;
             $('#carousel-wrap').attr('style', 'width: 50%; margin: 0 auto;');
             $('#sendToOrderDiv').addClass('mb-5')
@@ -67,7 +71,7 @@ let Carousels = {
                 Trampolines.addToSelected(this.ChosenTrampoline);
                 $('#selectedTrampolinesSection').show();
                 // Change the carousel column to col-lg-6
-                if (Trampolines.PcCarousel){
+                if (Trampolines.PcCarousel) {
                     $('#selectedTrampolinesSection').attr('style', ' margin: 0 auto;');
                     // $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
                     // Disable the CSS rule for carousel wrap
@@ -125,7 +129,7 @@ let Trampolines = {
                         Trampolines.addToSelected(Carousels.trampolinesCarousel.ChosenTrampoline);
                         Trampolines.Modals.showTrampoline.element.hide();
                         $('#selectedTrampolinesSection').show();
-                        if (Trampolines.PcCarousel){
+                        if (Trampolines.PcCarousel) {
                             $('#selectedTrampolinesSection').attr('style', ' margin: 0 auto;');
                             // $('#carouselColumn').removeClass('col-lg-12').addClass('col-lg-6');
                             // Disable the CSS rule for carousel wrap
