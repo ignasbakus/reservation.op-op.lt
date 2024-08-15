@@ -15,7 +15,7 @@
     <div style="padding: 20px; text-align: center;">
         <h1 style="font-size: 24px; margin: 0 0 10px; font-weight: 500;">Užsakymas atšauktas</h1>
         <p style="font-size: 16px; margin: 0 0 10px;">Užsakymas Nr. <strong>{{$order->order_number}}</strong> buvo atšauktas.</p>
-        <p style="font-size: 16px; margin: 0 0 10px;">Sumokėta avanso suma: <strong>{{ number_format($order->advance_sum, 2) }}{{ config('trampolines.currency') }}</strong></p>
+        <p style="font-size: 16px; margin: 0 0 10px;">Sumokėta avanso suma: <strong>{{ $order->advance_sum }}{{ config('trampolines.currency') }}</strong></p>
     </div>
     <table role="presentation" style="width: 100%; max-width: 650px; margin: 0 auto; background-color: #B6D2F7; padding: 20px; border-collapse: collapse; min-height: 70px">
         <tbody>
