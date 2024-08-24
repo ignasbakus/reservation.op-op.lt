@@ -86,6 +86,6 @@ Route::controller(TrampolinesController::class)->group(function () {
     });
 });
 
-Auth::routes();
+Auth::routes(['register' => false]);
 
 Route::get('/home', [TrampolinesController::class, 'publicIndex']);
