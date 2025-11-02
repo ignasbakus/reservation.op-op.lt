@@ -3,6 +3,8 @@
 A simple reservation system built for a **bouncy castle rental business**.  
 This project was created as a **learning project** to explore and practice Laravel development, database relationships, and basic CRUD operations.
 
+**Development period:** March 2024 – July 2024
+
 ## 🚀 Features
 
 - Manage reservations and customers  
