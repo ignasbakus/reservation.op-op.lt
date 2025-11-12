@@ -619,7 +619,7 @@ class OrderController extends Controller
         if (!config('montonio.require_payment')) {
             $order = Order::findOrFail($orderId);
             // Mark order as paid to grant access to the view page
-            $order->update(['order_status' => 'Apmok�-tas']);
+            $order->update(['order_status' => 'Apmokėtas']);
             return url('/orders/public/order/view/' . $order->order_number);
         }
 
